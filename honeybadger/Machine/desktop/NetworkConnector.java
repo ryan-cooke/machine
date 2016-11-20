@@ -1,6 +1,6 @@
 package Machine.desktop;
 
-import Machine.Message;
+import Machine.Common.Message;
 
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -38,11 +38,11 @@ public class NetworkConnector {
             LastMessage = new Message(msg);
             try {
                 outStream.writeObject(LastMessage);
-                System.out.println("Machine.Message sent");
+                System.out.println("Machine.Common.Message sent");
             }
             catch (Exception e){
                 e.printStackTrace();
-                System.out.println("Machine.Message Not Sent: "+LastMessage.getPayload());
+                System.out.println("Machine.Common.Message Not Sent: "+LastMessage.getPayload());
             }
         }
     }

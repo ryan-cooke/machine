@@ -1,4 +1,4 @@
-package Machine;
+package Machine.Common;
 
 import java.io.Serializable;
 
