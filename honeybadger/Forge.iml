@@ -25,5 +25,27 @@
         <SOURCES />
       </library>
     </orderEntry>
+    <orderEntry type="module-library" exported="">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/deps/pi4j-core.jar!/" />
+          <root url="jar://$MODULE_DIR$/deps/pi4j-device.jar!/" />
+          <root url="jar://$MODULE_DIR$/deps/pi4j-gpio-extension.jar!/" />
+          <root url="jar://$MODULE_DIR$/deps/pi4j-service.jar!/" />
+        </CLASSES>
+        <JAVADOC>
+          <root url="jar://$MODULE_DIR$/deps/pi4j-core-javadoc.jar!/" />
+          <root url="jar://$MODULE_DIR$/deps/pi4j-device-javadoc.jar!/" />
+          <root url="jar://$MODULE_DIR$/deps/pi4j-gpio-extension-javadoc.jar!/" />
+          <root url="jar://$MODULE_DIR$/deps/pi4j-service-javadoc.jar!/" />
+        </JAVADOC>
+        <SOURCES>
+          <root url="jar://$MODULE_DIR$/deps/pi4j-core-sources.jar!/" />
+          <root url="jar://$MODULE_DIR$/deps/pi4j-device-sources.jar!/" />
+          <root url="jar://$MODULE_DIR$/deps/pi4j-gpio-extension-sources.jar!/" />
+          <root url="jar://$MODULE_DIR$/deps/pi4j-service-sources.jar!/" />
+        </SOURCES>
+      </library>
+    </orderEntry>
   </component>
 </module>
