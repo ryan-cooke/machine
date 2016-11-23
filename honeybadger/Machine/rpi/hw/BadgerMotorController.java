@@ -1,4 +1,4 @@
-package Machine.rpi;
+package Machine.rpi.hw;
 
 import com.pi4j.gpio.extension.pca.PCA9685GpioProvider;
 import com.pi4j.io.gpio.*;
@@ -8,7 +8,7 @@ import com.pi4j.io.i2c.I2CFactory;
 /***
  * Simple class to manage the I2C communication with the PCA9685.
  */
-public class BadgerMotorController implements PCA, RPI{
+public class BadgerMotorController{
 
     /**
      * Array of each of the provisioned PCA9685 PWM Outputs
@@ -73,18 +73,18 @@ public class BadgerMotorController implements PCA, RPI{
         GpioController PCAGpio = GpioFactory.getInstance();
         GpioPinPwmOutput[] myOutputs;
         myOutputs = new GpioPinPwmOutput[]{
-                PCAGpio.provisionPwmOutputPin(PCAprovider, PCA.DRIVE_FRONT_LEFT, "Front Left - FL-H"),
-                PCAGpio.provisionPwmOutputPin(PCAprovider, PCA.DRIVE_FRONT_RIGHT, "Front Right - FR-H"),
-                PCAGpio.provisionPwmOutputPin(PCAprovider, PCA.DRIVE_BACK_LEFT, "Back Left - BL-H"),
-                PCAGpio.provisionPwmOutputPin(PCAprovider, PCA.DRIVE_BACK_RIGHT, "Back Right - BR-H"),
-                PCAGpio.provisionPwmOutputPin(PCAprovider, PCA.CONVEYOR_A, "Conveyor A - CV1"),
-                PCAGpio.provisionPwmOutputPin(PCAprovider, PCA.CONVEYOR_B, "Conveyor B - CV2"),
-                PCAGpio.provisionPwmOutputPin(PCAprovider, PCA.VACUUM_ROLLER, "Vacuum Roller - VAC"),
-                PCAGpio.provisionPwmOutputPin(PCAprovider, PCA.FLYWHEEL_A, "Flywheel A - BS1"),
-                PCAGpio.provisionPwmOutputPin(PCAprovider, PCA.FLYWHEEL_B, "Flywheel B - BS2"),
-                PCAGpio.provisionPwmOutputPin(PCAprovider, PCA.CLIMBING_ARM, "Climbing Arm - RND1"),
-                PCAGpio.provisionPwmOutputPin(PCAprovider, PCA.CLIMBING_WRIST, "Climbing Wrist - RND2"),
-                PCAGpio.provisionPwmOutputPin(PCAprovider, PCA.SHOOTING_AIM_ADJUST, "Shooting aim adjust - RND3")
+                PCAGpio.provisionPwmOutputPin(PCAprovider, PCAChip.DRIVE_FRONT_LEFT, "Front Left - FL-H"),
+                PCAGpio.provisionPwmOutputPin(PCAprovider, PCAChip.DRIVE_FRONT_RIGHT, "Front Right - FR-H"),
+                PCAGpio.provisionPwmOutputPin(PCAprovider, PCAChip.DRIVE_BACK_LEFT, "Back Left - BL-H"),
+                PCAGpio.provisionPwmOutputPin(PCAprovider, PCAChip.DRIVE_BACK_RIGHT, "Back Right - BR-H"),
+                PCAGpio.provisionPwmOutputPin(PCAprovider, PCAChip.CONVEYOR_A, "Conveyor A - CV1"),
+                PCAGpio.provisionPwmOutputPin(PCAprovider, PCAChip.CONVEYOR_B, "Conveyor B - CV2"),
+                PCAGpio.provisionPwmOutputPin(PCAprovider, PCAChip.VACUUM_ROLLER, "Vacuum Roller - VAC"),
+                PCAGpio.provisionPwmOutputPin(PCAprovider, PCAChip.FLYWHEEL_A, "Flywheel A - BS1"),
+                PCAGpio.provisionPwmOutputPin(PCAprovider, PCAChip.FLYWHEEL_B, "Flywheel B - BS2"),
+                PCAGpio.provisionPwmOutputPin(PCAprovider, PCAChip.CLIMBING_ARM, "Climbing Arm - RND1"),
+                PCAGpio.provisionPwmOutputPin(PCAprovider, PCAChip.CLIMBING_WRIST, "Climbing Wrist - RND2"),
+                PCAGpio.provisionPwmOutputPin(PCAprovider, PCAChip.SHOOTING_AIM_ADJUST, "Shooting aim adjust - RND3")
         };
         this.PWMOutputs = myOutputs;
     }
