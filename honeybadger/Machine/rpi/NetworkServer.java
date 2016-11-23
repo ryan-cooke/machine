@@ -1,6 +1,6 @@
 package Machine.rpi;
 
-import Machine.Message;
+import Machine.Common.Message;
 
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
