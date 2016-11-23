@@ -7,6 +7,10 @@ public class Badger implements PCA, RPI {
 
     private BadgerMotorController motorController;
 
+    /**
+     * Makes a new Badger, guaranteed not to give a shit
+     * @throws Exception But honey badger don't give a shit
+     */
     public Badger() throws Exception {
         motorController = new BadgerMotorController();
     }
