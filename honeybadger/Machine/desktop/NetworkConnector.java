@@ -38,7 +38,7 @@ public class NetworkConnector {
             LastMessage = new Message(msg);
             try {
                 outStream.writeObject(LastMessage);
-                System.out.println("Machine.Common.Message sent");
+                //System.out.println("Machine.Common.Message sent");
             }
             catch (Exception e){
                 e.printStackTrace();

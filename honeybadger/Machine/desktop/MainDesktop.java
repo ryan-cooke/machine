@@ -32,7 +32,7 @@ public class MainDesktop {
         Out("Enter RPi IP: ");
         String IP = Kb.nextLine();
         Machine.desktop.NetworkConnector nc = new Machine.desktop.NetworkConnector(IP,2017);
-
+        Controller Xbox = new Controller(nc);
         String input="";
         while(!input.contains("quit")){
             input = Prompt('>',Kb);
