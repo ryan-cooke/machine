@@ -8,7 +8,7 @@ import com.pi4j.io.i2c.I2CFactory;
 /***
  * Simple class to manage the I2C communication with the PCA9685.
  */
-public class BadgerMotor implements PCA, RPI{
+public class BadgerMotorController implements PCA, RPI{
 
     /**
      * Array of each of the provisioned PCA9685 PWM Outputs
@@ -49,7 +49,8 @@ public class BadgerMotor implements PCA, RPI{
      * Initializes the BadgerI2C class and creates it's provider
      * @throws Exception Yes, this may throw some exception (See random sample code from internet for more details)
      */
-    public BadgerMotor() throws Exception{
+    @SuppressWarnings("WeakerAccess")
+    public BadgerMotorController() throws Exception{
         I2CBus bus = I2CFactory.getInstance(I2CBus.BUS_1);
         PCAprovider = new PCA9685GpioProvider(bus, 0x40);
         RPIProvider = new RaspiGpioProvider();
@@ -116,7 +117,7 @@ public class BadgerMotor implements PCA, RPI{
     public void setTLEMotorSpeed(Pin pin, int speed) {
 
         if (speed < 0 || speed > 100){
-            System.out.println("[BadgerMotor.setDriveSpeed] Speed percentage out of range. Must be INT between 0 and " +
+            System.out.println("[BadgerMotorController.setDriveSpeed] Speed percentage out of range. Must be INT between 0 and " +
                     "100");
             return;
         }
@@ -130,9 +131,9 @@ public class BadgerMotor implements PCA, RPI{
     }
 
     /**
-     * Sets the direction of rotation of the motor, either BadgerMotor.CLOCKWISE or BadgerMotor.COUNTER_CLOCKWISE
+     * Sets the direction of rotation of the motor, either BadgerMotorController.CLOCKWISE or BadgerMotorController.COUNTER_CLOCKWISE
      * @param pin RaspberryPI pin that controlling direction of the desired motor. EX: RPI.DRIVE_FRONT_LEFT
-     * @param direction Direction in which the motor will rotate. EX: BadgerMotor.CLOCKWISE or BadgerMotor.COUNTER_CLOCKWISE
+     * @param direction Direction in which the motor will rotate. EX: BadgerMotorController.CLOCKWISE or BadgerMotorController.COUNTER_CLOCKWISE
      */
     //TODO: TEST THIS METHOD WITH A MOTOR
     public void setTLEMotorDirection(Pin pin, int direction) {
@@ -141,7 +142,7 @@ public class BadgerMotor implements PCA, RPI{
         else if (direction == COUNTER_CLOCKWISE)
             this.RPIProvider.setState(pin, PinState.HIGH);
         else
-            System.out.println("[BadgerMotor.setMotorDirection] Invalid motor direction given");
+            System.out.println("[BadgerMotorController.setMotorDirection] Invalid motor direction given");
     }
 
 
