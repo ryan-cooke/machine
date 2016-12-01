@@ -33,7 +33,7 @@ public class BadgerMotorController{
     /**
      * Absolute max ON PWN value. Essentially caps PWM signal for drive motors at 80%
      */
-    private static final int MaxONPWM = 3275;
+    private static final int MaxOffPWM = 3275;
 
     /**
      * Constant that defines integer representation of clockwise rotation
@@ -123,8 +123,8 @@ public class BadgerMotorController{
         }
 
         //Get the scaled PWM value based on the MaxONPWM value;
-        int PWMOnTime = MaxONPWM * (speed/100);
-        int PWMOffTime = 4095-MaxONPWM;
+        int PWMOffTime = MaxOffPWM * (speed/100);
+        int PWMOnTime = 4095-MaxOffPWM;
 
         this.PCAprovider.setPwm(pin, PWMOnTime, PWMOffTime);
 
