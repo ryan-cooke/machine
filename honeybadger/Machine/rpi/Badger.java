@@ -18,6 +18,10 @@ public class Badger {
         motorController = new BadgerMotorController();
     }
 
+    public void shutdown() {
+        this.motorController.shutdown();
+    }
+
     /**
      * Sets the direction of the badger's movement to forward at the given speed percentage
      * @param speed Int value between 0 (no motion) and 100 (max speed)
