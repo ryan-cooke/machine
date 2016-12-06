@@ -30,6 +30,8 @@ public class BadgerMotorController{
      */
     private GpioProvider RPIProvider;
 
+    private GpioController GPIO;
+
     /**
      * Absolute max ON PWN value. Essentially caps PWM signal for drive motors at 80%
      */
@@ -52,6 +54,7 @@ public class BadgerMotorController{
     @SuppressWarnings("WeakerAccess")
     public BadgerMotorController() throws Exception{
         I2CBus bus = I2CFactory.getInstance(I2CBus.BUS_1);
+        this.GPIO = GpioFactory.getInstance();
         PCAprovider = new PCA9685GpioProvider(bus, 0x40);
         RPIProvider = new RaspiGpioProvider();
         this.provisionPwmOutputs();
@@ -70,21 +73,20 @@ public class BadgerMotorController{
      * Provisions the PWM Pins and gives them descriptive names, because why not
      */
     private void provisionPwmOutputs() {
-        GpioController PCAGpio = GpioFactory.getInstance();
         GpioPinPwmOutput[] myOutputs;
         myOutputs = new GpioPinPwmOutput[]{
-                PCAGpio.provisionPwmOutputPin(PCAprovider, PCAChip.DRIVE_FRONT_LEFT, "Front Left - FL-H"),
-                PCAGpio.provisionPwmOutputPin(PCAprovider, PCAChip.DRIVE_FRONT_RIGHT, "Front Right - FR-H"),
-                PCAGpio.provisionPwmOutputPin(PCAprovider, PCAChip.DRIVE_BACK_LEFT, "Back Left - BL-H"),
-                PCAGpio.provisionPwmOutputPin(PCAprovider, PCAChip.DRIVE_BACK_RIGHT, "Back Right - BR-H"),
-                PCAGpio.provisionPwmOutputPin(PCAprovider, PCAChip.CONVEYOR_A, "Conveyor A - CV1"),
-                PCAGpio.provisionPwmOutputPin(PCAprovider, PCAChip.CONVEYOR_B, "Conveyor B - CV2"),
-                PCAGpio.provisionPwmOutputPin(PCAprovider, PCAChip.VACUUM_ROLLER, "Vacuum Roller - VAC"),
-                PCAGpio.provisionPwmOutputPin(PCAprovider, PCAChip.FLYWHEEL_A, "Flywheel A - BS1"),
-                PCAGpio.provisionPwmOutputPin(PCAprovider, PCAChip.FLYWHEEL_B, "Flywheel B - BS2"),
-                PCAGpio.provisionPwmOutputPin(PCAprovider, PCAChip.CLIMBING_ARM, "Climbing Arm - RND1"),
-                PCAGpio.provisionPwmOutputPin(PCAprovider, PCAChip.CLIMBING_WRIST, "Climbing Wrist - RND2"),
-                PCAGpio.provisionPwmOutputPin(PCAprovider, PCAChip.SHOOTING_AIM_ADJUST, "Shooting aim adjust - RND3")
+                GPIO.provisionPwmOutputPin(PCAprovider, PCAChip.DRIVE_FRONT_LEFT, "Front Left - FL-H"),
+                GPIO.provisionPwmOutputPin(PCAprovider, PCAChip.DRIVE_FRONT_RIGHT, "Front Right - FR-H"),
+                GPIO.provisionPwmOutputPin(PCAprovider, PCAChip.DRIVE_BACK_LEFT, "Back Left - BL-H"),
+                GPIO.provisionPwmOutputPin(PCAprovider, PCAChip.DRIVE_BACK_RIGHT, "Back Right - BR-H"),
+                GPIO.provisionPwmOutputPin(PCAprovider, PCAChip.CONVEYOR_A, "Conveyor A - CV1"),
+                GPIO.provisionPwmOutputPin(PCAprovider, PCAChip.CONVEYOR_B, "Conveyor B - CV2"),
+                GPIO.provisionPwmOutputPin(PCAprovider, PCAChip.VACUUM_ROLLER, "Vacuum Roller - VAC"),
+                GPIO.provisionPwmOutputPin(PCAprovider, PCAChip.FLYWHEEL_A, "Flywheel A - BS1"),
+                GPIO.provisionPwmOutputPin(PCAprovider, PCAChip.FLYWHEEL_B, "Flywheel B - BS2"),
+                GPIO.provisionPwmOutputPin(PCAprovider, PCAChip.CLIMBING_ARM, "Climbing Arm - RND1"),
+                GPIO.provisionPwmOutputPin(PCAprovider, PCAChip.CLIMBING_WRIST, "Climbing Wrist - RND2"),
+                GPIO.provisionPwmOutputPin(PCAprovider, PCAChip.SHOOTING_AIM_ADJUST, "Shooting aim adjust - RND3")
         };
         this.PWMOutputs = myOutputs;
     }
@@ -93,13 +95,12 @@ public class BadgerMotorController{
      * Provisions the Digital Pins on the RaspberryPI and gives them descriptive names, because why not
      */
     private void provisionDigitalOutputs() {
-        GpioController RPIGpio = GpioFactory.getInstance();
         GpioPinDigitalOutput[] myOutputs;
         myOutputs = new GpioPinDigitalOutput[]{
-                RPIGpio.provisionDigitalOutputPin(RPIProvider, RPI.DRIVE_FRONT_LEFT, "Front Left - FL-L"),
-                RPIGpio.provisionDigitalOutputPin(RPIProvider, RPI.DRIVE_FRONT_RIGHT, "Front Right - FR-L"),
-                RPIGpio.provisionDigitalOutputPin(RPIProvider, RPI.DRIVE_BACK_LEFT, "Back Left - BL-L"),
-                RPIGpio.provisionDigitalOutputPin(RPIProvider, RPI.DRIVE_BACK_RIGHT, "Back Right - BR-L")
+                GPIO.provisionDigitalOutputPin(RPIProvider, RPI.DRIVE_FRONT_LEFT, "Front Left - FL-L"),
+                GPIO.provisionDigitalOutputPin(RPIProvider, RPI.DRIVE_FRONT_RIGHT, "Front Right - FR-L"),
+                GPIO.provisionDigitalOutputPin(RPIProvider, RPI.DRIVE_BACK_LEFT, "Back Left - BL-L"),
+                GPIO.provisionDigitalOutputPin(RPIProvider, RPI.DRIVE_BACK_RIGHT, "Back Right - BR-L")
                 //TODO: Provision the rest of the digital pins
         };
         this.DigitalOutputs = myOutputs;
