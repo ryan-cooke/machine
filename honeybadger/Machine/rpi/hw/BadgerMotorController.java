@@ -51,7 +51,7 @@ public class BadgerMotorController{
      * Initializes the BadgerI2C class and creates it's provider
      * @throws Exception Yes, this may throw some exception (See random sample code from internet for more details)
      */
-    @SuppressWarnings("WeakerAccess")
+    //@SuppressWarnings("WeakerAccess")
     public BadgerMotorController() throws Exception{
         I2CBus bus = I2CFactory.getInstance(I2CBus.BUS_1);
         this.GPIO = GpioFactory.getInstance();
