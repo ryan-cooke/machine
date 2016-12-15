@@ -1,7 +1,7 @@
 package Machine.rpi;
 
 public class DriveTest {
-    public static void main() throws Exception {
+    public static void main(String[] args) throws Exception {
         Badger testBadger = new Badger();
 
         sopl("Moving forward at 50%");
