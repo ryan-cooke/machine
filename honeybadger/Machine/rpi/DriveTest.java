@@ -18,6 +18,6 @@ public class DriveTest {
         Thread.sleep(500);
     }
     private static void sopl(Object ob) {
-        System.out.print(ob);
+        System.out.println(ob);
     }
 }
