@@ -5,6 +5,8 @@ import com.pi4j.io.gpio.*;
 import com.pi4j.io.i2c.I2CBus;
 import com.pi4j.io.i2c.I2CFactory;
 
+import static com.pi4j.io.gpio.RaspiPinNumberingScheme.BROADCOM_PIN_NUMBERING;
+
 /***
  * Simple class to manage the I2C communication with the PCA9685.
  */
@@ -51,15 +53,21 @@ public class BadgerMotorController{
      * Initializes the BadgerI2C class and creates it's provider
      * @throws Exception Yes, this may throw some exception (See random sample code from internet for more details)
      */
-    @SuppressWarnings("WeakerAccess")
+    //@SuppressWarnings("WeakerAccess")
     public BadgerMotorController() throws Exception{
         I2CBus bus = I2CFactory.getInstance(I2CBus.BUS_1);
         this.GPIO = GpioFactory.getInstance();
+
+        RPIProvider = GpioFactory.getDefaultProvider();
+
         PCAprovider = new PCA9685GpioProvider(bus, 0x40);
-        RPIProvider = new RaspiGpioProvider();
+
         this.provisionPwmOutputs();
         this.provisionDigitalOutputs();
-        this.PCAprovider.reset();
+
+        //This generated a null-pointer exception
+        //Hopefully it's safe to assume that the call to "new" would've reset everything
+        //this.PCAprovider.reset();
     }
 
     /**
