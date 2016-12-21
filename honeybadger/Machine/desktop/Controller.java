@@ -1,6 +1,8 @@
 package Machine.desktop;
 
 import java.lang.Math;
+
+import Machine.Common.Network.BaseMsg;
 import ch.aplu.xboxcontroller.*;
 
 public class Controller extends XboxControllerAdapter{
@@ -13,6 +15,10 @@ public class Controller extends XboxControllerAdapter{
     double leftThumbstickAngle;
 
     private void SendMessage(String msg){
+        connector.SendMessage(msg);
+    }
+
+    private void SencMessage(BaseMsg msg){
         connector.SendMessage(msg);
     }
 

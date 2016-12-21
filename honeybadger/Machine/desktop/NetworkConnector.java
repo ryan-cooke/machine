@@ -1,6 +1,6 @@
 package Machine.desktop;
 
-import Machine.Common.Message;
+import Machine.Common.Network.BaseMsg;
 
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -16,7 +16,7 @@ public class NetworkConnector {
     Socket connection;
     ObjectOutputStream outStream;
     ObjectInputStream inStream;
-    Message LastMessage;
+    BaseMsg LastMessage;
 
     NetworkConnector(String Host, int connectPort){
         host = Host;
@@ -35,14 +35,28 @@ public class NetworkConnector {
 
     void SendMessage(String msg){
         if(connection!=null){
-            LastMessage = new Message(msg);
+            LastMessage = new BaseMsg(msg);
             try {
                 outStream.writeObject(LastMessage);
-                //System.out.println("Machine.Common.Message sent");
+                //System.out.println("Machine.Common.Network.BaseMsg sent");
             }
             catch (Exception e){
                 e.printStackTrace();
-                System.out.println("Machine.Common.Message Not Sent: "+LastMessage.getPayload());
+                System.out.println("Machine.Common.Network.BaseMsg Not Sent: "+LastMessage.getPayload());
+            }
+        }
+    }
+
+    void SendMessage(BaseMsg msg){
+        if(connection!=null){
+            LastMessage = msg;
+            try {
+                outStream.writeObject(LastMessage);
+                //System.out.println("Machine.Common.Network.BaseMsg sent");
+            }
+            catch (Exception e){
+                e.printStackTrace();
+                System.out.println("Machine.Common.Network.BaseMsg Not Sent: "+LastMessage.getPayload());
             }
         }
     }

@@ -7,7 +7,7 @@ import Machine.rpi.hw.PCAChip;
  * Contains methods that represent all the physical actions the badger can execute
  */
 public class Badger {
-
+    //Interact with the hardware
     private BadgerMotorController motorController;
 
     /**

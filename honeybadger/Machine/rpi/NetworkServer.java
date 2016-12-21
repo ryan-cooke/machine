@@ -1,6 +1,6 @@
 package Machine.rpi;
 
-import Machine.Common.Message;
+import Machine.Common.Network.BaseMsg;
 
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -17,7 +17,7 @@ public class NetworkServer {
     Socket clientConnection;
     ObjectOutputStream outStream;
     ObjectInputStream inStream;
-    Message LastMessage;
+    BaseMsg LastMessage;
 
     NetworkServer(){
         try{
@@ -50,7 +50,7 @@ public class NetworkServer {
 
     public String ReceiveMessage(){
         try{
-            LastMessage = (Message) inStream.readObject();
+            LastMessage = (BaseMsg) inStream.readObject();
             return LastMessage.getPayload();
         }
         catch (Exception e){

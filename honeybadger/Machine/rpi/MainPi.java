@@ -1,28 +1,15 @@
 package Machine.rpi;
 
 import java.net.InetAddress;
-import java.util.Calendar;
-import java.util.Scanner;
+
+import static Machine.Common.Utils.Newline;
+import static Machine.Common.Utils.Out;
+import static Machine.Common.Utils.Prompt;
 
 /**
  * Driver code for Pi
  */
 public class MainPi {
-    public static void Newline(){
-        System.out.println();
-    }
-
-    public static void Out(String log){
-        //Very lazy, just needed a quick timestamp
-        java.sql.Timestamp ts = new java.sql.Timestamp(Calendar.getInstance().getTime().getTime());
-        System.out.print(ts+": "+log);
-    }
-
-    public static String Prompt(char symbol, Scanner kb){
-        System.out.print(symbol+" ");
-        return kb.nextLine();
-    }
-
     //Quick test for network
     public static void main(String[] args){
         //Setup the server
