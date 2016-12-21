@@ -3,6 +3,7 @@ package Machine.desktop;
 import java.lang.Math;
 
 import Machine.Common.Network.BaseMsg;
+import Machine.Common.Network.ControllerMessage;
 import ch.aplu.xboxcontroller.*;
 
 public class Controller extends XboxControllerAdapter{
@@ -18,14 +19,14 @@ public class Controller extends XboxControllerAdapter{
         connector.SendMessage(msg);
     }
 
-    private void SencMessage(BaseMsg msg){
+    private void SendMessage(BaseMsg msg){
         connector.SendMessage(msg);
     }
 
     public void buttonA(boolean pressed)
     {
         if(pressed){
-            SendMessage("Pressed A");
+            SendMessage(new ControllerMessage(new ControllerMessage.MoveForward(100)));
         }
     }
 

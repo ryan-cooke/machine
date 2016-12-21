@@ -2,7 +2,7 @@ package Machine.rpi;
 
 public class DriveTest {
     public static void main(String[] args) throws Exception {
-        Badger testBadger = new Badger();
+        Badger testBadger = Badger.getInstance();
 
         sopl("Moving forward at 50%");
         testBadger.moveForward(50);

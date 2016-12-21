@@ -7,51 +7,70 @@ import Machine.rpi.hw.PCAChip;
  * Contains methods that represent all the physical actions the badger can execute
  */
 public class Badger {
+    private static Badger Singleton;
+
     //Interact with the hardware
     private BadgerMotorController motorController;
+
+    //Send and receive messages over the network being hosted on the pi
+    private BadgerNetworkServer networkServer;
 
     /**
      * Makes a new Badger, guaranteed not to give a shit
      * @throws Exception But honey badger don't give a shit
      */
-    public Badger() throws Exception {
+    private Badger() throws Exception {
         motorController = new BadgerMotorController();
+        networkServer = new BadgerNetworkServer(this);
+        System.out.println("Made a badger");
     }
 
-    public void shutdown() {
+    public BadgerNetworkServer getNetworkServer(){
+        return networkServer;
+    }
+
+    public static Badger getInstance() throws Exception{
+        if(Singleton==null){
+            Singleton = new Badger();
+        }
+
+        return Singleton;
+    }
+
+    private void shutdown() {
         this.motorController.shutdown();
     }
 
     /**
      * Sets the direction of the badger's movement to forward at the given speed percentage
-     * @param speed Int value between 0 (no motion) and 100 (max speed)
+     * @param throttle Int value between 0 (no motion) and 100 (max speed)
      */
-    public void moveForward(int speed) {
+    public void moveForward(float throttle) {
         motorController.setTLEMotorDirection(PCAChip.DRIVE_FRONT_LEFT, BadgerMotorController.CLOCKWISE);
         motorController.setTLEMotorDirection(PCAChip.DRIVE_BACK_LEFT, BadgerMotorController.CLOCKWISE);
         motorController.setTLEMotorDirection(PCAChip.DRIVE_FRONT_RIGHT, BadgerMotorController.COUNTER_CLOCKWISE);
         motorController.setTLEMotorDirection(PCAChip.DRIVE_BACK_RIGHT, BadgerMotorController.COUNTER_CLOCKWISE);
 
-        motorController.setTLEMotorSpeed(PCAChip.DRIVE_FRONT_LEFT, speed);
-        motorController.setTLEMotorSpeed(PCAChip.DRIVE_BACK_LEFT, speed);
-        motorController.setTLEMotorSpeed(PCAChip.DRIVE_FRONT_RIGHT, speed);
-        motorController.setTLEMotorSpeed(PCAChip.DRIVE_BACK_RIGHT, speed);
+        motorController.setTLEMotorSpeed(PCAChip.DRIVE_FRONT_LEFT, throttle);
+        motorController.setTLEMotorSpeed(PCAChip.DRIVE_BACK_LEFT, throttle);
+        motorController.setTLEMotorSpeed(PCAChip.DRIVE_FRONT_RIGHT, throttle);
+        motorController.setTLEMotorSpeed(PCAChip.DRIVE_BACK_RIGHT, throttle);
     }
 
     /**
      * Sets the direction of the badger's movement to backwards at the given speed percentage
-     * @param speed Int value between 0 (no motion) and 100 (max speed)
+     * @param throttle Int value between 0 (no motion) and 100 (max speed)
      */
-    public void moveBackward(int speed) {
+    public void moveBackward(float throttle) {
         motorController.setTLEMotorDirection(PCAChip.DRIVE_FRONT_LEFT, BadgerMotorController.COUNTER_CLOCKWISE);
         motorController.setTLEMotorDirection(PCAChip.DRIVE_BACK_LEFT, BadgerMotorController.COUNTER_CLOCKWISE);
         motorController.setTLEMotorDirection(PCAChip.DRIVE_FRONT_RIGHT, BadgerMotorController.CLOCKWISE);
         motorController.setTLEMotorDirection(PCAChip.DRIVE_BACK_RIGHT, BadgerMotorController.CLOCKWISE);
 
-        motorController.setTLEMotorSpeed(PCAChip.DRIVE_FRONT_LEFT, speed);
-        motorController.setTLEMotorSpeed(PCAChip.DRIVE_BACK_LEFT, speed);
-        motorController.setTLEMotorSpeed(PCAChip.DRIVE_FRONT_RIGHT, speed);
-        motorController.setTLEMotorSpeed(PCAChip.DRIVE_BACK_RIGHT, speed);
+        motorController.setTLEMotorSpeed(PCAChip.DRIVE_FRONT_LEFT, throttle);
+        motorController.setTLEMotorSpeed(PCAChip.DRIVE_BACK_LEFT, throttle);
+        motorController.setTLEMotorSpeed(PCAChip.DRIVE_FRONT_RIGHT, throttle);
+        motorController.setTLEMotorSpeed(PCAChip.DRIVE_BACK_RIGHT, throttle);
     }
 
     /**
@@ -88,34 +107,34 @@ public class Badger {
 
     /**
      * Sets the direction of the badger's movement to strafe left at the given speed percentage
-     * @param speed Int value between 0 (no motion) and 100 (max speed)
+     * @param throttle Int value between 0 (no motion) and 100 (max speed)
      */
-    public void strafeLeft(int speed) {
+    public void strafeLeft(float throttle) {
         motorController.setTLEMotorDirection(PCAChip.DRIVE_FRONT_LEFT, BadgerMotorController.COUNTER_CLOCKWISE);
         motorController.setTLEMotorDirection(PCAChip.DRIVE_BACK_LEFT, BadgerMotorController.CLOCKWISE);
         motorController.setTLEMotorDirection(PCAChip.DRIVE_FRONT_RIGHT, BadgerMotorController.COUNTER_CLOCKWISE);
         motorController.setTLEMotorDirection(PCAChip.DRIVE_BACK_RIGHT, BadgerMotorController.CLOCKWISE);
 
-        motorController.setTLEMotorSpeed(PCAChip.DRIVE_FRONT_LEFT, speed);
-        motorController.setTLEMotorSpeed(PCAChip.DRIVE_BACK_LEFT, speed);
-        motorController.setTLEMotorSpeed(PCAChip.DRIVE_FRONT_RIGHT, speed);
-        motorController.setTLEMotorSpeed(PCAChip.DRIVE_BACK_RIGHT, speed);
+        motorController.setTLEMotorSpeed(PCAChip.DRIVE_FRONT_LEFT, throttle);
+        motorController.setTLEMotorSpeed(PCAChip.DRIVE_BACK_LEFT, throttle);
+        motorController.setTLEMotorSpeed(PCAChip.DRIVE_FRONT_RIGHT, throttle);
+        motorController.setTLEMotorSpeed(PCAChip.DRIVE_BACK_RIGHT, throttle);
     }
 
     /**
      * Sets the direction of the badger's movement to strafe right at the given speed percentage
-     * @param speed Int value between 0 (no motion) and 100 (max speed)
+     * @param throttle Int value between 0 (no motion) and 100 (max speed)
      */
-    public void strafeRight(int speed) {
+    public void strafeRight(float throttle) {
         motorController.setTLEMotorDirection(PCAChip.DRIVE_FRONT_LEFT, BadgerMotorController.CLOCKWISE);
         motorController.setTLEMotorDirection(PCAChip.DRIVE_BACK_LEFT, BadgerMotorController.COUNTER_CLOCKWISE);
         motorController.setTLEMotorDirection(PCAChip.DRIVE_FRONT_RIGHT, BadgerMotorController.CLOCKWISE);
         motorController.setTLEMotorDirection(PCAChip.DRIVE_BACK_RIGHT, BadgerMotorController.COUNTER_CLOCKWISE);
 
-        motorController.setTLEMotorSpeed(PCAChip.DRIVE_FRONT_LEFT, speed);
-        motorController.setTLEMotorSpeed(PCAChip.DRIVE_BACK_LEFT, speed);
-        motorController.setTLEMotorSpeed(PCAChip.DRIVE_FRONT_RIGHT, speed);
-        motorController.setTLEMotorSpeed(PCAChip.DRIVE_BACK_RIGHT, speed);
+        motorController.setTLEMotorSpeed(PCAChip.DRIVE_FRONT_LEFT, throttle);
+        motorController.setTLEMotorSpeed(PCAChip.DRIVE_BACK_LEFT, throttle);
+        motorController.setTLEMotorSpeed(PCAChip.DRIVE_FRONT_RIGHT, throttle);
+        motorController.setTLEMotorSpeed(PCAChip.DRIVE_BACK_RIGHT, throttle);
     }
 
     /**

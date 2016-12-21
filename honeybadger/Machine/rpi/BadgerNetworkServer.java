@@ -7,22 +7,40 @@ import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+import static Machine.Common.Utils.OutLine;
+
 /**
  * Creates and handles the server connection
  */
-public class NetworkServer {
-    final int port = 2017;
+public class BadgerNetworkServer {
+    //Port from which to send and receive commands
+    private final int port = 2017;
 
-    ServerSocket connection;
-    Socket clientConnection;
-    ObjectOutputStream outStream;
-    ObjectInputStream inStream;
-    BaseMsg LastMessage;
+    //The Honeybadger that should process messages
+    private Badger Machine;
 
-    NetworkServer(){
+    private ServerSocket connection;
+    private Socket clientConnection;
+    private ObjectOutputStream outStream;
+    private ObjectInputStream inStream;
+    private BaseMsg LastMessage;
+
+    BadgerNetworkServer(Badger badger){
+        Machine = badger;
+        SetupNetwork();
+    }
+
+    BadgerNetworkServer(){
+        SetupNetwork();
+    }
+
+    protected void SetupNetwork(){
+        if(connection!=null){
+            return;
+        }
+
         try{
-            MainPi.Out("Using port "+port);
-            MainPi.Newline();
+            OutLine("Using port "+port);
             connection = new ServerSocket(port);
         }
         catch (Exception e){
@@ -32,12 +50,11 @@ public class NetworkServer {
     }
 
     public void WaitForConnect(){
-        MainPi.Out("Waiting for a remote connection");
-        MainPi.Newline();
+        OutLine("Waiting for a remote connection");
         try{
             clientConnection = connection.accept();
             if(clientConnection!=null){
-                MainPi.Out("Connected to "+clientConnection.getInetAddress().toString());
+                OutLine("Connected to "+clientConnection.getInetAddress().toString());
                 outStream = new ObjectOutputStream(clientConnection.getOutputStream());
                 inStream = new ObjectInputStream(clientConnection.getInputStream());
             }
@@ -51,6 +68,7 @@ public class NetworkServer {
     public String ReceiveMessage(){
         try{
             LastMessage = (BaseMsg) inStream.readObject();
+            LastMessage.Execute(Machine);
             return LastMessage.getPayload();
         }
         catch (Exception e){

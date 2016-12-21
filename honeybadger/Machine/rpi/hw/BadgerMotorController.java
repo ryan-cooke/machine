@@ -5,12 +5,14 @@ import com.pi4j.io.gpio.*;
 import com.pi4j.io.i2c.I2CBus;
 import com.pi4j.io.i2c.I2CFactory;
 
-import static com.pi4j.io.gpio.RaspiPinNumberingScheme.BROADCOM_PIN_NUMBERING;
-
 /***
  * Simple class to manage the I2C communication with the PCA9685.
  */
 public class BadgerMotorController{
+    /**
+     * Boolean to check that the expected RPi hardware is present and ready
+     */
+    private boolean IsReady;
 
     /**
      * Array of each of the provisioned PCA9685 PWM Outputs
@@ -54,20 +56,29 @@ public class BadgerMotorController{
      * @throws Exception Yes, this may throw some exception (See random sample code from internet for more details)
      */
     //@SuppressWarnings("WeakerAccess")
-    public BadgerMotorController() throws Exception{
-        I2CBus bus = I2CFactory.getInstance(I2CBus.BUS_1);
-        this.GPIO = GpioFactory.getInstance();
+    public BadgerMotorController() /*throws Exception*/{
+        IsReady = false;
+        try {
+            I2CBus bus = I2CFactory.getInstance(I2CBus.BUS_1);
+            this.GPIO = GpioFactory.getInstance();
 
-        RPIProvider = GpioFactory.getDefaultProvider();
+            RPIProvider = GpioFactory.getDefaultProvider();
 
-        PCAprovider = new PCA9685GpioProvider(bus, 0x40);
+            PCAprovider = new PCA9685GpioProvider(bus, 0x40);
 
-        this.provisionPwmOutputs();
-        this.provisionDigitalOutputs();
+            this.provisionPwmOutputs();
+            this.provisionDigitalOutputs();
 
-        //This generated a null-pointer exception
-        //Hopefully it's safe to assume that the call to "new" would've reset everything
-        //this.PCAprovider.reset();
+            //This generated a null-pointer exception
+            //Hopefully it's safe to assume that the call to "new" would've reset everything
+            //this.PCAprovider.reset();
+
+            IsReady = true;
+        }
+        catch (Exception e){
+            //TODO: Should be a harder warning
+            System.out.println("ERROR: THE EXPECTED DEVICES WERE NOT AVAILABLE");
+        }
     }
 
     /**
@@ -120,23 +131,25 @@ public class BadgerMotorController{
      * Actual speed of the motor is maxed out at at 80% at Ryan's request
      * therefore, percentage parameter is used to scale motor speed based on the Max PWM value.
      * @param pin PCA9685Pin for the motor whose speed will be set
-     * @param speed Speed to set the motor too, int value from 0 to 100
+     * @param speedPercent Speed to set the motor too, int value from 0 to 100
      */
     //TODO: TEST THIS METHOD WITH A MOTOR
-    public void setTLEMotorSpeed(Pin pin, int speed) {
+    public void setTLEMotorSpeed(Pin pin, float speedPercent) {
+        if(!IsReady){
+            return;
+        }
 
-        if (speed < 0 || speed > 100){
+        if (speedPercent < 0 || speedPercent > 100){
             System.out.println("[BadgerMotorController.setDriveSpeed] Speed percentage out of range. Must be INT between 0 and " +
                     "100");
             return;
         }
 
         //Get the scaled PWM value based on the MaxONPWM value;
-        int PWMOffTime = MaxOffPWM * (speed/100);
+        int PWMOffTime = Math.round(MaxOffPWM * (speedPercent /100));
         int PWMOnTime = 4095-MaxOffPWM;
 
         this.PCAprovider.setPwm(pin, PWMOnTime, PWMOffTime);
-
     }
 
     /**
@@ -146,6 +159,10 @@ public class BadgerMotorController{
      */
     //TODO: TEST THIS METHOD WITH A MOTOR
     public void setTLEMotorDirection(Pin pin, int direction) {
+        if(!IsReady){
+            return;
+        }
+
         if (direction == CLOCKWISE)
             this.RPIProvider.setState(pin, PinState.LOW);
         else if (direction == COUNTER_CLOCKWISE)

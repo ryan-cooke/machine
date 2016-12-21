@@ -21,7 +21,7 @@ public class BaseMsg implements Serializable, INetCommand {
     }
 
     public void Execute(Object context){
-        System.out.format("BaseMessage: %s",payload);
+        System.out.format("BaseMessage: %s\n",payload);
     }
 
 }
