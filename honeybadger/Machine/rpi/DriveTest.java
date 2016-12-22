@@ -15,7 +15,7 @@ public class DriveTest {
         Thread.sleep(500);
         sopl("Strafing right at 50%");
         testBadger.strafeRight(50);
-        Thread.sleep(500);
+        //Thread.sleep(500);
     }
     private static void sopl(Object ob) {
         System.out.println(ob);
