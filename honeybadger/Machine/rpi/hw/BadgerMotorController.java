@@ -92,12 +92,12 @@ public class BadgerMotorController{
      * Provisions the PWM Pins and gives them descriptive names, because why not
      */
     private void provisionPwmOutputs() {
-        GpioPinPwmOutput[] myOutputs;
-        myOutputs = new GpioPinPwmOutput[]{
+        this.PWMOutputs = new GpioPinPwmOutput[]{
                 GPIO.provisionPwmOutputPin(PCAprovider, PCAChip.DRIVE_FRONT_LEFT, "Front Left - FL-H"),
                 GPIO.provisionPwmOutputPin(PCAprovider, PCAChip.DRIVE_FRONT_RIGHT, "Front Right - FR-H"),
                 GPIO.provisionPwmOutputPin(PCAprovider, PCAChip.DRIVE_BACK_LEFT, "Back Left - BL-H"),
                 GPIO.provisionPwmOutputPin(PCAprovider, PCAChip.DRIVE_BACK_RIGHT, "Back Right - BR-H"),
+
                 GPIO.provisionPwmOutputPin(PCAprovider, PCAChip.CONVEYOR_A, "Conveyor A - CV1"),
                 GPIO.provisionPwmOutputPin(PCAprovider, PCAChip.CONVEYOR_B, "Conveyor B - CV2"),
                 GPIO.provisionPwmOutputPin(PCAprovider, PCAChip.VACUUM_ROLLER, "Vacuum Roller - VAC"),
@@ -107,7 +107,11 @@ public class BadgerMotorController{
                 GPIO.provisionPwmOutputPin(PCAprovider, PCAChip.CLIMBING_WRIST, "Climbing Wrist - RND2"),
                 GPIO.provisionPwmOutputPin(PCAprovider, PCAChip.SHOOTING_AIM_ADJUST, "Shooting aim adjust - RND3")
         };
-        this.PWMOutputs = myOutputs;
+
+        //Set Drive motors to high when shutting down.
+        for (int i = 0; i < 4; i++) {
+            PWMOutputs[i].setShutdownOptions(false,PinState.HIGH);
+        }
     }
 
     /**
@@ -147,7 +151,7 @@ public class BadgerMotorController{
 
         //Get the scaled PWM value based on the MaxONPWM value;
         int PWMOnTime = Math.round(MaxOffPWM * (1-(speedPercent /100)));
-        int PWMOffTime = 4095-MaxOffPWM;
+        int PWMOffTime = 4095-PWMOnTime;
 
         this.PCAprovider.setPwm(pin, PWMOnTime, PWMOffTime);
     }
