@@ -26,35 +26,35 @@ public class Controller extends XboxControllerAdapter{
     public void buttonA(boolean pressed)
     {
         if(pressed){
-            SendMessage(new ControllerMessage(new ControllerMessage.MoveForward(100)));
+            SendMessage(new ControllerMessage(new ControllerMessage.MoveBack(100)));
         }
     }
 
     public void buttonB(boolean pressed)
     {
         if(pressed){
-            SendMessage("Pressed B");
+            SendMessage(new ControllerMessage(new ControllerMessage.MoveRight(100)));
         }
     }
 
     public void buttonX(boolean pressed)
     {
         if(pressed){
-            SendMessage("Pressed X");
+            SendMessage(new ControllerMessage(new ControllerMessage.MoveLeft(100)));
         }
     }
 
     public void buttonY(boolean pressed)
     {
         if (pressed){
-            SendMessage("Pressed Y");
+            SendMessage(new ControllerMessage(new ControllerMessage.MoveForward(100)));
         }
     }
 
     public void back(boolean pressed)
     {
         if (pressed){
-            SendMessage("Pressed back button");
+            SendMessage(new ControllerMessage(new ControllerMessage.Stop()));
         }
     }
 
@@ -99,24 +99,28 @@ public class Controller extends XboxControllerAdapter{
             switch (direction) {
                 case 0:
                     // N
+                    SendMessage(new ControllerMessage(new ControllerMessage.DEBUG_MOTOR_FL()));
                     break;
                 case 1:
                     // NE
                     break;
                 case 2:
                     // E
+                    SendMessage(new ControllerMessage(new ControllerMessage.DEBUG_MOTOR_BR()));
                     break;
                 case 3:
                     // SE
                     break;
                 case 4:
                     // S
+                    SendMessage(new ControllerMessage(new ControllerMessage.DEBUG_MOTOR_FR()));
                     break;
                 case 5:
                     // SW
                     break;
                 case 6:
                     // W
+                    SendMessage(new ControllerMessage(new ControllerMessage.DEBUG_MOTOR_BL()));
                     break;
                 case 7:
                     // NW

@@ -2,7 +2,7 @@ package Machine.rpi;
 
 import java.net.InetAddress;
 
-import static Machine.Common.Utils.OutLine;
+import static Machine.Common.Utils.Log;
 
 /**
  * Driver code for Pi
@@ -12,7 +12,7 @@ public class MainPi {
     public static void main(String[] args){
         //Setup the server
         try {
-            OutLine("Starting server at IP: " + InetAddress.getLocalHost().toString());
+            Log("Starting server at IP: " + InetAddress.getLocalHost().toString());
         }
         catch(Exception e){
             System.out.println(e.getStackTrace());
@@ -21,6 +21,7 @@ public class MainPi {
         BadgerNetworkServer ns=null;
         try {
             Badger badger = Badger.getInstance();
+            badger.STOP();
             ns = badger.getNetworkServer();
         }
         catch(Exception e){
@@ -32,7 +33,7 @@ public class MainPi {
         String input="";
         while(!input.contains("quit")) {
             input = ns.ReceiveMessage();
-            OutLine(input);
+            Log(input);
         }
         ns.CloseAll();
     }

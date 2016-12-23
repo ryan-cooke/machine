@@ -146,10 +146,14 @@ public class BadgerMotorController{
         }
 
         //Get the scaled PWM value based on the MaxONPWM value;
-        int PWMOffTime = Math.round(MaxOffPWM * (speedPercent /100));
-        int PWMOnTime = 4095-MaxOffPWM;
+        int PWMOnTime = Math.round(MaxOffPWM * (1-(speedPercent /100)));
+        int PWMOffTime = 4095-MaxOffPWM;
 
         this.PCAprovider.setPwm(pin, PWMOnTime, PWMOffTime);
+    }
+
+    public void STOP(Pin pin){
+        this.PCAprovider.setAlwaysOn(pin);
     }
 
     /**

@@ -2,7 +2,7 @@ package Machine.desktop;
 
 import java.util.Scanner;
 
-import static Machine.Common.Utils.OutLine;
+import static Machine.Common.Utils.Log;
 import static Machine.Common.Utils.Prompt;
 
 /**
@@ -15,14 +15,14 @@ public class MainDesktop {
         Scanner Kb = new Scanner(System.in);
 
         //Ask for IP
-        OutLine("Enter RPi IP: ");
+        Log("Enter RPi IP: ");
         String IP = Kb.nextLine();
         Machine.desktop.NetworkConnector nc = new Machine.desktop.NetworkConnector(IP,2017);
         Controller Xbox = new Controller(nc);
         String input="";
         while(true){
             input = Prompt('>',Kb);
-            OutLine("Sending "+input);
+            Log("Sending "+input);
             nc.SendMessage(input);
             if(input.contains("quit")){
                 nc = null;

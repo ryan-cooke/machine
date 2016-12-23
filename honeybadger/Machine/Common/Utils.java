@@ -7,7 +7,7 @@ import java.util.Scanner;
  * Some common Utilities that might be needed
  */
 public class Utils {
-    public static void OutLine(String log){
+    public static void Log(String log){
         //Very lazy, just needed a quick timestamp
         java.sql.Timestamp ts = new java.sql.Timestamp(Calendar.getInstance().getTime().getTime());
         System.out.format("%s: %s\n", ts, log);

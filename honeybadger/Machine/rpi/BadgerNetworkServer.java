@@ -7,7 +7,7 @@ import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-import static Machine.Common.Utils.OutLine;
+import static Machine.Common.Utils.Log;
 
 /**
  * Creates and handles the server connection
@@ -40,7 +40,7 @@ public class BadgerNetworkServer {
         }
 
         try{
-            OutLine("Using port "+port);
+            Log("Using port "+port);
             connection = new ServerSocket(port);
         }
         catch (Exception e){
@@ -50,11 +50,11 @@ public class BadgerNetworkServer {
     }
 
     public void WaitForConnect(){
-        OutLine("Waiting for a remote connection");
+        Log("Waiting for a remote connection");
         try{
             clientConnection = connection.accept();
             if(clientConnection!=null){
-                OutLine("Connected to "+clientConnection.getInetAddress().toString());
+                Log("Connected to "+clientConnection.getInetAddress().toString());
                 outStream = new ObjectOutputStream(clientConnection.getOutputStream());
                 inStream = new ObjectInputStream(clientConnection.getInputStream());
             }
