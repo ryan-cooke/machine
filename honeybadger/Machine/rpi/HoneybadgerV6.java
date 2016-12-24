@@ -11,8 +11,8 @@ import static Machine.Common.Utils.Log;
 /**
  * Contains methods that represent all the physical actions the badger can execute
  */
-public class Badger {
-    private static Badger Singleton;
+public class HoneybadgerV6 {
+    private static HoneybadgerV6 Singleton;
 
     //Interact with the hardware
     private BadgerMotorController motorController;
@@ -21,10 +21,10 @@ public class Badger {
     private BadgerNetworkServer networkServer;
 
     /**
-     * Makes a new Badger, guaranteed not to give a shit
+     * Makes a new Honeybadger (this is version 6). Guaranteed not to give a shit
      * @throws Exception But honey badger don't give a shit
      */
-    private Badger() throws Exception {
+    private HoneybadgerV6() throws Exception {
         motorController = new BadgerMotorController();
         networkServer = new BadgerNetworkServer(this);
         Log("Made the BadgerV6");
@@ -34,9 +34,9 @@ public class Badger {
         return networkServer;
     }
 
-    public static Badger getInstance() throws Exception{
+    public static HoneybadgerV6 getInstance() throws Exception{
         if(Singleton==null){
-            Singleton = new Badger();
+            Singleton = new HoneybadgerV6();
         }
 
         return Singleton;

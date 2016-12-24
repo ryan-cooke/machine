@@ -39,10 +39,15 @@ public class BadgerPWM extends PCA9685GpioProvider{
             CLIMBING_ARM,
             CLIMBING_WRIST,
             SHOOTING_AIM_ADJUST,
-            };
+    };
 
     public BadgerPWM(I2CBus bus, int address) throws IOException{
         super(bus,address);
+
+        //Set Drive motors to low immediately
+        for (Pin pin: DriveMotors) {
+            setAlwaysOn(pin);
+        }
     }
 
     @Override

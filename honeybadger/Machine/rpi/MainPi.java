@@ -20,7 +20,7 @@ public class MainPi {
 
         BadgerNetworkServer ns=null;
         try {
-            Badger badger = Badger.getInstance();
+            HoneybadgerV6 badger = HoneybadgerV6.getInstance();
             badger.STOP();
             ns = badger.getNetworkServer();
         }

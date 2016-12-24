@@ -1,9 +1,10 @@
 package Machine.rpi.hw;
 
-import com.pi4j.gpio.extension.pca.PCA9685GpioProvider;
 import com.pi4j.io.gpio.*;
 import com.pi4j.io.i2c.I2CBus;
 import com.pi4j.io.i2c.I2CFactory;
+
+import static Machine.Common.Utils.Log;
 
 /***
  * Simple class to manage the I2C communication with the PCA9685.
@@ -27,7 +28,7 @@ public class BadgerMotorController{
     /**
      * Object that represents the PCA9685. Is used mostly to set PWM of it's pins
      */
-    private PCA9685GpioProvider PCAprovider;
+    private BadgerPWM PWMProvider;
 
     /**
      * Object that represents the RaspberryPI. Is used mostly to set the PinState of it's pins (HIGH or LOW)
@@ -63,14 +64,10 @@ public class BadgerMotorController{
 
             RPIProvider = GpioFactory.getDefaultProvider();
 
-            PCAprovider = new PCA9685GpioProvider(bus, 0x40);
+            PWMProvider = new BadgerPWM(bus, 0x40);
 
             this.provisionPwmOutputs();
             this.provisionDigitalOutputs();
-
-            //This generated a null-pointer exception
-            //Hopefully it's safe to assume that the call to "new" would've reset everything
-            //this.PCAprovider.reset();
 
             IsReady = true;
         }
@@ -84,7 +81,7 @@ public class BadgerMotorController{
      * Closes the bus for I2C comms and effectively shuts down communication with the PCA9685
      */
     public void shutdown() {
-        PCAprovider.shutdown();
+        PWMProvider.shutdown();
     }
 
     /**
@@ -92,25 +89,20 @@ public class BadgerMotorController{
      */
     private void provisionPwmOutputs() {
         this.PWMOutputs = new GpioPinPwmOutput[]{
-                GPIO.provisionPwmOutputPin(PCAprovider, BadgerPWM.DRIVE_FRONT_LEFT, "Front Left - FL-H"),
-                GPIO.provisionPwmOutputPin(PCAprovider, BadgerPWM.DRIVE_FRONT_RIGHT, "Front Right - FR-H"),
-                GPIO.provisionPwmOutputPin(PCAprovider, BadgerPWM.DRIVE_BACK_LEFT, "Back Left - BL-H"),
-                GPIO.provisionPwmOutputPin(PCAprovider, BadgerPWM.DRIVE_BACK_RIGHT, "Back Right - BR-H"),
+                GPIO.provisionPwmOutputPin(PWMProvider, BadgerPWM.DRIVE_FRONT_LEFT, "Front Left - FL-H"),
+                GPIO.provisionPwmOutputPin(PWMProvider, BadgerPWM.DRIVE_FRONT_RIGHT, "Front Right - FR-H"),
+                GPIO.provisionPwmOutputPin(PWMProvider, BadgerPWM.DRIVE_BACK_LEFT, "Back Left - BL-H"),
+                GPIO.provisionPwmOutputPin(PWMProvider, BadgerPWM.DRIVE_BACK_RIGHT, "Back Right - BR-H"),
 
-                GPIO.provisionPwmOutputPin(PCAprovider, BadgerPWM.CONVEYOR_A, "Conveyor A - CV1"),
-                GPIO.provisionPwmOutputPin(PCAprovider, BadgerPWM.CONVEYOR_B, "Conveyor B - CV2"),
-                GPIO.provisionPwmOutputPin(PCAprovider, BadgerPWM.VACUUM_ROLLER, "Vacuum Roller - VAC"),
-                GPIO.provisionPwmOutputPin(PCAprovider, BadgerPWM.FLYWHEEL_A, "Flywheel A - BS1"),
-                GPIO.provisionPwmOutputPin(PCAprovider, BadgerPWM.FLYWHEEL_B, "Flywheel B - BS2"),
-                GPIO.provisionPwmOutputPin(PCAprovider, BadgerPWM.CLIMBING_ARM, "Climbing Arm - RND1"),
-                GPIO.provisionPwmOutputPin(PCAprovider, BadgerPWM.CLIMBING_WRIST, "Climbing Wrist - RND2"),
-                GPIO.provisionPwmOutputPin(PCAprovider, BadgerPWM.SHOOTING_AIM_ADJUST, "Shooting aim adjust - RND3")
+                GPIO.provisionPwmOutputPin(PWMProvider, BadgerPWM.CONVEYOR_A, "Conveyor A - CV1"),
+                GPIO.provisionPwmOutputPin(PWMProvider, BadgerPWM.CONVEYOR_B, "Conveyor B - CV2"),
+                GPIO.provisionPwmOutputPin(PWMProvider, BadgerPWM.VACUUM_ROLLER, "Vacuum Roller - VAC"),
+                GPIO.provisionPwmOutputPin(PWMProvider, BadgerPWM.FLYWHEEL_A, "Flywheel A - BS1"),
+                GPIO.provisionPwmOutputPin(PWMProvider, BadgerPWM.FLYWHEEL_B, "Flywheel B - BS2"),
+                GPIO.provisionPwmOutputPin(PWMProvider, BadgerPWM.CLIMBING_ARM, "Climbing Arm - RND1"),
+                GPIO.provisionPwmOutputPin(PWMProvider, BadgerPWM.CLIMBING_WRIST, "Climbing Wrist - RND2"),
+                GPIO.provisionPwmOutputPin(PWMProvider, BadgerPWM.SHOOTING_AIM_ADJUST, "Shooting aim adjust - RND3")
         };
-
-        //Set Drive motors to high when shutting down.
-        for (int i = 0; i < 4; i++) {
-            PWMOutputs[i].setShutdownOptions(false, PinState.HIGH);
-        }
     }
 
     /**
@@ -142,7 +134,7 @@ public class BadgerMotorController{
         }
 
         if (speedPercent < 0 || speedPercent > 100){
-            System.out.println("[BadgerMotorController.setDriveSpeed] Speed percentage out of range. Must be INT between 0 and " +
+            Log("[BadgerMotorController.setDriveSpeed] Speed percentage out of range. Must be INT between 0 and " +
                     "100");
             return;
         }
@@ -151,11 +143,11 @@ public class BadgerMotorController{
         int PWMOffTime = Math.round(MaxOffPWM - ((1-(speedPercent /100)) * MaxOffPWM));
         int PWMOnTime = 4095-PWMOffTime;
 
-        this.PCAprovider.setPwm(pin, PWMOnTime, PWMOffTime);
+        this.PWMProvider.setPwm(pin, PWMOnTime, PWMOffTime);
     }
 
     public void STOP(Pin pin){
-        this.PCAprovider.setAlwaysOn(pin);
+        this.PWMProvider.setAlwaysOn(pin);
     }
 
     /**

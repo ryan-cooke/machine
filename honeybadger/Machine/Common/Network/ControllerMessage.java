@@ -1,6 +1,6 @@
 package Machine.Common.Network;
 
-import Machine.rpi.Badger;
+import Machine.rpi.HoneybadgerV6;
 import Machine.rpi.hw.BadgerMotorController;
 import Machine.rpi.hw.BadgerPWM;
 import Machine.rpi.hw.RPI;
@@ -8,13 +8,19 @@ import Machine.rpi.hw.RPI;
 import java.io.Serializable;
 
 /**
- * Created by Javier Fajardo on 2016-12-20.
+ * Handles everything related to networking the controller
  */
 public class ControllerMessage extends BaseMsg {
+    /**
+     * Inner interface to define a new controller action that a honeybadger must do
+     */
     public interface ControllerAction{
-        void Do(Badger badger);
+        void Do(HoneybadgerV6 badger);
     }
 
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // START Controller Action Commands
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     public static class MoveForward implements ControllerAction, Serializable{
         float throttle;
 
@@ -22,7 +28,7 @@ public class ControllerMessage extends BaseMsg {
             this.throttle=throttle;
         }
 
-        public void Do(Badger badger){
+        public void Do(HoneybadgerV6 badger){
             badger.moveForward(throttle);
         }
 
@@ -39,7 +45,7 @@ public class ControllerMessage extends BaseMsg {
             this.throttle=throttle;
         }
 
-        public void Do(Badger badger){
+        public void Do(HoneybadgerV6 badger){
             badger.strafeLeft(throttle);
         }
     }
@@ -51,7 +57,7 @@ public class ControllerMessage extends BaseMsg {
             this.throttle=throttle;
         }
 
-        public void Do(Badger badger){
+        public void Do(HoneybadgerV6 badger){
             badger.strafeRight(throttle);
         }
     }
@@ -63,49 +69,56 @@ public class ControllerMessage extends BaseMsg {
             this.throttle=throttle;
         }
 
-        public void Do(Badger badger){
+        public void Do(HoneybadgerV6 badger){
             badger.moveBackward(throttle);
         }
     }
 
     public static class Stop implements ControllerAction, Serializable{
-        public void Do(Badger badger){
+        public void Do(HoneybadgerV6 badger){
             badger.STOP();
         }
     }
 
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // START Debug Commands
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
     public static class DEBUG_MOTOR_FL implements ControllerAction, Serializable{
-        public void Do(Badger badger){
+        public void Do(HoneybadgerV6 badger){
             badger.SetMotor(RPI.DRIVE_FRONT_LEFT, BadgerPWM.DRIVE_FRONT_LEFT, BadgerMotorController.CLOCKWISE,100);
         }
     }
 
     public static class DEBUG_MOTOR_FR implements ControllerAction, Serializable{
-        public void Do(Badger badger){
+        public void Do(HoneybadgerV6 badger){
             badger.SetMotor(RPI.DRIVE_FRONT_RIGHT, BadgerPWM.DRIVE_FRONT_RIGHT, BadgerMotorController.CLOCKWISE,100);
         }
     }
     public static class DEBUG_MOTOR_BL implements ControllerAction, Serializable{
-        public void Do(Badger badger){
+        public void Do(HoneybadgerV6 badger){
             badger.SetMotor(RPI.DRIVE_BACK_LEFT, BadgerPWM.DRIVE_BACK_LEFT, BadgerMotorController.CLOCKWISE,100);
         }
     }
     public static class DEBUG_MOTOR_BR implements ControllerAction, Serializable{
-        public void Do(Badger badger){
+        public void Do(HoneybadgerV6 badger){
             badger.SetMotor(RPI.DRIVE_BACK_RIGHT, BadgerPWM.DRIVE_BACK_RIGHT, BadgerMotorController.CLOCKWISE,100);
         }
     }
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // END Controller Action Commands
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     private ControllerAction Action;
 
     public ControllerMessage(ControllerAction someAction){
         Action = someAction;
-        payload = someAction.toString();
+        payload = someAction.getClass().getName();
     }
 
     @Override
     public void Execute(Object context) {
-        Badger badger = (Badger) context;
+        HoneybadgerV6 badger = (HoneybadgerV6) context;
         if(badger==null){
             //TODO: Send some error message back
             return;

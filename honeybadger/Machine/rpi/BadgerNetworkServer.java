@@ -17,7 +17,7 @@ public class BadgerNetworkServer {
     private final int port = 2017;
 
     //The Honeybadger that should process messages
-    private Badger Machine;
+    private HoneybadgerV6 Machine;
 
     private ServerSocket connection;
     private Socket clientConnection;
@@ -25,7 +25,7 @@ public class BadgerNetworkServer {
     private ObjectInputStream inStream;
     private BaseMsg LastMessage;
 
-    BadgerNetworkServer(Badger badger){
+    BadgerNetworkServer(HoneybadgerV6 badger){
         Machine = badger;
         SetupNetwork();
     }

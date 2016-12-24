@@ -2,7 +2,7 @@ package Machine.rpi;
 
 public class DriveTest {
     public static void main(String[] args) throws Exception {
-        Badger testBadger = Badger.getInstance();
+        HoneybadgerV6 testBadger = HoneybadgerV6.getInstance();
 
 //        testBadger.moveForward(100);
 
