@@ -20,9 +20,17 @@ public class MainPi {
 
         BadgerNetworkServer ns=null;
         try {
-            HoneybadgerV6 badger = HoneybadgerV6.getInstance();
-            badger.STOP();
-            ns = badger.getNetworkServer();
+            //TODO: Change later.
+            //If we're not running on arm, this is probably a quick networking prototype.
+            String arch = System.getProperty("os.arch");
+            if(!arch.contains("arm")){
+                ns = new BadgerNetworkServer(null);
+            }
+            else{ //if this is running on ARM, then make the HoneyBadger.
+                HoneybadgerV6 badger = HoneybadgerV6.getInstance();
+                badger.STOP();
+                ns = badger.getNetworkServer();
+            }
         }
         catch(Exception e){
             e.printStackTrace();

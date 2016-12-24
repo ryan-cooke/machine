@@ -38,11 +38,10 @@ public class NetworkConnector {
             LastMessage = new BaseMsg(msg);
             try {
                 outStream.writeObject(LastMessage);
-                //System.out.println("Machine.Common.Network.BaseMsg sent");
             }
             catch (Exception e){
                 e.printStackTrace();
-                System.out.println("Machine.Common.Network.BaseMsg Not Sent: "+LastMessage.getPayload());
+                System.out.println("Message Not Sent: "+LastMessage.getPayload());
             }
         }
     }
@@ -52,12 +51,20 @@ public class NetworkConnector {
             LastMessage = msg;
             try {
                 outStream.writeObject(LastMessage);
-                //System.out.println("Machine.Common.Network.BaseMsg sent");
             }
             catch (Exception e){
                 e.printStackTrace();
-                System.out.println("Machine.Common.Network.BaseMsg Not Sent: "+LastMessage.getPayload());
+                System.out.println("Message Not Sent: "+LastMessage.getPayload());
             }
+        }
+    }
+
+    void End(){
+        try {
+            connection.close();
+        }
+        catch (Exception e){
+            e.printStackTrace();
         }
     }
 

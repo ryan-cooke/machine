@@ -7,6 +7,8 @@ import Machine.rpi.hw.RPI;
 
 import java.io.Serializable;
 
+import static Machine.Common.Utils.Log;
+
 /**
  * Handles everything related to networking the controller
  */
@@ -120,6 +122,7 @@ public class ControllerMessage extends BaseMsg {
     public void Execute(Object context) {
         HoneybadgerV6 badger = (HoneybadgerV6) context;
         if(badger==null){
+            Log(String.format("Unable to execute %s",this.payload));
             //TODO: Send some error message back
             return;
         }

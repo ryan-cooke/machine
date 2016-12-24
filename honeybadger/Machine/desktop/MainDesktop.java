@@ -11,23 +11,32 @@ import static Machine.Common.Utils.Prompt;
 public class MainDesktop {
     //Quick test for network
     public static void main(String[] args){
-
         Scanner Kb = new Scanner(System.in);
 
-        //Ask for IP
-        Log("Enter RPi IP: ");
-        String IP = Kb.nextLine();
+        String IP = "192.168.0.1";
+        Log(String.format("Enter RPi IP (Default %s): ",IP));
+        String input = Kb.nextLine();
+        if(!input.isEmpty()){
+            IP=input;
+        }
+
+        Log(String.format("Connecting to %s",IP));
         Machine.desktop.NetworkConnector nc = new Machine.desktop.NetworkConnector(IP,2017);
         Controller Xbox = new Controller(nc);
-        String input="";
+        input="";
+        Log("Connection established");
         while(true){
             input = Prompt('>',Kb);
-            Log("Sending "+input);
+            Log(String.format("Sending \"%s\"",input));
             nc.SendMessage(input);
             if(input.contains("quit")){
+                nc.End();
                 nc = null;
                 break;
             }
         }
+
+        Log("Closing Connection");
+        System.exit(0);
     }
 }
