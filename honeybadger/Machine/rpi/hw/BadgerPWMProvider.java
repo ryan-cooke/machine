@@ -8,9 +8,9 @@ import com.pi4j.io.i2c.I2CBus;
 import java.io.IOException;
 
 /**
- * Contains definitions of each pin used on the PCA9685
+ * A Specific implementation of the PCA9685 chip which is more personalized and fixes some issues in the PCA9685 provider
  */
-public class BadgerPWM extends PCA9685GpioProvider{
+public class BadgerPWMProvider extends PCA9685GpioProvider{
     public static Pin DRIVE_FRONT_LEFT = PCA9685Pin.PWM_00;
     public static Pin DRIVE_FRONT_RIGHT = PCA9685Pin.PWM_01;
     public static Pin DRIVE_BACK_LEFT = PCA9685Pin.PWM_02;
@@ -41,7 +41,7 @@ public class BadgerPWM extends PCA9685GpioProvider{
             SHOOTING_AIM_ADJUST,
     };
 
-    public BadgerPWM(I2CBus bus, int address) throws IOException{
+    public BadgerPWMProvider(I2CBus bus, int address) throws IOException{
         super(bus,address);
 
         //Set Drive motors to low immediately

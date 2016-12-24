@@ -28,7 +28,7 @@ public class BadgerMotorController{
     /**
      * Object that represents the PCA9685. Is used mostly to set PWM of it's pins
      */
-    private BadgerPWM PWMProvider;
+    private BadgerPWMProvider PWMProvider;
 
     /**
      * Object that represents the RaspberryPI. Is used mostly to set the PinState of it's pins (HIGH or LOW)
@@ -64,7 +64,7 @@ public class BadgerMotorController{
 
             RPIProvider = GpioFactory.getDefaultProvider();
 
-            PWMProvider = new BadgerPWM(bus, 0x40);
+            PWMProvider = new BadgerPWMProvider(bus, 0x40);
 
             this.provisionPwmOutputs();
             this.provisionDigitalOutputs();
@@ -89,19 +89,19 @@ public class BadgerMotorController{
      */
     private void provisionPwmOutputs() {
         this.PWMOutputs = new GpioPinPwmOutput[]{
-                GPIO.provisionPwmOutputPin(PWMProvider, BadgerPWM.DRIVE_FRONT_LEFT, "Front Left - FL-H"),
-                GPIO.provisionPwmOutputPin(PWMProvider, BadgerPWM.DRIVE_FRONT_RIGHT, "Front Right - FR-H"),
-                GPIO.provisionPwmOutputPin(PWMProvider, BadgerPWM.DRIVE_BACK_LEFT, "Back Left - BL-H"),
-                GPIO.provisionPwmOutputPin(PWMProvider, BadgerPWM.DRIVE_BACK_RIGHT, "Back Right - BR-H"),
+                GPIO.provisionPwmOutputPin(PWMProvider, BadgerPWMProvider.DRIVE_FRONT_LEFT, "Front Left - FL-H"),
+                GPIO.provisionPwmOutputPin(PWMProvider, BadgerPWMProvider.DRIVE_FRONT_RIGHT, "Front Right - FR-H"),
+                GPIO.provisionPwmOutputPin(PWMProvider, BadgerPWMProvider.DRIVE_BACK_LEFT, "Back Left - BL-H"),
+                GPIO.provisionPwmOutputPin(PWMProvider, BadgerPWMProvider.DRIVE_BACK_RIGHT, "Back Right - BR-H"),
 
-                GPIO.provisionPwmOutputPin(PWMProvider, BadgerPWM.CONVEYOR_A, "Conveyor A - CV1"),
-                GPIO.provisionPwmOutputPin(PWMProvider, BadgerPWM.CONVEYOR_B, "Conveyor B - CV2"),
-                GPIO.provisionPwmOutputPin(PWMProvider, BadgerPWM.VACUUM_ROLLER, "Vacuum Roller - VAC"),
-                GPIO.provisionPwmOutputPin(PWMProvider, BadgerPWM.FLYWHEEL_A, "Flywheel A - BS1"),
-                GPIO.provisionPwmOutputPin(PWMProvider, BadgerPWM.FLYWHEEL_B, "Flywheel B - BS2"),
-                GPIO.provisionPwmOutputPin(PWMProvider, BadgerPWM.CLIMBING_ARM, "Climbing Arm - RND1"),
-                GPIO.provisionPwmOutputPin(PWMProvider, BadgerPWM.CLIMBING_WRIST, "Climbing Wrist - RND2"),
-                GPIO.provisionPwmOutputPin(PWMProvider, BadgerPWM.SHOOTING_AIM_ADJUST, "Shooting aim adjust - RND3")
+                GPIO.provisionPwmOutputPin(PWMProvider, BadgerPWMProvider.CONVEYOR_A, "Conveyor A - CV1"),
+                GPIO.provisionPwmOutputPin(PWMProvider, BadgerPWMProvider.CONVEYOR_B, "Conveyor B - CV2"),
+                GPIO.provisionPwmOutputPin(PWMProvider, BadgerPWMProvider.VACUUM_ROLLER, "Vacuum Roller - VAC"),
+                GPIO.provisionPwmOutputPin(PWMProvider, BadgerPWMProvider.FLYWHEEL_A, "Flywheel A - BS1"),
+                GPIO.provisionPwmOutputPin(PWMProvider, BadgerPWMProvider.FLYWHEEL_B, "Flywheel B - BS2"),
+                GPIO.provisionPwmOutputPin(PWMProvider, BadgerPWMProvider.CLIMBING_ARM, "Climbing Arm - RND1"),
+                GPIO.provisionPwmOutputPin(PWMProvider, BadgerPWMProvider.CLIMBING_WRIST, "Climbing Wrist - RND2"),
+                GPIO.provisionPwmOutputPin(PWMProvider, BadgerPWMProvider.SHOOTING_AIM_ADJUST, "Shooting aim adjust - RND3")
         };
     }
 
