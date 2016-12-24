@@ -7,7 +7,6 @@ import com.pi4j.io.gpio.RaspiPin;
  * Contains definitions of each pin used on the RaspberryPI
  */
 public class RPI {
-    //5,6,13,19
     // GPIO 19 == Pi4J 24 -> BACK_RIGHT
     // GPIO 13 == Pi4J 23 -> BACK_LEFT
     // GPIO 6 == PI4J 22 -> FRONT_RIGHT

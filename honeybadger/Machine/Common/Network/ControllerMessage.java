@@ -2,7 +2,7 @@ package Machine.Common.Network;
 
 import Machine.rpi.Badger;
 import Machine.rpi.hw.BadgerMotorController;
-import Machine.rpi.hw.PCAChip;
+import Machine.rpi.hw.BadgerPWM;
 import Machine.rpi.hw.RPI;
 
 import java.io.Serializable;
@@ -76,23 +76,23 @@ public class ControllerMessage extends BaseMsg {
 
     public static class DEBUG_MOTOR_FL implements ControllerAction, Serializable{
         public void Do(Badger badger){
-            badger.SetMotor(RPI.DRIVE_FRONT_LEFT, PCAChip.DRIVE_FRONT_LEFT, BadgerMotorController.CLOCKWISE,100);
+            badger.SetMotor(RPI.DRIVE_FRONT_LEFT, BadgerPWM.DRIVE_FRONT_LEFT, BadgerMotorController.CLOCKWISE,100);
         }
     }
 
     public static class DEBUG_MOTOR_FR implements ControllerAction, Serializable{
         public void Do(Badger badger){
-            badger.SetMotor(RPI.DRIVE_FRONT_RIGHT, PCAChip.DRIVE_FRONT_RIGHT, BadgerMotorController.CLOCKWISE,100);
+            badger.SetMotor(RPI.DRIVE_FRONT_RIGHT, BadgerPWM.DRIVE_FRONT_RIGHT, BadgerMotorController.CLOCKWISE,100);
         }
     }
     public static class DEBUG_MOTOR_BL implements ControllerAction, Serializable{
         public void Do(Badger badger){
-            badger.SetMotor(RPI.DRIVE_BACK_LEFT, PCAChip.DRIVE_BACK_LEFT, BadgerMotorController.CLOCKWISE,100);
+            badger.SetMotor(RPI.DRIVE_BACK_LEFT, BadgerPWM.DRIVE_BACK_LEFT, BadgerMotorController.CLOCKWISE,100);
         }
     }
     public static class DEBUG_MOTOR_BR implements ControllerAction, Serializable{
         public void Do(Badger badger){
-            badger.SetMotor(RPI.DRIVE_BACK_RIGHT, PCAChip.DRIVE_BACK_RIGHT, BadgerMotorController.CLOCKWISE,100);
+            badger.SetMotor(RPI.DRIVE_BACK_RIGHT, BadgerPWM.DRIVE_BACK_RIGHT, BadgerMotorController.CLOCKWISE,100);
         }
     }
 

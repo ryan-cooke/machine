@@ -92,19 +92,19 @@ public class BadgerMotorController{
      */
     private void provisionPwmOutputs() {
         this.PWMOutputs = new GpioPinPwmOutput[]{
-                GPIO.provisionPwmOutputPin(PCAprovider, PCAChip.DRIVE_FRONT_LEFT, "Front Left - FL-H"),
-                GPIO.provisionPwmOutputPin(PCAprovider, PCAChip.DRIVE_FRONT_RIGHT, "Front Right - FR-H"),
-                GPIO.provisionPwmOutputPin(PCAprovider, PCAChip.DRIVE_BACK_LEFT, "Back Left - BL-H"),
-                GPIO.provisionPwmOutputPin(PCAprovider, PCAChip.DRIVE_BACK_RIGHT, "Back Right - BR-H"),
+                GPIO.provisionPwmOutputPin(PCAprovider, BadgerPWM.DRIVE_FRONT_LEFT, "Front Left - FL-H"),
+                GPIO.provisionPwmOutputPin(PCAprovider, BadgerPWM.DRIVE_FRONT_RIGHT, "Front Right - FR-H"),
+                GPIO.provisionPwmOutputPin(PCAprovider, BadgerPWM.DRIVE_BACK_LEFT, "Back Left - BL-H"),
+                GPIO.provisionPwmOutputPin(PCAprovider, BadgerPWM.DRIVE_BACK_RIGHT, "Back Right - BR-H"),
 
-                GPIO.provisionPwmOutputPin(PCAprovider, PCAChip.CONVEYOR_A, "Conveyor A - CV1"),
-                GPIO.provisionPwmOutputPin(PCAprovider, PCAChip.CONVEYOR_B, "Conveyor B - CV2"),
-                GPIO.provisionPwmOutputPin(PCAprovider, PCAChip.VACUUM_ROLLER, "Vacuum Roller - VAC"),
-                GPIO.provisionPwmOutputPin(PCAprovider, PCAChip.FLYWHEEL_A, "Flywheel A - BS1"),
-                GPIO.provisionPwmOutputPin(PCAprovider, PCAChip.FLYWHEEL_B, "Flywheel B - BS2"),
-                GPIO.provisionPwmOutputPin(PCAprovider, PCAChip.CLIMBING_ARM, "Climbing Arm - RND1"),
-                GPIO.provisionPwmOutputPin(PCAprovider, PCAChip.CLIMBING_WRIST, "Climbing Wrist - RND2"),
-                GPIO.provisionPwmOutputPin(PCAprovider, PCAChip.SHOOTING_AIM_ADJUST, "Shooting aim adjust - RND3")
+                GPIO.provisionPwmOutputPin(PCAprovider, BadgerPWM.CONVEYOR_A, "Conveyor A - CV1"),
+                GPIO.provisionPwmOutputPin(PCAprovider, BadgerPWM.CONVEYOR_B, "Conveyor B - CV2"),
+                GPIO.provisionPwmOutputPin(PCAprovider, BadgerPWM.VACUUM_ROLLER, "Vacuum Roller - VAC"),
+                GPIO.provisionPwmOutputPin(PCAprovider, BadgerPWM.FLYWHEEL_A, "Flywheel A - BS1"),
+                GPIO.provisionPwmOutputPin(PCAprovider, BadgerPWM.FLYWHEEL_B, "Flywheel B - BS2"),
+                GPIO.provisionPwmOutputPin(PCAprovider, BadgerPWM.CLIMBING_ARM, "Climbing Arm - RND1"),
+                GPIO.provisionPwmOutputPin(PCAprovider, BadgerPWM.CLIMBING_WRIST, "Climbing Wrist - RND2"),
+                GPIO.provisionPwmOutputPin(PCAprovider, BadgerPWM.SHOOTING_AIM_ADJUST, "Shooting aim adjust - RND3")
         };
 
         //Set Drive motors to high when shutting down.
@@ -136,7 +136,6 @@ public class BadgerMotorController{
      * @param pin PCA9685Pin for the motor whose speed will be set
      * @param speedPercent Speed to set the motor too, int value from 0 to 100
      */
-    //TODO: TEST THIS METHOD WITH A MOTOR
     public void setTLEMotorSpeed(Pin pin, float speedPercent) {
         if(!IsReady){
             return;
