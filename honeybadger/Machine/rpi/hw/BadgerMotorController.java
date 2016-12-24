@@ -53,7 +53,6 @@ public class BadgerMotorController{
 
     /**
      * Initializes the BadgerI2C class and creates it's provider
-     * @throws Exception Yes, this may throw some exception (See random sample code from internet for more details)
      */
     //@SuppressWarnings("WeakerAccess")
     public BadgerMotorController() /*throws Exception*/{
@@ -110,7 +109,7 @@ public class BadgerMotorController{
 
         //Set Drive motors to high when shutting down.
         for (int i = 0; i < 4; i++) {
-            PWMOutputs[i].setShutdownOptions(false,PinState.HIGH);
+            PWMOutputs[i].setShutdownOptions(false, PinState.HIGH);
         }
     }
 
@@ -150,8 +149,8 @@ public class BadgerMotorController{
         }
 
         //Get the scaled PWM value based on the MaxONPWM value;
-        int PWMOnTime = Math.round(MaxOffPWM * (1-(speedPercent /100)));
-        int PWMOffTime = 4095-PWMOnTime;
+        int PWMOffTime = Math.round(MaxOffPWM - ((1-(speedPercent /100)) * MaxOffPWM));
+        int PWMOnTime = 4095-PWMOffTime;
 
         this.PCAprovider.setPwm(pin, PWMOnTime, PWMOffTime);
     }
