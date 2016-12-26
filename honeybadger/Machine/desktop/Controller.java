@@ -1,19 +1,24 @@
 package Machine.desktop;
 
-import java.lang.Math;
-
 import Machine.Common.Network.BaseMsg;
 import Machine.Common.Network.ControllerMessage;
+import Machine.Common.Utils;
+
 import ch.aplu.xboxcontroller.*;
+
+import java.nio.file.SecureDirectoryStream;
+
 
 public class Controller extends XboxControllerAdapter{
 
-    String path = "xboxcontroller64.dll";
-    NetworkConnector connector;
-    XboxController connectedController;
+    private String path = "xboxcontroller64.dll";
+    private NetworkConnector connector;
+    private XboxController connectedController;
 
-    double rightThumbstickAngle;
-    double leftThumbstickAngle;
+    private Utils.Vector2D RightThumbstick;
+    private Utils.Vector2D LeftThumbstick;
+
+
 
     private void SendMessage(String msg){
         connector.SendMessage(msg);
@@ -144,39 +149,39 @@ public class Controller extends XboxControllerAdapter{
     public void leftThumbMagnitude(double magnitude)
     {
         //magnitude is how hard you press. Between 0-1.0
-        double x = magnitude*Math.sin(leftThumbstickAngle);
-        double y = magnitude*Math.cos(leftThumbstickAngle);
-        SendMessage("leftThumbsticks: "+x+" "+y);
+        LeftThumbstick.UpdateMagnitude(magnitude);
+        SendMessage(LeftThumbstick.toString());
     }
 
     public void leftThumbDirection(double direction)
     {
         //direction is angle. Between 0-360.0, at top
-        leftThumbstickAngle = Math.toRadians(direction);
+        LeftThumbstick.UpdateAngleDegrees(direction);
+        SendMessage(LeftThumbstick.toString());
     }
 
     public void rightThumbMagnitude(double magnitude)
     {
         //magnitude is how hard you press. Between 0-1.0
-        double x = magnitude*Math.sin(rightThumbstickAngle);
-        double y = magnitude*Math.cos(rightThumbstickAngle);
-        SendMessage("leftThumbsticks: "+x+" "+y);
+        RightThumbstick.UpdateMagnitude(magnitude);
+        SendMessage(RightThumbstick.toString());
     }
 
     public void rightThumbDirection(double direction)
     {
         //direction is angle. Between 0-360.0, at top
-        rightThumbstickAngle =  Math.toRadians(direction);
+        RightThumbstick.UpdateAngleDegrees(direction);
+        SendMessage(RightThumbstick.toString());
     }
 
     public void isConnected()
     {
         if (connectedController.isConnected()) {
-            System.out.println(" - Controller connected");
+            Utils.Log(" - Controller connected");
             SendMessage(" - Controller connected");
         }
         else {
-            System.out.println(" - Controller disconnected");
+            Utils.Log(" - Controller disconnected");
             SendMessage(" - Controller connected");
         }
     }
@@ -186,11 +191,12 @@ public class Controller extends XboxControllerAdapter{
         connector = messageConnector;
         connectedController = new XboxController(System.getProperty("user.dir") +"\\"+path ,1,50,50);
         isConnected();
+
         connectedController.addXboxControllerListener(this);
         connectedController.setLeftThumbDeadZone(0.2);
         connectedController.setRightThumbDeadZone(0.2);
 
-        rightThumbstickAngle = 0.0;
-        leftThumbstickAngle = 0.0;
+        RightThumbstick = new Utils.Vector2D();
+        LeftThumbstick = new Utils.Vector2D();
     }
 }

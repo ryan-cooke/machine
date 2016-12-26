@@ -22,7 +22,7 @@ public class BadgerNetworkServer {
     private final int port = 2017;
 
     //The Honeybadger that should process messages
-    private HoneybadgerV6 Machine;
+    private HoneybadgerV6 Badger;
 
     private ServerSocket connection;
     private Socket clientConnection;
@@ -35,7 +35,7 @@ public class BadgerNetworkServer {
     private boolean KeepAlive;
 
     BadgerNetworkServer(HoneybadgerV6 badger){
-        Machine = badger;
+        Badger = badger;
         ScheduledManager = Executors.newScheduledThreadPool(1);
 
         SetupNetwork();
@@ -58,7 +58,7 @@ public class BadgerNetworkServer {
         }
     }
 
-    public void WaitForConnect(){
+    protected void WaitForConnect(){
         Log("Waiting for a remote connection");
         try{
             clientConnection = connection.accept();
@@ -74,16 +74,15 @@ public class BadgerNetworkServer {
         }
     }
 
-    public boolean Handshake(){
-        //TODO: last part
+    protected boolean Handshake(){
+        //TODO: last part. Implement some verification with the badger to make sure they speak our language.
         //Currently does nothing.
         return true;
     }
 
-    public void SendMessage(BaseMsg message){
+    protected void SendMessage(BaseMsg message){
         LastSentMessage = message;
         try {
-            Log(String.format("Sending \'%s\'",message.getPayload()));
             outStream.writeObject(LastSentMessage);
         }
         catch (Exception e){
@@ -93,7 +92,7 @@ public class BadgerNetworkServer {
         }
     }
 
-    public String ReceiveMessage(){
+    protected String ReceiveMessage(){
         try{
             LastReceivedMessage = (BaseMsg) inStream.readObject();
 
@@ -102,7 +101,7 @@ public class BadgerNetworkServer {
                 SendMessage(new BaseMsg("Bad Message/Command!"));
             }
 
-            LastReceivedMessage.Execute(Machine);
+            LastReceivedMessage.Execute(Badger);
             return LastReceivedMessage.getPayload();
         }
         catch (Exception e){
@@ -113,7 +112,7 @@ public class BadgerNetworkServer {
         return "";
     }
 
-    public void CloseAll(){
+    protected void CloseAll(){
         try{
             if (clientConnection!=null && !clientConnection.isClosed()){
                 Log("Closing Client Connection");
@@ -153,7 +152,7 @@ public class BadgerNetworkServer {
                                 SendMessage(new BaseMsg("RPi OK!"));
                             }
                         },
-                        0,10, TimeUnit.SECONDS
+                        3,10, TimeUnit.SECONDS
                 );
 
                 while(KeepAlive && !Message.contains("quit")){
@@ -163,7 +162,15 @@ public class BadgerNetworkServer {
                 }
                 Log("Cancelling PeriodicSender");
                 PeriodicSenderHandle.cancel(true);
+                if(Badger!=null) {
+                    Badger.STOP();
+                }
             }
+            else{
+                Log("Handshake FAILED!");
+                Log(String.format("Failed device IP: %s",clientConnection.getInetAddress().toString()));
+            }
+
             Log("Cleaning up connections");
             CloseAll();
         }while(!Message.contains("quit"));
