@@ -23,14 +23,14 @@ public class BadgerNetworkServer {
     private Socket clientConnection;
     private ObjectOutputStream outStream;
     private ObjectInputStream inStream;
-    private BaseMsg LastMessage;
+
+    private BaseMsg LastReceivedMessage;
+    private BaseMsg LastSentMessage;
+
+    private boolean KeepAlive;
 
     BadgerNetworkServer(HoneybadgerV6 badger){
         Machine = badger;
-        SetupNetwork();
-    }
-
-    BadgerNetworkServer(){
         SetupNetwork();
     }
 
@@ -42,9 +42,11 @@ public class BadgerNetworkServer {
         try{
             Log("Using port "+port);
             connection = new ServerSocket(port);
+            KeepAlive = true;
         }
         catch (Exception e){
             e.printStackTrace();
+            System.err.println("BadgerNetworkServer failed to setup server.");
             System.exit(-1);
         }
     }
@@ -61,19 +63,43 @@ public class BadgerNetworkServer {
         }
         catch (Exception e){
             e.printStackTrace();
-            System.exit(-1);
+            KeepAlive=false;
+        }
+    }
+
+    public boolean Handshake(){
+        //TODO: last part
+        //Currently does nothing.
+        return true;
+    }
+
+    public void SendMessage(BaseMsg message){
+        LastSentMessage = message;
+        try {
+            outStream.writeObject(LastSentMessage);
+        }
+        catch (Exception e){
+            e.printStackTrace();
+            System.err.println("Message Not Sent: "+ LastReceivedMessage.getPayload());
+            KeepAlive=false;
         }
     }
 
     public String ReceiveMessage(){
         try{
-            LastMessage = (BaseMsg) inStream.readObject();
-            LastMessage.Execute(Machine);
-            return LastMessage.getPayload();
+            LastReceivedMessage = (BaseMsg) inStream.readObject();
+
+            //If this wasn't a base message, send an error out.
+            if(LastReceivedMessage ==null){
+                SendMessage(new BaseMsg("Bad Message/Command!"));
+            }
+
+            LastReceivedMessage.Execute(Machine);
+            return LastReceivedMessage.getPayload();
         }
         catch (Exception e){
             e.printStackTrace();
-            System.exit(-1);
+            KeepAlive=false;
         }
 
         return "";
@@ -89,11 +115,33 @@ public class BadgerNetworkServer {
                 connection.close();
                 connection = null;
             }
+
+            outStream = null;
+            inStream = null;
         }
         catch (Exception e){
             e.printStackTrace();
             System.exit(-1);
         }
 
+    }
+
+    public void Run(){
+        //Main loop
+        String Message="";
+        do{
+            SetupNetwork();
+            WaitForConnect();
+
+            if(Handshake()){
+                while(KeepAlive && !Message.contains("quit")){
+                    Message = ReceiveMessage();
+                    //only for DEBUG
+                    Log(Message);
+                }
+            }
+
+            CloseAll();
+        }while(!Message.contains("quit"));
     }
 }

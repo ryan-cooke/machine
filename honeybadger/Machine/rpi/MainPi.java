@@ -36,13 +36,6 @@ public class MainPi {
             e.printStackTrace();
         }
 
-        ns.WaitForConnect();
-
-        String input="";
-        while(!input.contains("quit")) {
-            input = ns.ReceiveMessage();
-            Log(input);
-        }
-        ns.CloseAll();
+        ns.Run();
     }
 }
