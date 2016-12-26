@@ -7,12 +7,17 @@ import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+import java.util.concurrent.*;
+
 import static Machine.Common.Utils.Log;
+import static java.util.concurrent.Executors.newScheduledThreadPool;
 
 /**
  * Creates and handles the server connection
  */
 public class BadgerNetworkServer {
+    private final ScheduledExecutorService ScheduledManager;
+
     //Port from which to send and receive commands
     private final int port = 2017;
 
@@ -31,6 +36,8 @@ public class BadgerNetworkServer {
 
     BadgerNetworkServer(HoneybadgerV6 badger){
         Machine = badger;
+        ScheduledManager = Executors.newScheduledThreadPool(1);
+
         SetupNetwork();
     }
 
@@ -76,6 +83,7 @@ public class BadgerNetworkServer {
     public void SendMessage(BaseMsg message){
         LastSentMessage = message;
         try {
+            Log(String.format("Sending \'%s\'",message.getPayload()));
             outStream.writeObject(LastSentMessage);
         }
         catch (Exception e){
@@ -108,14 +116,17 @@ public class BadgerNetworkServer {
     public void CloseAll(){
         try{
             if (clientConnection!=null && !clientConnection.isClosed()){
+                Log("Closing Client Connection");
                 clientConnection.close();
                 clientConnection = null;
             }
             if(connection!=null && !connection.isClosed()){
+                Log("Shutting Down Server");
                 connection.close();
                 connection = null;
             }
 
+            Log("Releasing Streams");
             outStream = null;
             inStream = null;
         }
@@ -134,14 +145,29 @@ public class BadgerNetworkServer {
             WaitForConnect();
 
             if(Handshake()){
+                //Setup the regular message sender
+                final ScheduledFuture<?> PeriodicSenderHandle = ScheduledManager.scheduleAtFixedRate(
+                        new Runnable() {
+                            @Override
+                            public void run() {
+                                SendMessage(new BaseMsg("RPi OK!"));
+                            }
+                        },
+                        0,10, TimeUnit.SECONDS
+                );
+
                 while(KeepAlive && !Message.contains("quit")){
                     Message = ReceiveMessage();
                     //only for DEBUG
                     Log(Message);
                 }
+                Log("Cancelling PeriodicSender");
+                PeriodicSenderHandle.cancel(true);
             }
-
+            Log("Cleaning up connections");
             CloseAll();
         }while(!Message.contains("quit"));
+
+        Log("Stopping BadgerNetworkServer Run");
     }
 }

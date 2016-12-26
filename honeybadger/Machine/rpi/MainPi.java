@@ -37,5 +37,9 @@ public class MainPi {
         }
 
         ns.Run();
+
+        ns = null;
+        Log("Ending");
+        System.exit(0);
     }
 }
