@@ -20,7 +20,9 @@ public class NetworkConnector {
     Socket connection;
     ObjectOutputStream outStream;
     ObjectInputStream inStream;
-    BaseMsg LastMessage;
+
+    private BaseMsg LastReceivedMessage;
+    private BaseMsg LastSentMessage;
 
     NetworkConnector(String Host, int connectPort){
         host = Host;
@@ -58,28 +60,49 @@ public class NetworkConnector {
         }
 
         Log(String.format("Connection to %s:%s established successfully",Host,connectPort));
-        LastMessage = null;
+        LastSentMessage = null;
     }
 
     void SendMessage(String msg){
         if(connection!=null){
-            LastMessage = new BaseMsg(msg);
-            SendMessage(LastMessage);
+            LastSentMessage = new BaseMsg(msg);
+            SendMessage(LastSentMessage);
         }
     }
 
     void SendMessage(BaseMsg msg){
         if(connection!=null){
-            LastMessage = msg;
+            LastSentMessage = msg;
             try {
-                outStream.writeObject(LastMessage);
+                outStream.writeObject(LastSentMessage);
             }
             catch (Exception e){
                 exceptionOccurred = true;
                 e.printStackTrace();
-                System.out.println("Message Not Sent: "+LastMessage.getPayload());
+                System.out.println("Message Not Sent: "+ LastSentMessage.getPayload());
             }
         }
+    }
+
+    public String ReceiveMessage(){
+        try{
+            LastReceivedMessage = (BaseMsg) inStream.readObject();
+
+            //If this wasn't a base message, send an error out.
+            if(LastReceivedMessage ==null){
+                Log("Bad Message!");
+            }
+
+            LastReceivedMessage.Execute(null);
+
+            return LastReceivedMessage.getPayload();
+        }
+        catch (Exception e){
+            //Don't do anything.
+            //e.printStackTrace();
+        }
+
+        return "";
     }
 
     void End(){
