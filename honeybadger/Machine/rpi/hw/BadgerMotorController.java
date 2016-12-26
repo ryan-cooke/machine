@@ -59,20 +59,29 @@ public class BadgerMotorController{
     public BadgerMotorController() /*throws Exception*/{
         IsReady = false;
         try {
+            Log("Enabling I2C Bus");
             I2CBus bus = I2CFactory.getInstance(I2CBus.BUS_1);
+
+            Log("Enabling GPIO");
             this.GPIO = GpioFactory.getInstance();
 
+            Log("Locking GPIO Provider");
             RPIProvider = GpioFactory.getDefaultProvider();
 
+            Log("Creating BadgerPWM Provider");
             PWMProvider = new BadgerPWMProvider(bus, 0x40);
 
+            Log("Provisioning Outputs");
             this.provisionPwmOutputs();
             this.provisionDigitalOutputs();
+            PWMProvider.reset();
 
             IsReady = true;
+            Log("Badger Motor Controller Ready");
         }
         catch (Exception e){
             //TODO: Should be a harder warning
+            e.printStackTrace();
             System.out.println("ERROR: THE EXPECTED DEVICES WERE NOT AVAILABLE");
         }
     }
@@ -140,17 +149,13 @@ public class BadgerMotorController{
         }
 
         //Get the scaled PWM value based on the MaxONPWM value;
-        int PWMOffTime = Math.round(MaxOffPWM - ((1-(speedPercent /100)) * MaxOffPWM));
-        int PWMOnTime = 4095-PWMOffTime;
-
+        int PWMOnTime = Math.round(MaxOffPWM - ((1-(speedPercent /100)) * MaxOffPWM));
+        int PWMOffTime = 4095-PWMOnTime;
+        Log(String.format("PWM OFF: %d | PWM ON %d", PWMOffTime, PWMOnTime));
         this.PWMProvider.setPwm(pin, PWMOnTime, PWMOffTime);
     }
 
     public void STOP(Pin pin){
-        if(!IsReady){
-            return;
-        }
-
         this.PWMProvider.setAlwaysOn(pin);
     }
 

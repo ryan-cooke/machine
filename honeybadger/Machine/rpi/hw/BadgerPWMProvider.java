@@ -43,11 +43,6 @@ public class BadgerPWMProvider extends PCA9685GpioProvider{
 
     public BadgerPWMProvider(I2CBus bus, int address) throws IOException{
         super(bus,address);
-
-        //Set Drive motors to low immediately
-        for (Pin pin: DriveMotors) {
-            setAlwaysOn(pin);
-        }
     }
 
     @Override
