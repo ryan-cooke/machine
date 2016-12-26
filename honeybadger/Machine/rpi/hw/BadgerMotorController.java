@@ -147,6 +147,10 @@ public class BadgerMotorController{
     }
 
     public void STOP(Pin pin){
+        if(!IsReady){
+            return;
+        }
+
         this.PWMProvider.setAlwaysOn(pin);
     }
 
