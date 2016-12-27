@@ -138,7 +138,7 @@ public class BadgerNetworkServer {
 
     public void Run(){
         //Main loop
-        String Message="";
+        String message="";
         do{
             SetupNetwork();
             WaitForConnect();
@@ -155,10 +155,10 @@ public class BadgerNetworkServer {
                         3,10, TimeUnit.SECONDS
                 );
 
-                while(KeepAlive && !Message.contains("quit")){
-                    Message = ReceiveMessage();
+                while(KeepAlive && !message.contains("quit") && !message.endsWith("close")){
+                    message = ReceiveMessage();
                     //only for DEBUG
-                    Log(Message);
+                    Log(message);
                 }
                 Log("Cancelling PeriodicSender");
                 PeriodicSenderHandle.cancel(true);
@@ -173,7 +173,7 @@ public class BadgerNetworkServer {
 
             Log("Cleaning up connections");
             CloseAll();
-        }while(!Message.contains("quit"));
+        }while(!message.contains("quit"));
 
         Log("Stopping BadgerNetworkServer Run");
     }

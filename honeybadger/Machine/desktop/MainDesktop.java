@@ -1,6 +1,7 @@
 package Machine.desktop;
 
 import Machine.Common.Network.ControllerMessage;
+import Machine.Common.Network.ReflectionMessage;
 import Machine.desktop.NetworkConnector;
 
 import java.util.Scanner;
@@ -86,24 +87,27 @@ public class MainDesktop {
                     nc.SendMessage(new ControllerMessage(new ControllerMessage.Shoot((float)level)));
                 }
 
+                if(input.contains("CALL")){
+                    Log(String.format("Sending ReflectionMessage \'%s\'",input.substring(5)));
+                    nc.SendMessage(new ReflectionMessage(input.substring(5)));
+                }
+
                 //Exit if we said "quit"
                 if (input.contains("quit")) {
-                    nc.End();
-                    nc = null;
                     Log("Closing Connection");
                     isActive=false;
                     keepAlive = false;
                 }
                 //Retry if the connection broke
                 else if (nc.IsBroken()) {
-                    nc.End();
-                    nc = null;
                     Log("Lost Connection... Reconnecting");
                     keepAlive = false;
                 }
             }
 
             readerHandle.end();
+            nc.End();
+            nc = null;
         }while(isActive);
 
         System.exit(0);

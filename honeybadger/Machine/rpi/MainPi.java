@@ -15,12 +15,11 @@ public class MainPi {
             Log("Starting server at IP: " + InetAddress.getLocalHost().toString());
         }
         catch(Exception e){
-            System.out.println(e.getStackTrace());
+            e.printStackTrace();
         }
 
         BadgerNetworkServer ns=null;
         try {
-            String arch = System.getProperty("os.arch");
             HoneybadgerV6 badger = HoneybadgerV6.getInstance();
             badger.STOP();
             ns = badger.getNetworkServer();
