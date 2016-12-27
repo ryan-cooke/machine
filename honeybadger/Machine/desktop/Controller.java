@@ -4,6 +4,7 @@ import Machine.Common.Network.BaseMsg;
 import Machine.Common.Network.ControllerMessage;
 import Machine.Common.Utils;
 
+import Machine.rpi.hw.BadgerMotorController;
 import ch.aplu.xboxcontroller.*;
 
 import java.nio.file.SecureDirectoryStream;
@@ -18,7 +19,7 @@ public class Controller extends XboxControllerAdapter{
     private Utils.Vector2D RightThumbstick;
     private Utils.Vector2D LeftThumbstick;
 
-
+    private float FlywheelSpeed;
 
     private void SendMessage(String msg){
         connector.SendMessage(msg);
@@ -73,6 +74,8 @@ public class Controller extends XboxControllerAdapter{
     public void leftShoulder(boolean pressed)
     {
         if (pressed){
+            ControllerMessage.DEBUG_MOTOR.throttle = ControllerMessage.DEBUG_MOTOR.throttle <100?
+                    ControllerMessage.DEBUG_MOTOR.throttle - 5.0f : ControllerMessage.DEBUG_MOTOR.throttle;
             SendMessage("Pressed left bumper");
         }
     }
@@ -80,6 +83,9 @@ public class Controller extends XboxControllerAdapter{
     public void rightShoulder(boolean pressed)
     {
         if (pressed){
+            ControllerMessage.DEBUG_MOTOR.throttle = ControllerMessage.DEBUG_MOTOR.throttle <100?
+                    ControllerMessage.DEBUG_MOTOR.throttle + 5.0f : ControllerMessage.DEBUG_MOTOR.throttle;
+
             SendMessage("Pressed right bumper");
         }
     }
@@ -104,28 +110,28 @@ public class Controller extends XboxControllerAdapter{
             switch (direction) {
                 case 0:
                     // N
-                    SendMessage(new ControllerMessage(new ControllerMessage.DEBUG_MOTOR_FL()));
+                    SendMessage(new ControllerMessage(new ControllerMessage.DEBUG_MOTOR_FR(BadgerMotorController.CLOCKWISE)));
                     break;
                 case 1:
                     // NE
                     break;
                 case 2:
                     // E
-                    SendMessage(new ControllerMessage(new ControllerMessage.DEBUG_MOTOR_BR()));
+                    SendMessage(new ControllerMessage(new ControllerMessage.DEBUG_MOTOR_BR(BadgerMotorController.CLOCKWISE)));
                     break;
                 case 3:
                     // SE
                     break;
                 case 4:
                     // S
-                    SendMessage(new ControllerMessage(new ControllerMessage.DEBUG_MOTOR_FR()));
+                    SendMessage(new ControllerMessage(new ControllerMessage.DEBUG_MOTOR_FR(BadgerMotorController.COUNTER_CLOCKWISE)));
                     break;
                 case 5:
                     // SW
                     break;
                 case 6:
                     // W
-                    SendMessage(new ControllerMessage(new ControllerMessage.DEBUG_MOTOR_BL()));
+                    SendMessage(new ControllerMessage(new ControllerMessage.DEBUG_MOTOR_BR(BadgerMotorController.COUNTER_CLOCKWISE)));
                     break;
                 case 7:
                     // NW
@@ -137,13 +143,17 @@ public class Controller extends XboxControllerAdapter{
     public void leftTrigger(double value)
     {
         //value is how hard you press. Between 0-1.0
-        SendMessage("leftTrigger: "+value);
+        FlywheelSpeed += value;
+        if(FlywheelSpeed>100){
+            FlywheelSpeed=100;
+        }
+        SendMessage(new ControllerMessage(new ControllerMessage.Shoot((float)value)));
     }
 
     public void rightTrigger(double value)
     {
         //value is how hard you press. Between 0-1.0
-        SendMessage("rightTrigger: "+value);
+        SendMessage(new ControllerMessage(new ControllerMessage.Shoot((float)value)));
     }
 
     public void leftThumbMagnitude(double magnitude)
@@ -198,5 +208,6 @@ public class Controller extends XboxControllerAdapter{
 
         RightThumbstick = new Utils.Vector2D();
         LeftThumbstick = new Utils.Vector2D();
+
     }
 }

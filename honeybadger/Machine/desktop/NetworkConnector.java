@@ -95,6 +95,7 @@ public class NetworkConnector {
 
             LastReceivedMessage.Execute(null);
 
+            exceptionOccurred = connection.isClosed();
             return LastReceivedMessage.getPayload();
         }
         catch (Exception e){
@@ -105,7 +106,7 @@ public class NetworkConnector {
         return "";
     }
 
-    void End(){
+    public void End(){
         if(!connection.isConnected()){
             return;
         }

@@ -6,6 +6,7 @@ import com.pi4j.io.gpio.Pin;
 import com.pi4j.io.i2c.I2CBus;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 
 /**
  * A Specific implementation of the PCA9685 chip which is more personalized and fixes some issues in the PCA9685 provider
@@ -24,8 +25,10 @@ public class BadgerPWMProvider extends PCA9685GpioProvider{
     public static Pin CONVEYOR_A = PCA9685Pin.PWM_04;
     public static Pin CONVEYOR_B = PCA9685Pin.PWM_05;
     public static Pin VACUUM_ROLLER = PCA9685Pin.PWM_06;
+    public static Pin CLIMBING_WHEEL = PCA9685Pin.PWM_07;
     public static Pin FLYWHEEL_A = PCA9685Pin.PWM_07;
     public static Pin FLYWHEEL_B =PCA9685Pin.PWM_08;
+    //TODO: Map the rest
     public static Pin CLIMBING_ARM = PCA9685Pin.PWM_09;
     public static Pin CLIMBING_WRIST = PCA9685Pin.PWM_10;
     public static Pin SHOOTING_AIM_ADJUST = PCA9685Pin.PWM_11;
@@ -42,7 +45,7 @@ public class BadgerPWMProvider extends PCA9685GpioProvider{
     };
 
     public BadgerPWMProvider(I2CBus bus, int address) throws IOException{
-        super(bus,address);
+        super(bus,address,new BigDecimal(100.00));
     }
 
     @Override

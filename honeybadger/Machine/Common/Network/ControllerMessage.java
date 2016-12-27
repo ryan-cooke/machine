@@ -76,6 +76,18 @@ public class ControllerMessage extends BaseMsg {
         }
     }
 
+    public static class Shoot implements ControllerAction, Serializable{
+        float throttle;
+
+        public Shoot(float throttle){
+            this.throttle=throttle;
+        }
+
+        public void Do(HoneybadgerV6 badger){
+            badger.setFlywheelSpeed(throttle);
+        }
+    }
+
     public static class Stop implements ControllerAction, Serializable{
         public void Do(HoneybadgerV6 badger){
             badger.STOP();
@@ -86,25 +98,49 @@ public class ControllerMessage extends BaseMsg {
     // START Debug Commands
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    public static class DEBUG_MOTOR_FL implements ControllerAction, Serializable{
+    public static class DEBUG_MOTOR implements ControllerAction, Serializable{
+        protected int dir;
+        public static float throttle;
+        DEBUG_MOTOR(){
+            dir=0;
+            throttle=100;
+        }
         public void Do(HoneybadgerV6 badger){
-            badger.SetMotor(RPI.DRIVE_FRONT_LEFT, BadgerPWMProvider.DRIVE_FRONT_LEFT, BadgerMotorController.CLOCKWISE,100);
+            badger.SetMotor(RPI.DRIVE_FRONT_LEFT, BadgerPWMProvider.DRIVE_FRONT_LEFT, BadgerMotorController.COUNTER_CLOCKWISE,throttle);
         }
     }
 
-    public static class DEBUG_MOTOR_FR implements ControllerAction, Serializable{
+    public static class DEBUG_MOTOR_FL extends DEBUG_MOTOR{
+        public DEBUG_MOTOR_FL(int direction){
+            dir = direction;
+        }
         public void Do(HoneybadgerV6 badger){
-            badger.SetMotor(RPI.DRIVE_FRONT_RIGHT, BadgerPWMProvider.DRIVE_FRONT_RIGHT, BadgerMotorController.CLOCKWISE,100);
+            badger.SetMotor(RPI.DRIVE_FRONT_LEFT, BadgerPWMProvider.DRIVE_FRONT_LEFT, dir,throttle);
         }
     }
-    public static class DEBUG_MOTOR_BL implements ControllerAction, Serializable{
+
+    public static class DEBUG_MOTOR_FR extends DEBUG_MOTOR{
+        public DEBUG_MOTOR_FR(int direction){
+            dir = direction;
+        }
         public void Do(HoneybadgerV6 badger){
-            badger.SetMotor(RPI.DRIVE_BACK_LEFT, BadgerPWMProvider.DRIVE_BACK_LEFT, BadgerMotorController.CLOCKWISE,100);
+            badger.SetMotor(RPI.DRIVE_FRONT_RIGHT, BadgerPWMProvider.DRIVE_FRONT_RIGHT, dir,throttle);
         }
     }
-    public static class DEBUG_MOTOR_BR implements ControllerAction, Serializable{
+    public static class DEBUG_MOTOR_BL extends DEBUG_MOTOR{
+        public DEBUG_MOTOR_BL(int direction){
+            dir = direction;
+        }
         public void Do(HoneybadgerV6 badger){
-            badger.SetMotor(RPI.DRIVE_BACK_RIGHT, BadgerPWMProvider.DRIVE_BACK_RIGHT, BadgerMotorController.CLOCKWISE,100);
+            badger.SetMotor(RPI.DRIVE_BACK_LEFT, BadgerPWMProvider.DRIVE_BACK_LEFT, dir,throttle);
+        }
+    }
+    public static class DEBUG_MOTOR_BR extends DEBUG_MOTOR{
+        public DEBUG_MOTOR_BR(int direction){
+            dir = direction;
+        }
+        public void Do(HoneybadgerV6 badger){
+            badger.SetMotor(RPI.DRIVE_BACK_RIGHT, BadgerPWMProvider.DRIVE_BACK_RIGHT, dir,throttle);
         }
     }
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

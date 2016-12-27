@@ -1,5 +1,6 @@
 package Machine.rpi.hw;
 
+import Machine.rpi.HoneybadgerV6;
 import com.pi4j.io.gpio.*;
 import com.pi4j.io.i2c.I2CBus;
 import com.pi4j.io.i2c.I2CFactory;
@@ -74,7 +75,10 @@ public class BadgerMotorController{
             Log("Provisioning Outputs");
             this.provisionPwmOutputs();
             this.provisionDigitalOutputs();
+
             PWMProvider.reset();
+            setFlywheelSpeed(BadgerPWMProvider.FLYWHEEL_A,0.0f);
+            setFlywheelSpeed(BadgerPWMProvider.FLYWHEEL_B,0.0f);
 
             IsReady = true;
             Log("Badger Motor Controller Ready");
@@ -178,5 +182,30 @@ public class BadgerMotorController{
             System.out.println("[BadgerMotorController.setMotorDirection] Invalid motor direction given");
     }
 
+    public void setFlywheelSpeed(Pin pin, float throttle){
+        if(!IsReady){
+            return;
+        }
+        //Get the scaled PWM value based on the MaxONPWM value;
+        throttle = 4095*throttle;
+        int PWMOffTime = (int)throttle;
+        int PWMOnTime = 4095-PWMOffTime;
+        Log(String.format("PWM OFF: %d | PWM ON %d", PWMOffTime, PWMOnTime));
+
+        try {
+            HoneybadgerV6.getInstance().sendToDesktop(String.format("FLYWHEEL PWM OFF: %d | PWM ON %d", PWMOffTime, PWMOnTime));
+        }
+        catch (Exception e){}
+
+        this.PWMProvider.setPwm(pin, PWMOnTime, PWMOffTime);
+    }
+
+//    public void setPWM(Pin pin, float value){
+//        //Get the scaled PWM value based on the MaxONPWM value;
+//        int PWMOnTime = Math.round(4095*value);
+//        int PWMOffTime = 4095-PWMOnTime;
+//        Log(String.format("PWM OFF: %d | PWM ON %d", PWMOffTime, PWMOnTime));
+//        this.PWMProvider.setPwm(pin, PWMOnTime, PWMOffTime);
+//    }
 
 }

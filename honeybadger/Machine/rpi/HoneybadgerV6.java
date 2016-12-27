@@ -1,5 +1,6 @@
 package Machine.rpi;
 
+import Machine.Common.Network.BaseMsg;
 import Machine.rpi.hw.BadgerMotorController;
 import Machine.rpi.hw.BadgerPWMProvider;
 import Machine.rpi.hw.RPI;
@@ -54,7 +55,7 @@ public class HoneybadgerV6 {
         motorController.setTLEMotorDirection(RPI.DRIVE_FRONT_LEFT, BadgerMotorController.CLOCKWISE);
         motorController.setTLEMotorDirection(RPI.DRIVE_BACK_LEFT, BadgerMotorController.CLOCKWISE);
         motorController.setTLEMotorDirection(RPI.DRIVE_FRONT_RIGHT, BadgerMotorController.CLOCKWISE);
-        motorController.setTLEMotorDirection(RPI.DRIVE_BACK_RIGHT, BadgerMotorController.CLOCKWISE);
+        motorController.setTLEMotorDirection(RPI.DRIVE_BACK_RIGHT, BadgerMotorController.COUNTER_CLOCKWISE);
 
         motorController.setTLEMotorSpeed(BadgerPWMProvider.DRIVE_FRONT_LEFT, throttle);
         motorController.setTLEMotorSpeed(BadgerPWMProvider.DRIVE_BACK_LEFT, throttle);
@@ -208,5 +209,14 @@ public class HoneybadgerV6 {
         motorController.setTLEMotorSpeed(BadgerPWMProvider.DRIVE_BACK_LEFT, speed);
         motorController.setTLEMotorSpeed(BadgerPWMProvider.DRIVE_FRONT_RIGHT, speed);
         motorController.setTLEMotorSpeed(BadgerPWMProvider.DRIVE_BACK_RIGHT, 0);
+    }
+
+    public void setFlywheelSpeed(float speed){
+        motorController.setFlywheelSpeed(BadgerPWMProvider.FLYWHEEL_A,speed);
+        motorController.setFlywheelSpeed(BadgerPWMProvider.FLYWHEEL_B,speed);
+    }
+
+    public void sendToDesktop(String msg){
+        networkServer.SendMessage(new BaseMsg(msg));
     }
 }

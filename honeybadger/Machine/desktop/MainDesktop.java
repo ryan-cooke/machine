@@ -1,5 +1,7 @@
 package Machine.desktop;
 
+import Machine.Common.Network.ControllerMessage;
+
 import java.util.Scanner;
 
 import static Machine.Common.Utils.Log;
@@ -20,12 +22,13 @@ public class MainDesktop {
 
         @Override
         public void run() {
-            while(keepAlive && !Thread.currentThread().isInterrupted()){
+            while(keepAlive && !Thread.currentThread().isInterrupted() && !Net.IsBroken()){
                 try {
-                    Log(String.format("Received \'%s\'", Net.ReceiveMessage()));
+                    Net.ReceiveMessage();
+//                    Log(String.format("Received \'%s\'", Net.ReceiveMessage()));
                 }
                 catch (Exception e){
-                    Log("Closing Message Reader");
+                    Log("Exception in Message Reader");
                 }
             }
         }
@@ -59,6 +62,25 @@ public class MainDesktop {
                 input = Prompt('>', Kb);
                 Log(String.format("Sending \"%s\"", input));
                 nc.SendMessage(input);
+
+                if(input.contains("ramp up")){
+                    for (float i = 0; i < 1; i+=0.005) {
+                        nc.SendMessage(new ControllerMessage(new ControllerMessage.Shoot((float)i)));
+                        try {
+                            Thread.sleep(1500);
+                        }
+                        catch (Exception e){
+
+                        }
+                    }
+                }
+
+                if(input.contains("SEND")){
+                    float level = Kb.nextFloat();
+                    level = level/100.f;
+                    Log(String.format("Sending %f",level));
+                    nc.SendMessage(new ControllerMessage(new ControllerMessage.Shoot((float)level)));
+                }
 
                 //Exit if we said "quit"
                 if (input.contains("quit")) {
