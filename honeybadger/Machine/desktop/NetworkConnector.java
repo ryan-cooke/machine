@@ -92,8 +92,8 @@ public class NetworkConnector {
             if(LastReceivedMessage ==null){
                 Log("Bad Message!");
             }
-
-            LastReceivedMessage.Execute(null);
+            //Don't execute for now
+            //LastReceivedMessage.Execute(null);
 
             exceptionOccurred = connection.isClosed();
             return LastReceivedMessage.getPayload();

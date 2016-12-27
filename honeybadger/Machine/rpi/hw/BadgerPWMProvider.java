@@ -7,6 +7,7 @@ import com.pi4j.io.i2c.I2CBus;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.HashMap;
 
 /**
  * A Specific implementation of the PCA9685 chip which is more personalized and fixes some issues in the PCA9685 provider
@@ -46,8 +47,25 @@ public class BadgerPWMProvider extends PCA9685GpioProvider{
             SHOOTING_AIM_ADJUST,
     };
 
+    protected static HashMap<Integer,Pin> PinNumberMap;
+
     public BadgerPWMProvider(I2CBus bus, int address) throws IOException{
-        super(bus,address,new BigDecimal(100.00));
+        super(bus,address,new BigDecimal(490.00));
+
+        PinNumberMap = new HashMap<>();
+        PinNumberMap.put(0,PCA9685Pin.PWM_00);
+        PinNumberMap.put(1,PCA9685Pin.PWM_01);
+        PinNumberMap.put(2,PCA9685Pin.PWM_02);
+        PinNumberMap.put(3,PCA9685Pin.PWM_03);
+        PinNumberMap.put(4,PCA9685Pin.PWM_04);
+        PinNumberMap.put(5,PCA9685Pin.PWM_05);
+        PinNumberMap.put(6,PCA9685Pin.PWM_06);
+        PinNumberMap.put(8,PCA9685Pin.PWM_08);
+        PinNumberMap.put(9,PCA9685Pin.PWM_09);
+        PinNumberMap.put(10,PCA9685Pin.PWM_10);
+//        PinNumberMap.put(11,PCA9685Pin.PWM_11);
+//        PinNumberMap.put(12,PCA9685Pin.PWM_12);
+//        PinNumberMap.put(13,PCA9685Pin.PWM_13);
     }
 
     @Override
@@ -61,5 +79,9 @@ public class BadgerPWMProvider extends PCA9685GpioProvider{
         for(Pin pin : OtherMotors){
             setAlwaysOff(pin);
         }
+    }
+
+    public Pin getPinByNumber(int num){
+        return PinNumberMap.get(num);
     }
 }

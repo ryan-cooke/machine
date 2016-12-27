@@ -35,6 +35,8 @@ public class HoneybadgerV6 {
         return networkServer;
     }
 
+    public BadgerMotorController getMotorController() { return motorController; }
+
     public static HoneybadgerV6 getInstance() throws Exception{
         if(Singleton==null){
             Singleton = new HoneybadgerV6();

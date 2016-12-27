@@ -218,4 +218,14 @@ public class BadgerMotorController extends NetworkDebuggable{
         this.PWMProvider.setPwm(pin, PWMOnTime, PWMOffTime);
     }
 
+    public void setAbsPWM(Pin pin, int val){
+        if(!IsReady){
+            return;
+        }
+        this.PWMProvider.setPwm(pin,val);
+    }
+
+    public Pin getPWMPin(int num){
+        return PWMProvider.getPinByNumber(num);
+    }
 }

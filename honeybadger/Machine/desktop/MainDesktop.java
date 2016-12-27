@@ -2,6 +2,7 @@ package Machine.desktop;
 
 import Machine.Common.Network.ControllerMessage;
 import Machine.Common.Network.ReflectionMessage;
+import Machine.Common.Network.TextCommandMessage;
 import Machine.desktop.NetworkConnector;
 
 import java.util.Scanner;
@@ -59,7 +60,8 @@ public class MainDesktop {
             Thread readMessages = new Thread(readerHandle);
             Controller Xbox = new Controller(nc);
             input = "";
-
+            keepAlive = true;
+            isActive = true;
             readMessages.start();
             while (keepAlive) {
                 input = Prompt('>', Kb);
@@ -85,6 +87,11 @@ public class MainDesktop {
                     level = level/100.f;
                     Log(String.format("Sending %f",level));
                     nc.SendMessage(new ControllerMessage(new ControllerMessage.Shoot((float)level)));
+                }
+
+                if(input.contains("CMD")){
+                    Log(String.format("Sending TextCommandMessage \'%s\'",input.substring(4)));
+                    nc.SendMessage(new TextCommandMessage(input.substring(4)));
                 }
 
                 if(input.contains("CALL")){
