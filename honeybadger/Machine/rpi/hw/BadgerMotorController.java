@@ -1,6 +1,8 @@
 package Machine.rpi.hw;
 
+import Machine.Common.Utils;
 import Machine.rpi.HoneybadgerV6;
+import Machine.rpi.NetworkDebuggable;
 import com.pi4j.io.gpio.*;
 import com.pi4j.io.i2c.I2CBus;
 import com.pi4j.io.i2c.I2CFactory;
@@ -10,7 +12,7 @@ import static Machine.Common.Utils.Log;
 /***
  * Simple class to manage the I2C communication with the PCA9685.
  */
-public class BadgerMotorController{
+public class BadgerMotorController extends NetworkDebuggable{
     /**
      * Boolean to check that the expected RPi hardware is present and ready
      */
@@ -56,8 +58,7 @@ public class BadgerMotorController{
     /**
      * Initializes the BadgerI2C class and creates it's provider
      */
-    //@SuppressWarnings("WeakerAccess")
-    public BadgerMotorController() /*throws Exception*/{
+    public BadgerMotorController(){
         IsReady = false;
         try {
             Log("Enabling I2C Bus");
@@ -141,8 +142,15 @@ public class BadgerMotorController{
      * @param pin PCA9685Pin for the motor whose speed will be set
      * @param speedPercent Speed to set the motor too, int value from 0 to 100
      */
-    public void setTLEMotorSpeed(Pin pin, float speedPercent) {
+    public void setDriveMotorSpeed(Pin pin, float speedPercent) {
         if(!IsReady){
+            return;
+        }
+
+        boolean shouldMovePin = (pin==BadgerPWMProvider.DRIVE_BACK_LEFT || pin==BadgerPWMProvider.DRIVE_BACK_RIGHT
+                || pin ==BadgerPWMProvider.DRIVE_FRONT_LEFT || pin==BadgerPWMProvider.DRIVE_FRONT_RIGHT);
+
+        if(!shouldMovePin){
             return;
         }
 
@@ -169,7 +177,7 @@ public class BadgerMotorController{
      * @param direction Direction in which the motor will rotate. EX: BadgerMotorController.CLOCKWISE or BadgerMotorController.COUNTER_CLOCKWISE
      */
     //TODO: TEST THIS METHOD WITH A MOTOR
-    public void setTLEMotorDirection(Pin pin, int direction) {
+    public void setDriveMotorDirection(Pin pin, int direction) {
         if(!IsReady){
             return;
         }
@@ -187,25 +195,27 @@ public class BadgerMotorController{
             return;
         }
         //Get the scaled PWM value based on the MaxONPWM value;
-        throttle = 4095*throttle;
-        int PWMOffTime = (int)throttle;
+        float scaledThrottle = 4095*throttle/100.f;
+        int PWMOffTime = (int)scaledThrottle;
         int PWMOnTime = 4095-PWMOffTime;
         Log(String.format("PWM OFF: %d | PWM ON %d", PWMOffTime, PWMOnTime));
 
-        try {
-            HoneybadgerV6.getInstance().sendToDesktop(String.format("FLYWHEEL PWM OFF: %d | PWM ON %d", PWMOffTime, PWMOnTime));
-        }
-        catch (Exception e){}
+        SendDebugMessage(String.format("FLYWHEEL PWM OFF: %d | PWM ON %d", PWMOffTime, PWMOnTime));
 
         this.PWMProvider.setPwm(pin, PWMOnTime, PWMOffTime);
     }
 
-//    public void setPWM(Pin pin, float value){
-//        //Get the scaled PWM value based on the MaxONPWM value;
-//        int PWMOnTime = Math.round(4095*value);
-//        int PWMOffTime = 4095-PWMOnTime;
-//        Log(String.format("PWM OFF: %d | PWM ON %d", PWMOffTime, PWMOnTime));
-//        this.PWMProvider.setPwm(pin, PWMOnTime, PWMOffTime);
-//    }
+    public void setPWM(Pin pin, float value){
+        if(!IsReady){
+            return;
+        }
+
+        float scaledThrottle = BadgerPWMProvider.PWM_MAX * (value / 100.f);
+        int PWMOffTime = (int)scaledThrottle;
+        int PWMOnTime = BadgerPWMProvider.PWM_MAX - PWMOffTime;
+
+        SendDebugMessage(String.format("PWM:%s - value: %f",pin.getName(),value));
+        this.PWMProvider.setPwm(pin, PWMOnTime, PWMOffTime);
+    }
 
 }

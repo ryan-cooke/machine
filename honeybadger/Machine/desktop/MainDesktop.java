@@ -1,6 +1,7 @@
 package Machine.desktop;
 
 import Machine.Common.Network.ControllerMessage;
+import Machine.desktop.NetworkConnector;
 
 import java.util.Scanner;
 
@@ -11,18 +12,19 @@ import static Machine.Common.Utils.Prompt;
  * Driver code for Desktop App
  */
 public class MainDesktop {
-    static boolean isActive=true;
-    static boolean keepAlive=true;
+    private static boolean isActive=true;
+    private static boolean keepAlive=true;
 
-    public static class ReadMessage implements Runnable{
-        private Machine.desktop.NetworkConnector Net;
-        ReadMessage(Machine.desktop.NetworkConnector nc){
+    public static class MessageReader implements Runnable{
+        private NetworkConnector Net;
+        MessageReader(NetworkConnector nc){
             Net=nc;
         }
 
         @Override
         public void run() {
-            while(keepAlive && !Thread.currentThread().isInterrupted() && !Net.IsBroken()){
+            //Four conditions can make this stop reading messages
+            while(keepAlive && !Thread.currentThread().isInterrupted() && !Net.IsBroken() && Net.HasActiveConnection()){
                 try {
                     Net.ReceiveMessage();
 //                    Log(String.format("Received \'%s\'", Net.ReceiveMessage()));
@@ -51,8 +53,8 @@ public class MainDesktop {
             }
 
             Log(String.format("Connecting to %s", IP));
-            Machine.desktop.NetworkConnector nc = new Machine.desktop.NetworkConnector(IP, 2017);
-            ReadMessage readerHandle = new ReadMessage(nc);
+            NetworkConnector nc = new NetworkConnector(IP, 2017);
+            MessageReader readerHandle = new MessageReader(nc);
             Thread readMessages = new Thread(readerHandle);
             Controller Xbox = new Controller(nc);
             input = "";
@@ -61,11 +63,13 @@ public class MainDesktop {
             while (keepAlive) {
                 input = Prompt('>', Kb);
                 Log(String.format("Sending \"%s\"", input));
+
+                //TODO: Cleanup the cases below
                 nc.SendMessage(input);
 
                 if(input.contains("ramp up")){
                     for (float i = 0; i < 1; i+=0.005) {
-                        nc.SendMessage(new ControllerMessage(new ControllerMessage.Shoot((float)i)));
+                        nc.SendMessage(new ControllerMessage(new ControllerMessage.Shoot(i)));
                         try {
                             Thread.sleep(1500);
                         }

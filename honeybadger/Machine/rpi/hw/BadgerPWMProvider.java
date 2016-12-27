@@ -12,6 +12,8 @@ import java.math.BigDecimal;
  * A Specific implementation of the PCA9685 chip which is more personalized and fixes some issues in the PCA9685 provider
  */
 public class BadgerPWMProvider extends PCA9685GpioProvider{
+    public static final int PWM_MAX = 4095;
+
     public static Pin DRIVE_FRONT_LEFT = PCA9685Pin.PWM_00;
     public static Pin DRIVE_FRONT_RIGHT = PCA9685Pin.PWM_01;
     public static Pin DRIVE_BACK_LEFT = PCA9685Pin.PWM_02;

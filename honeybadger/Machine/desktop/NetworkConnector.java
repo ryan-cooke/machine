@@ -122,4 +122,9 @@ public class NetworkConnector {
     public boolean IsBroken() {
         return exceptionOccurred;
     }
+
+    public boolean HasActiveConnection(){
+        return connection!=null && connection.isConnected() &&
+                !connection.isClosed() && !connection.isInputShutdown() && !connection.isOutputShutdown();
+    }
 }
