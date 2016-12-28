@@ -1,7 +1,5 @@
 package Machine.rpi.hw;
 
-import Machine.Common.Utils;
-import Machine.rpi.HoneybadgerV6;
 import Machine.rpi.NetworkDebuggable;
 import com.pi4j.io.gpio.*;
 import com.pi4j.io.i2c.I2CBus;
@@ -17,6 +15,8 @@ public class BadgerMotorController extends NetworkDebuggable{
      * Boolean to check that the expected RPi hardware is present and ready
      */
     private boolean IsReady;
+
+    private boolean DriveMotorLimiting;
 
     /**
      * Array of each of the provisioned PCA9685 PWM Outputs
@@ -43,7 +43,12 @@ public class BadgerMotorController extends NetworkDebuggable{
     /**
      * Absolute max ON PWN value. Essentially caps PWM signal for drive motors at 80%
      */
-    private static final int MaxOffPWM = 3275;
+    private static final int DriveMaxPWM = 3275;
+
+    /**
+     * Absolute max ON PWN value. Essentially caps PWM signal for drive motors at 80%
+     */
+    private static final int DriveMinPWM = 850;
 
     /**
      * Constant that defines integer representation of clockwise rotation
@@ -60,6 +65,7 @@ public class BadgerMotorController extends NetworkDebuggable{
      */
     public BadgerMotorController(){
         IsReady = false;
+        DriveMotorLimiting = true;
         try {
             Log("Enabling I2C Bus");
             I2CBus bus = I2CFactory.getInstance(I2CBus.BUS_1);
@@ -160,11 +166,15 @@ public class BadgerMotorController extends NetworkDebuggable{
             return;
         }
 
-        //Get the scaled PWM value based on the MaxONPWM value;
-        int PWMOnTime = Math.round(MaxOffPWM - ((1-(speedPercent /100)) * MaxOffPWM));
-        int PWMOffTime = 4095-PWMOnTime;
-        Log(String.format("PWM OFF: %d | PWM ON %d", PWMOffTime, PWMOnTime));
-        this.PWMProvider.setPwm(pin, PWMOnTime, PWMOffTime);
+        //TODO: REVIEW!!!
+        float percent = speedPercent/100.f;
+        int PWMtime = (int)(DriveMaxPWM - ((1-percent)*DriveMaxPWM));
+        //Overdrive option
+        if(DriveMotorLimiting){
+            PWMtime += DriveMinPWM;
+        }
+
+        this.PWMProvider.setPwm(pin, 0, PWMtime);
     }
 
     public void STOP(Pin pin){
@@ -212,10 +222,32 @@ public class BadgerMotorController extends NetworkDebuggable{
 
         float scaledThrottle = BadgerPWMProvider.PWM_MAX * (value / 100.f);
         int PWMOffTime = (int)scaledThrottle;
-        int PWMOnTime = BadgerPWMProvider.PWM_MAX - PWMOffTime;
+        PWMOffTime = PWMOffTime<1? 1 : PWMOffTime;
 
         SendDebugMessage(String.format("PWM:%s - value: %f",pin.getName(),value));
-        this.PWMProvider.setPwm(pin, PWMOnTime, PWMOffTime);
+        this.PWMProvider.setPwm(pin, 0, PWMOffTime);
     }
 
+    public void setAbsPWM(Pin pin, int val){
+        if(!IsReady){
+            return;
+        }
+        this.PWMProvider.setPwm(pin,val);
+    }
+
+    public Pin getPWMPin(int num){
+        return PWMProvider.getPinByNumber(num);
+    }
+
+    public Pin getPWMPin(String str){
+        return PWMProvider.getPinByName(str);
+    }
+
+    public Pin getGPIOPin(int num){
+        return null;
+    }
+
+    public Pin getGPIOPin(String str){
+        return RPI.getPinByName(str);
+    }
 }

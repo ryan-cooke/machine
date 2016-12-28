@@ -2,6 +2,7 @@ package Machine.Common.Network;
 
 import Machine.Common.Utils;
 import Machine.rpi.HoneybadgerV6;
+import Machine.rpi.hw.BadgerMotorController;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -31,7 +32,7 @@ public class ReflectionMessage extends BaseMsg {
             ObjectMap.put("honeybadger", badger);
             ObjectMap.put("pi", badger);
 
-            Field BMCField = badger.getClass().getDeclaredField("PWMProvider");
+            Field BMCField = badger.getClass().getDeclaredField("motorController");
             BMCField.setAccessible(true);
             Object BadgerMotorController = (Object) BMCField.get(badger);
             ObjectMap.put("BMC",BadgerMotorController);
@@ -41,7 +42,14 @@ public class ReflectionMessage extends BaseMsg {
             Object NetworkController = badger.getNetworkServer();
             ObjectMap.put("net",NetworkController);
             ObjectMap.put("BNS",NetworkController);
+        }
+        catch (Exception e){
+            e.printStackTrace();
+            Log("Didn't finish ObjectMap");
+            return;
+        }
 
+        try{
             //Build the Method Table
             MethodMap = new HashMap<>();
             Class badgerClass = badger.getClass();
@@ -51,14 +59,19 @@ public class ReflectionMessage extends BaseMsg {
             MethodMap.put("forward", badgerClass.getDeclaredMethod("moveForward"));
             MethodMap.put("backward", badgerClass.getDeclaredMethod("moveBackward"));
 
+            Field BMCField = badger.getClass().getDeclaredField("motorController");
+            BMCField.setAccessible(true);
+            Object BadgerMotorController = (Object) BMCField.get(badger);
             Class motorControlClass = BadgerMotorController.getClass();
             MethodMap.put("PWM",motorControlClass.getDeclaredMethod("setPWM"));
-
-            reflectionIsMapped=true;
         }
         catch (Exception e){
-
+            e.printStackTrace();
+            Log("Didn't finish MethodMap");
+            return;
         }
+
+        reflectionIsMapped=true;
     }
 
     public void Execute(Object context){
@@ -75,11 +88,11 @@ public class ReflectionMessage extends BaseMsg {
         try {
             //split as method call
             String[] methodCall = payload.split(" ");
-            Object object = ObjectMap.get(methodCall[1]);
+            Object object = ObjectMap.get(methodCall[0]);
 
             Method function;
             if(MethodMap.containsKey(methodCall[1])) {
-                function = MethodMap.get(methodCall[2]);
+                function = MethodMap.get(methodCall[1]);
             }
             else{
                 function = object.getClass().getDeclaredMethod(methodCall[1]);
