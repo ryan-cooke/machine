@@ -7,6 +7,9 @@ import Machine.rpi.hw.RPI;
 
 import com.pi4j.io.gpio.Pin;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+
 import static Machine.Common.Utils.Log;
 
 /**
@@ -162,8 +165,19 @@ public class HoneybadgerV6 {
         motorController.setFlywheelSpeed(BadgerPWMProvider.FLYWHEEL_B,speed);
     }
 
-    public void sendToDesktop(String msg){
+    public void sendMessageToDesktop(String msg){
         networkServer.SendMessage(new BaseMsg(msg));
+    }
+
+    public void sendDebugMessageToDesktop(String msg){
+        //TODO: Implement
+    }
+
+    public void sendCriticalMessageToDesktop(String msg, Exception except){
+        StringWriter errors = new StringWriter();
+        except.printStackTrace(new PrintWriter(errors));
+        String stackTrace = errors.toString();
+
     }
 
     /**

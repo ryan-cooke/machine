@@ -43,7 +43,7 @@ public class BadgerMotorController extends NetworkDebuggable{
     /**
      * Absolute max ON PWN value. Essentially caps PWM signal for drive motors at 80%
      */
-    private static final int DriveMaxPWM = 3275;
+    private static final int DriveMaxPWM = 3245;
 
     /**
      * Absolute max ON PWN value. Essentially caps PWM signal for drive motors at 80%

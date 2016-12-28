@@ -1,10 +1,10 @@
-package Machine.Common.Network;
+package Machine.Common.Network.Command;
 
+import Machine.Common.Network.BaseMsg;
 import Machine.Common.Utils;
 import Machine.rpi.HoneybadgerV6;
 import Machine.rpi.hw.BadgerMotorController;
 import com.pi4j.io.gpio.Pin;
-import sun.rmi.runtime.Log;
 
 import java.util.HashMap;
 

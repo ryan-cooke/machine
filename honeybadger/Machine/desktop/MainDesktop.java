@@ -1,9 +1,6 @@
 package Machine.desktop;
 
-import Machine.Common.Network.ControllerMessage;
-import Machine.Common.Network.ReflectionMessage;
-import Machine.Common.Network.TextCommandMessage;
-import Machine.desktop.NetworkConnector;
+import Machine.Common.Network.Command.TextCommandMessage;
 
 import java.util.Scanner;
 
@@ -68,35 +65,13 @@ public class MainDesktop {
                 Log(String.format("Sending \"%s\"", input));
 
                 //TODO: Cleanup the cases below
-                nc.SendMessage(input);
-
-                if(input.contains("ramp up")){
-                    for (float i = 0; i < 1; i+=0.005) {
-                        nc.SendMessage(new ControllerMessage(new ControllerMessage.Shoot(i)));
-                        try {
-                            Thread.sleep(1500);
-                        }
-                        catch (Exception e){
-
-                        }
-                    }
-                }
-
-                if(input.contains("SEND")){
-                    float level = Kb.nextFloat();
-                    level = level/100.f;
-                    Log(String.format("Sending %f",level));
-                    nc.SendMessage(new ControllerMessage(new ControllerMessage.Shoot((float)level)));
-                }
 
                 if(input.contains("CMD")){
                     Log(String.format("Sending TextCommandMessage \'%s\'",input.substring(4)));
                     nc.SendMessage(new TextCommandMessage(input.substring(4)));
                 }
-
-                if(input.contains("CALL")){
-                    Log(String.format("Sending ReflectionMessage \'%s\'",input.substring(5)));
-                    nc.SendMessage(new ReflectionMessage(input.substring(5)));
+                else{
+                    nc.SendMessage(input);
                 }
 
                 //Exit if we said "quit"
