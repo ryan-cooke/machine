@@ -4,11 +4,13 @@ import Machine.Common.Utils;
 import Machine.rpi.HoneybadgerV6;
 import Machine.rpi.hw.BadgerMotorController;
 import com.pi4j.io.gpio.Pin;
+import sun.rmi.runtime.Log;
 
 import java.util.HashMap;
 
 /**
- * Created by Javier Fajardo on 2016-12-27.
+ * Class to send debug, plain-text commands.
+ *  A lot simpler/more reliable than ReflectionMessage.
  */
 public class TextCommandMessage extends BaseMsg {
     public TextCommandMessage(String msg){
@@ -43,6 +45,30 @@ public class TextCommandMessage extends BaseMsg {
                 int value = Integer.parseInt(Command[2]);
 
                 BMC.setAbsPWM(namedPin, value);
+                break;
+            }
+
+            case "sweepPWM":{ //TODO: USE and DEBUG
+                BadgerMotorController BMC = badger.getMotorController();
+                //Next param is pin name and float
+                int PWMnum = Integer.parseInt(Command[1]);
+                Pin namedPin = BMC.getPWMPin(PWMnum);
+
+                float minVal = Float.parseFloat(Command[2]);
+                float maxVal = Float.parseFloat(Command[3]);
+                float step = 5.f;
+                if(Command.length>4){
+                    step = Float.parseFloat(Command[4]);
+                }
+
+                //Sweep!
+                for (float i = minVal; i < maxVal; i+=step) {
+                    BMC.setPWM(namedPin, i);
+                    try{
+                        Thread.sleep(1000);
+                    }catch (Exception e){}
+                }
+
                 break;
             }
 

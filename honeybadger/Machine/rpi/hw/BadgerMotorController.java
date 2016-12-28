@@ -212,10 +212,10 @@ public class BadgerMotorController extends NetworkDebuggable{
 
         float scaledThrottle = BadgerPWMProvider.PWM_MAX * (value / 100.f);
         int PWMOffTime = (int)scaledThrottle;
-        int PWMOnTime = BadgerPWMProvider.PWM_MAX - PWMOffTime;
+        PWMOffTime = PWMOffTime<1? 1 : PWMOffTime;
 
         SendDebugMessage(String.format("PWM:%s - value: %f",pin.getName(),value));
-        this.PWMProvider.setPwm(pin, PWMOnTime, PWMOffTime);
+        this.PWMProvider.setPwm(pin, 0, PWMOffTime);
     }
 
     public void setAbsPWM(Pin pin, int val){
