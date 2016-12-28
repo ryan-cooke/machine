@@ -48,11 +48,12 @@ public class BadgerPWMProvider extends PCA9685GpioProvider{
     };
 
     protected static HashMap<Integer,Pin> PinNumberMap;
+    protected static HashMap<String,Pin> PinNameMap;
 
     public BadgerPWMProvider(I2CBus bus, int address) throws IOException{
         super(bus,address,new BigDecimal(490.00));
 
-        PinNumberMap = new HashMap<>();
+        PinNumberMap = new HashMap<>(10);
         PinNumberMap.put(0,PCA9685Pin.PWM_00);
         PinNumberMap.put(1,PCA9685Pin.PWM_01);
         PinNumberMap.put(2,PCA9685Pin.PWM_02);
@@ -66,6 +67,12 @@ public class BadgerPWMProvider extends PCA9685GpioProvider{
 //        PinNumberMap.put(11,PCA9685Pin.PWM_11);
 //        PinNumberMap.put(12,PCA9685Pin.PWM_12);
 //        PinNumberMap.put(13,PCA9685Pin.PWM_13);
+
+        PinNameMap = new HashMap<>(4);
+        PinNameMap.put("FL",DRIVE_FRONT_LEFT);
+        PinNameMap.put("FR",DRIVE_FRONT_RIGHT);
+        PinNameMap.put("BL",DRIVE_BACK_LEFT);
+        PinNameMap.put("BR",DRIVE_BACK_RIGHT);
     }
 
     @Override
@@ -83,5 +90,9 @@ public class BadgerPWMProvider extends PCA9685GpioProvider{
 
     public Pin getPinByNumber(int num){
         return PinNumberMap.get(num);
+    }
+
+    public Pin getPinByName(String str){
+        return PinNameMap.get(str);
     }
 }

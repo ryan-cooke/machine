@@ -25,9 +25,9 @@ public class TextCommandMessage extends BaseMsg {
         }
 
         String[] Command = payload.split(" ");
+        BadgerMotorController BMC = badger.getMotorController();
         switch (Command[0]){
             case "setPWM": {
-                BadgerMotorController BMC = badger.getMotorController();
                 //Next param is pin name and float
                 int PWMnum = Integer.parseInt(Command[1]);
                 Pin namedPin = BMC.getPWMPin(PWMnum);
@@ -38,7 +38,6 @@ public class TextCommandMessage extends BaseMsg {
             }
 
             case "setAbsPWM": {
-                BadgerMotorController BMC = badger.getMotorController();
                 //Next param is pin name and float
                 int PWMnum = Integer.parseInt(Command[1]);
                 Pin namedPin = BMC.getPWMPin(PWMnum);
@@ -49,7 +48,6 @@ public class TextCommandMessage extends BaseMsg {
             }
 
             case "sweepPWM":{ //TODO: USE and DEBUG
-                BadgerMotorController BMC = badger.getMotorController();
                 //Next param is pin name and float
                 int PWMnum = Integer.parseInt(Command[1]);
                 Pin namedPin = BMC.getPWMPin(PWMnum);
@@ -72,6 +70,16 @@ public class TextCommandMessage extends BaseMsg {
                 break;
             }
 
+            case "setMotor":{ //e.g. "CMD setMotor FL 0 100"
+                String motorName = Command[1];
+                Pin motorPWM = BMC.getPWMPin(motorName);
+                Pin motorGPIO = BMC.getGPIOPin(motorName);
+                int direction = Integer.parseInt(Command[2]);
+                float throttle = Float.parseFloat(Command[3]);
+
+                badger.SetMotor(motorGPIO,motorPWM,direction,throttle);
+                break;
+            }
 
             //TODO: add more cases!
         }
