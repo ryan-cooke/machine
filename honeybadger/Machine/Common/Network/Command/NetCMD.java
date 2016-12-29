@@ -188,4 +188,44 @@ public class NetCMD {
             return 2;
         }
     }
+
+    public static class flywheel extends MotorFunction{
+        @Override
+        public boolean Invoke(HoneybadgerV6 badger, String[] params) {
+            if(!super.Invoke(badger,params)){
+                return false;
+            }
+
+            //TODO: Implement
+            return true;
+        }
+
+        @Override
+        public String Explain() {
+            return "\"flywheel <Percent throttle>\"";
+        }
+
+        @Override
+        public int MinimumParameterNum() {
+            return 1;
+        }
+    }
+
+    public static class stop implements IBadgerFunction{
+        @Override
+        public boolean Invoke(HoneybadgerV6 badger, String[] params) {
+            badger.STOP();
+            return true;
+        }
+
+        @Override
+        public String Explain() {
+            return "\'stop\'";
+        }
+
+        @Override
+        public int MinimumParameterNum() {
+            return 0;
+        }
+    }
 }

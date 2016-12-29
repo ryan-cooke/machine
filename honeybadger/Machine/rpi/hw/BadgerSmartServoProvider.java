@@ -50,7 +50,7 @@ public class BadgerSmartServoProvider {
                     .stopBits(StopBits._1);
         }catch (Exception e){e.printStackTrace();}
 
-        Log("Configuration ready. Opening Serial Device");
+        Log("Opening Serial Device");
 
         try {
             serialBus.open(config);

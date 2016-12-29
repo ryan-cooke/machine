@@ -81,6 +81,11 @@ public class BadgerNetworkServer {
     }
 
     protected void SendMessage(BaseMsg message){
+        if(outStream==null){
+            //There's no one connected. don't send a message
+            return;
+        }
+
         LastSentMessage = message;
         try {
             outStream.writeObject(LastSentMessage);
@@ -93,6 +98,12 @@ public class BadgerNetworkServer {
     }
 
     protected String ReceiveMessage(){
+        if(inStream==null){
+            //There's no one connected. Don't keep this connection alive.
+            KeepAlive=false;
+            return "";
+        }
+
         try{
             LastReceivedMessage = (BaseMsg) inStream.readObject();
 

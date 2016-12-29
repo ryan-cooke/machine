@@ -149,10 +149,15 @@ public class HoneybadgerV6 {
     }
 
     public void STOP(){
+        //KILL the Drive Motors
         motorController.STOP(BadgerPWMProvider.DRIVE_FRONT_LEFT);
         motorController.STOP(BadgerPWMProvider.DRIVE_BACK_LEFT);
         motorController.STOP(BadgerPWMProvider.DRIVE_FRONT_RIGHT);
         motorController.STOP(BadgerPWMProvider.DRIVE_BACK_RIGHT);
+
+        //Stop the flywheels
+        motorController.setPWM(BadgerPWMProvider.FLYWHEEL_A,BadgerPWMProvider.FLYWHEEL_PWM_MIN);
+        motorController.setPWM(BadgerPWMProvider.FLYWHEEL_B,BadgerPWMProvider.FLYWHEEL_PWM_MIN);
     }
 
     public void SetMotor(Pin DirPin, Pin PWMPin, int direction, float throttle){

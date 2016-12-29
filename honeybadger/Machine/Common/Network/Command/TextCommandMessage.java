@@ -91,10 +91,13 @@ public class TextCommandMessage extends BaseMsg {
             }
 
             case "flywheel":{//e.g. "CMD flywheel <percent>
-
+                //TODO: Implement
             }
 
-            //TODO: add more cases!
+            case "stop":{//e.g. "CMD stop"
+                badger.STOP();
+            }
+
         }
     }
 }

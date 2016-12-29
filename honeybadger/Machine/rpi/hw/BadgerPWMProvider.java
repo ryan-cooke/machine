@@ -15,6 +15,9 @@ import java.util.HashMap;
 public class BadgerPWMProvider extends PCA9685GpioProvider{
     public static final int PWM_MAX = 4095;
 
+    public static final float FLYWHEEL_PWM_MIN = 10;
+    public static final float FLYWHEEL_PWM_MAX = 90;
+
     public static Pin DRIVE_FRONT_LEFT = PCA9685Pin.PWM_00;
     public static Pin DRIVE_FRONT_RIGHT = PCA9685Pin.PWM_01;
     public static Pin DRIVE_BACK_LEFT = PCA9685Pin.PWM_02;
