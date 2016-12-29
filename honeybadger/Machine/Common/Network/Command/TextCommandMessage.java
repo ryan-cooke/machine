@@ -26,6 +26,7 @@ public class TextCommandMessage extends BaseMsg {
 
         String[] Command = payload.split(" ");
         BadgerMotorController BMC = badger.getMotorController();
+        //TODO: Change to map and objects
         switch (Command[0]){
             case "setPWM": {
                 //Next param is pin name and float
@@ -87,6 +88,10 @@ public class TextCommandMessage extends BaseMsg {
 
                 BMC.setServoPosition(servoID,position);
                 break;
+            }
+
+            case "flywheel":{//e.g. "CMD flywheel <percent>
+
             }
 
             //TODO: add more cases!
