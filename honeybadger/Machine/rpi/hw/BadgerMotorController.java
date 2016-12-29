@@ -33,6 +33,8 @@ public class BadgerMotorController extends NetworkDebuggable{
      */
     private BadgerPWMProvider PWMProvider;
 
+    private BadgerSmartServoProvider SerialServo;
+
     /**
      * Object that represents the RaspberryPI. Is used mostly to set the PinState of it's pins (HIGH or LOW)
      */
@@ -82,10 +84,9 @@ public class BadgerMotorController extends NetworkDebuggable{
             Log("Provisioning Outputs");
             this.provisionPwmOutputs();
             this.provisionDigitalOutputs();
-
             PWMProvider.reset();
-            setFlywheelSpeed(BadgerPWMProvider.FLYWHEEL_A,0.0f);
-            setFlywheelSpeed(BadgerPWMProvider.FLYWHEEL_B,0.0f);
+
+            SerialServo = new BadgerSmartServoProvider();
 
             IsReady = true;
             Log("Badger Motor Controller Ready");
@@ -249,5 +250,12 @@ public class BadgerMotorController extends NetworkDebuggable{
 
     public Pin getGPIOPin(String str){
         return RPI.getPinByName(str);
+    }
+
+    public void setServoPosition(int servoID, int position){
+        if(!IsReady){
+            return;
+        }
+        this.SerialServo.SetPosition((byte)(servoID&0xFF),250,position);
     }
 }

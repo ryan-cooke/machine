@@ -81,6 +81,14 @@ public class TextCommandMessage extends BaseMsg {
                 break;
             }
 
+            case "servo":{ //e.g. "CMD servo <ID> <position>
+                int servoID = Integer.parseInt(Command[1]);
+                int position = Integer.parseInt(Command[2]);
+
+                BMC.setServoPosition(servoID,position);
+                break;
+            }
+
             //TODO: add more cases!
         }
     }
