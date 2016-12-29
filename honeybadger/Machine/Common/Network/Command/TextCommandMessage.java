@@ -6,6 +6,7 @@ import Machine.rpi.HoneybadgerV6;
 import Machine.rpi.hw.BadgerMotorController;
 import com.pi4j.io.gpio.Pin;
 
+import java.util.Arrays;
 import java.util.HashMap;
 
 /**
@@ -13,6 +14,20 @@ import java.util.HashMap;
  *  A lot simpler/more reliable than ReflectionMessage.
  */
 public class TextCommandMessage extends BaseMsg {
+    protected static HashMap<String,IBadgerFunction> CommandMap;
+
+    protected static void GenerateMap(){
+        CommandMap = new HashMap<>();
+
+        CommandMap.put("setPWM",new NetCMD.setPWM());
+        CommandMap.put("setAbsPWM",new NetCMD.setAbsPWM());
+        CommandMap.put("sweepPWM", new NetCMD.sweepPWM());
+        CommandMap.put("setMotor",new NetCMD.setMotor());
+        CommandMap.put("servo", new NetCMD.servo());
+        CommandMap.put("flywheel", new NetCMD.flywheel());
+        CommandMap.put("stop", new NetCMD.stop());
+    }
+
     public TextCommandMessage(String msg){
         payload = msg;
     }
@@ -24,80 +39,23 @@ public class TextCommandMessage extends BaseMsg {
             return;
         }
 
-        String[] Command = payload.split(" ");
-        BadgerMotorController BMC = badger.getMotorController();
-        //TODO: Change to map and objects
-        switch (Command[0]){
-            case "setPWM": {
-                //Next param is pin name and float
-                int PWMnum = Integer.parseInt(Command[1]);
-                Pin namedPin = BMC.getPWMPin(PWMnum);
-                float value = Float.parseFloat(Command[2]);
+        if(CommandMap==null){
+            GenerateMap();
+        }
 
-                BMC.setPWM(namedPin, value);
-                break;
-            }
+        String[] command = payload.split(" ");
+        String[] callParameters = Arrays.copyOfRange(command,1,command.length);
+        IBadgerFunction function = CommandMap.get(command[0]);
 
-            case "setAbsPWM": {
-                //Next param is pin name and float
-                int PWMnum = Integer.parseInt(Command[1]);
-                Pin namedPin = BMC.getPWMPin(PWMnum);
-                int value = Integer.parseInt(Command[2]);
-
-                BMC.setAbsPWM(namedPin, value);
-                break;
-            }
-
-            case "sweepPWM":{ //TODO: USE and DEBUG
-                //Next param is pin name and float
-                int PWMnum = Integer.parseInt(Command[1]);
-                Pin namedPin = BMC.getPWMPin(PWMnum);
-
-                float minVal = Float.parseFloat(Command[2]);
-                float maxVal = Float.parseFloat(Command[3]);
-                float step = 5.f;
-                if(Command.length>4){
-                    step = Float.parseFloat(Command[4]);
-                }
-
-                //Sweep!
-                for (float i = minVal; i < maxVal; i+=step) {
-                    BMC.setPWM(namedPin, i);
-                    try{
-                        Thread.sleep(1000);
-                    }catch (Exception e){}
-                }
-
-                break;
-            }
-
-            case "setMotor":{ //e.g. "CMD setMotor FL 0 100"
-                String motorName = Command[1];
-                Pin motorPWM = BMC.getPWMPin(motorName);
-                Pin motorGPIO = BMC.getGPIOPin(motorName);
-                int direction = Integer.parseInt(Command[2]);
-                float throttle = Float.parseFloat(Command[3]);
-
-                badger.SetMotor(motorGPIO,motorPWM,direction,throttle);
-                break;
-            }
-
-            case "servo":{ //e.g. "CMD servo <ID> <position>
-                int servoID = Integer.parseInt(Command[1]);
-                int position = Integer.parseInt(Command[2]);
-
-                BMC.setServoPosition(servoID,position);
-                break;
-            }
-
-            case "flywheel":{//e.g. "CMD flywheel <percent>
-                //TODO: Implement
-            }
-
-            case "stop":{//e.g. "CMD stop"
-                badger.STOP();
-            }
-
+        //Call the function on the badger
+        boolean success = function.Invoke(badger,callParameters);
+        if(success){
+            //Send an ACK message
+            badger.sendDebugMessageToDesktop(String.format("Call to %s successful",command[0]));
+        }
+        else{
+            //Send a critical message
+            badger.sendMessageToDesktop(String.format("Error calling %s",command[0]));
         }
     }
 }
