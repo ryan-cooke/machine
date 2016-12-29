@@ -13,17 +13,21 @@ public class MainWindow extends JDialog {
     private JButton buttonExit;
     private JFormattedTextField Prompt;
 
-    private JTextArea MessageFeed;
-    private JPanelOpenCV VideoPanel;
+    private JTextArea messageFeed;
+    private JPanelOpenCV videoPanel;
 
-    private ArrayList<String> InputHistory;
+    private final String promptChar = "> ";
+    private ArrayList<String> inputHistory;
+    private int inputOffset;
 
     public MainWindow() {
         setContentPane(contentPane);
         setModal(true);
         getRootPane().setDefaultButton(buttonReboot);
 
-        InputHistory = new ArrayList<>(40);
+        inputHistory = new ArrayList<>(40);
+        inputOffset = 0;
+        Prompt.setText(promptChar);
 
         registerCallbacks();
         //Below are listeners being tested
@@ -32,12 +36,13 @@ public class MainWindow extends JDialog {
             public void actionPerformed(ActionEvent actionEvent) {
                 String input = Prompt.getText().substring(2);
                 if(input.length()>0) {
-                    Prompt.setText("> ");
-                    MessageFeed.append(input);
-                    MessageFeed.append("\n");
+                    Prompt.setText(promptChar);
+                    messageFeed.append(input);
+                    messageFeed.append("\n");
 
-                    InputHistory.add(input);
+                    inputHistory.add(input);
                 }
+                inputOffset=0;
             }
         },KeyStroke.getKeyStroke(KeyEvent.VK_ENTER,0),JComponent.WHEN_FOCUSED);
 
@@ -47,7 +52,7 @@ public class MainWindow extends JDialog {
                 Document rawIn = Prompt.getDocument();
                 Cursor cursor = Prompt.getCursor();
                 int pos = Prompt.getCaretPosition();
-                if(rawIn.getLength()>2 && pos>2) {
+                if(rawIn.getLength()>promptChar.length() && pos>promptChar.length()) {
                     try {
                         rawIn.remove(Prompt.getCaretPosition()-1, 1);
                     }
@@ -56,6 +61,22 @@ public class MainWindow extends JDialog {
             }
         },KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE,0),JComponent.WHEN_FOCUSED);
 
+        Prompt.registerKeyboardAction(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                //Try getting previous commands
+                inputOffset +=1;
+                previousInputLookup();
+            }
+        },KeyStroke.getKeyStroke(KeyEvent.VK_UP,0),JComponent.WHEN_FOCUSED);
+
+        Prompt.registerKeyboardAction(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                inputOffset -=1;
+                previousInputLookup();
+            }
+        },KeyStroke.getKeyStroke(KeyEvent.VK_DOWN,0),JComponent.WHEN_FOCUSED);
     }
 
     private void registerCallbacks(){
@@ -86,6 +107,13 @@ public class MainWindow extends JDialog {
                 onPressExit();
             }
         }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+    }
+
+    private void previousInputLookup(){
+        int historyIndex = inputHistory.size()-inputOffset;
+        if(historyIndex>=0 && historyIndex<inputHistory.size()){
+            Prompt.setText(String.format("%s%s",promptChar,inputHistory.get(historyIndex)));
+        }
     }
 
     private void onPressReboot() {
