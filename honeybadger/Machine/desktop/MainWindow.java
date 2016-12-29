@@ -7,7 +7,7 @@ public class MainWindow extends JDialog {
     private JPanel contentPane;
     private JButton buttonOK;
     private JButton buttonCancel;
-    private JLabel textArea1;
+    private JTextField labelTextField;
 
     public MainWindow() {
         setContentPane(contentPane);
