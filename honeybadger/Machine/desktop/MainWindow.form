@@ -66,7 +66,8 @@
               <background color="-14013910"/>
               <foreground color="-2246144"/>
               <requestFocusEnabled value="true"/>
-              <text value="&gt;"/>
+              <text value="&gt; "/>
+              <toolTipText value="Use this to send a Network Message to the Honeybadger"/>
             </properties>
           </component>
         </children>
@@ -85,16 +86,6 @@
         </properties>
         <border type="none"/>
         <children>
-          <component id="6f429" class="javax.swing.JTextArea" binding="MessageFeed">
-            <constraints>
-              <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="6" hsize-policy="6" anchor="0" fill="3" indent="0" use-parent-layout="false">
-                <preferred-size width="300" height="50"/>
-              </grid>
-            </constraints>
-            <properties>
-              <background color="-13880265"/>
-            </properties>
-          </component>
           <component id="ac0b" class="Machine.desktop.JPanelOpenCV" binding="VideoPanel">
             <constraints>
               <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false">
@@ -106,6 +97,23 @@
               <foreground color="-11312537"/>
             </properties>
           </component>
+          <scrollpane id="535eb">
+            <constraints>
+              <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="7" hsize-policy="7" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties/>
+            <border type="none"/>
+            <children>
+              <component id="6f429" class="javax.swing.JTextArea" binding="MessageFeed">
+                <constraints/>
+                <properties>
+                  <background color="-13880265"/>
+                  <doubleBuffered value="true"/>
+                  <editable value="false"/>
+                </properties>
+              </component>
+            </children>
+          </scrollpane>
         </children>
       </grid>
     </children>
