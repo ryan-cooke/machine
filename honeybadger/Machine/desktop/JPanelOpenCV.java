@@ -20,6 +20,7 @@ import org.opencv.videoio.VideoWriter;
     
 public class JPanelOpenCV extends JPanel{
     static BufferedImage image;
+
     public static void main (String args[]) throws InterruptedException{
 
         String arch = System.getProperty("os.arch");
