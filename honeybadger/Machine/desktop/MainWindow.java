@@ -1,9 +1,18 @@
 package Machine.desktop;
 
+import org.opencv.core.Core;
+import org.opencv.core.CvType;
+import org.opencv.core.Mat;
+import org.opencv.core.Size;
+import org.opencv.imgproc.Imgproc;
+
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.text.Document;
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.image.DataBufferByte;
+import java.io.File;
 import java.util.ArrayList;
 
 public class MainWindow extends JDialog {
@@ -28,6 +37,18 @@ public class MainWindow extends JDialog {
         inputHistory = new ArrayList<>(40);
         inputOffset = 0;
         Prompt.setText(promptChar);
+
+        try {
+            //TODO: Additional debug here. Might have to load some system libs
+            videoPanel.image = ImageIO.read(new File("maxresdefault.jpg"));
+            Mat original = new Mat(videoPanel.image.getHeight(), videoPanel.image.getWidth(), CvType.CV_8UC3);
+            original.put(0,0,((DataBufferByte) JPanelOpenCV.image.getRaster().getDataBuffer()).getData());
+            Mat reduced = new Mat();
+            Size newSize = new Size(640,480);
+            Imgproc.resize(original,reduced,newSize);
+
+            JPanelOpenCV.image = JPanelOpenCV.MatToBufferedImage(reduced);
+        }catch (Exception e){e.printStackTrace();}
 
         registerCallbacks();
         //Below are listeners being tested
