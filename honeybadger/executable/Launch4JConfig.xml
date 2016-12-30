@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch4jConfig>
+  <dontWrapJar>false</dontWrapJar>
+  <headerType>gui</headerType>
+  <jar>bin\BadgerV6-Desktop.jar</jar>
+  <outfile>Badger.exe</outfile>
+  <errTitle></errTitle>
+  <cmdLine></cmdLine>
+  <chdir>.</chdir>
+  <priority>normal</priority>
+  <downloadUrl>http://java.com/download</downloadUrl>
+  <supportUrl></supportUrl>
+  <stayAlive>false</stayAlive>
+  <restartOnCrash>false</restartOnCrash>
+  <manifest></manifest>
+  <icon>C:\Users\alexs\Downloads\launch4j-3.9-win32\bin\icon.ico</icon>
+  <singleInstance>
+    <mutexName>EngGamesBadgerController</mutexName>
+    <windowTitle></windowTitle>
+  </singleInstance>
+  <jre>
+    <path>bin\jre</path>
+    <bundledJre64Bit>false</bundledJre64Bit>
+    <bundledJreAsFallback>false</bundledJreAsFallback>
+    <minVersion></minVersion>
+    <maxVersion></maxVersion>
+    <jdkPreference>preferJre</jdkPreference>
+    <runtimeBits>64/32</runtimeBits>
+  </jre>
+  <splash>
+    <file>bin\Splash.bmp</file>
+    <waitForWindow>true</waitForWindow>
+    <timeout>60</timeout>
+    <timeoutErr>true</timeoutErr>
+  </splash>
+  <versionInfo>
+    <fileVersion>0.0.0.1</fileVersion>
+    <txtFileVersion>0.01_ALPHA</txtFileVersion>
+    <fileDescription>Badger Controller version 0.01_ALPHA</fileDescription>
+    <copyright>Engineering Games Concordia - Machine Team</copyright>
+    <productVersion>0.0.0.1</productVersion>
+    <txtProductVersion>0.01_ALPHA</txtProductVersion>
+    <productName>Badger Controller</productName>
+    <companyName>Badger Controller version 0.01_ALPHA</companyName>
+    <internalName>BadgerController</internalName>
+    <originalFilename>Badger.exe</originalFilename>
+    <trademarks></trademarks>
+    <language>ENGLISH_US</language>
+  </versionInfo>
+  <messages>
+    <startupErr>An error occurred while starting the application.</startupErr>
+    <bundledJreErr>This application was configured to use a bundled Java Runtime Environment but the runtime is missing or corrupted. Make sure the &apos;bin&apos; folder containing the proper &apos;jre&apos; folder
+is present in the same directory as the Badger executable</bundledJreErr>
+    <jreVersionErr>This application requires a Java Runtime Environment of version 1.8.0_111 </jreVersionErr>
+    <launcherErr>The registry refers to a nonexistent Java Runtime Environment installation or the runtime is corrupted. </launcherErr>
+    <instanceAlreadyExistsMsg>An application instance is already running. You may not run more than one instance of the controller application.</instanceAlreadyExistsMsg>
+  </messages>
+</launch4jConfig>
