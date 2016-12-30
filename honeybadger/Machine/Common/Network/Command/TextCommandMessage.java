@@ -3,8 +3,6 @@ package Machine.Common.Network.Command;
 import Machine.Common.Network.BaseMsg;
 import Machine.Common.Utils;
 import Machine.rpi.HoneybadgerV6;
-import Machine.rpi.hw.BadgerMotorController;
-import com.pi4j.io.gpio.Pin;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -21,13 +19,13 @@ public class TextCommandMessage extends BaseMsg {
     protected static void GenerateMap(){
         CommandMap = new HashMap<>();
 
-        CommandMap.put("setPWM",new NetCMD.setPWM());
-        CommandMap.put("setAbsPWM",new NetCMD.setAbsPWM());
-        CommandMap.put("sweepPWM", new NetCMD.sweepPWM());
-        CommandMap.put("setMotor",new NetCMD.setMotor());
-        CommandMap.put("servo", new NetCMD.servo());
-        CommandMap.put("flywheel", new NetCMD.flywheel());
-        CommandMap.put("stop", new NetCMD.stop());
+        CommandMap.put("setPWM",new CMD.setPWM());
+        CommandMap.put("setAbsPWM",new CMD.setAbsPWM());
+        CommandMap.put("sweepPWM", new CMD.sweepPWM());
+        CommandMap.put("setMotor",new CMD.setMotor());
+        CommandMap.put("servo", new CMD.servo());
+        CommandMap.put("flywheel", new CMD.flywheel());
+        CommandMap.put("stop", new CMD.stop());
     }
 
     public TextCommandMessage(String msg){

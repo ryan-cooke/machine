@@ -11,7 +11,7 @@ import static Machine.Common.Utils.Log;
 /**
  * Namespace class for classes implementing the IBadgerFunction interface
  */
-public class NetCMD {
+public class CMD {
     public static abstract class MotorFunction implements IBadgerFunction{
         protected BadgerMotorController BMC;
 
