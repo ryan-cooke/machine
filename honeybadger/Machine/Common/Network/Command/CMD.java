@@ -152,7 +152,7 @@ public class CMD {
             int direction = Integer.parseInt(params[1]);
             float throttle = Float.parseFloat(params[2]);
 
-            badger.SetMotor(motorGPIO,motorPWM,direction,throttle);
+            badger.setDriveMotor(motorGPIO,motorPWM,direction,throttle);
             return true;
         }
 
@@ -207,6 +207,57 @@ public class CMD {
         @Override
         public String Explain() {
             return "\"flywheel <Percent throttle of flywheel range>\"";
+        }
+
+        @Override
+        public int MinimumParameterNum() {
+            return 1;
+        }
+    }
+
+    public static class setConveyor extends MotorFunction{
+        @Override
+        public boolean Invoke(HoneybadgerV6 badger, String[] params) {
+            if(!super.Invoke(badger,params)){
+                return false;
+            }
+
+            int direction = Integer.parseInt(params[0]);
+            float throttle = Float.parseFloat(params[1]);
+
+            badger.setConveyor(direction,throttle);
+            return true;
+        }
+
+        @Override
+        public String Explain() {
+            return "\"setConveyor <Direction (0,1)> <Throttle percent>\"";
+        }
+
+        @Override
+        public int MinimumParameterNum() {
+            return 2;
+        }
+    }
+
+    public static class setAllDriveMotors extends MotorFunction{
+        @Override
+        public boolean Invoke(HoneybadgerV6 badger, String[] params) {
+            if(!super.Invoke(badger,params)){
+                return false;
+            }
+
+            float throttle = Float.parseFloat(params[0]);
+            for(Pin motor : BadgerPWMProvider.DriveMotors){
+                BMC.setPWM(motor,throttle);
+            }
+
+            return true;
+        }
+
+        @Override
+        public String Explain() {
+            return "\"setAllDriveMotors <Throttle percent>\"";
         }
 
         @Override

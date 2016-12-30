@@ -106,7 +106,7 @@ public class ControllerMessage extends BaseMsg {
             throttle=100;
         }
         public void Do(HoneybadgerV6 badger){
-            badger.SetMotor(RPI.DRIVE_FRONT_LEFT, BadgerPWMProvider.DRIVE_FRONT_LEFT, BadgerMotorController.COUNTER_CLOCKWISE,throttle);
+            badger.setDriveMotor(RPI.DRIVE_FRONT_LEFT, BadgerPWMProvider.DRIVE_FRONT_LEFT, BadgerMotorController.COUNTER_CLOCKWISE,throttle);
         }
     }
 
@@ -115,7 +115,7 @@ public class ControllerMessage extends BaseMsg {
             dir = direction;
         }
         public void Do(HoneybadgerV6 badger){
-            badger.SetMotor(RPI.DRIVE_FRONT_LEFT, BadgerPWMProvider.DRIVE_FRONT_LEFT, dir,throttle);
+            badger.setDriveMotor(RPI.DRIVE_FRONT_LEFT, BadgerPWMProvider.DRIVE_FRONT_LEFT, dir,throttle);
         }
     }
 
@@ -124,7 +124,7 @@ public class ControllerMessage extends BaseMsg {
             dir = direction;
         }
         public void Do(HoneybadgerV6 badger){
-            badger.SetMotor(RPI.DRIVE_FRONT_RIGHT, BadgerPWMProvider.DRIVE_FRONT_RIGHT, dir,throttle);
+            badger.setDriveMotor(RPI.DRIVE_FRONT_RIGHT, BadgerPWMProvider.DRIVE_FRONT_RIGHT, dir,throttle);
         }
     }
     public static class DEBUG_MOTOR_BL extends DEBUG_MOTOR{
@@ -132,7 +132,7 @@ public class ControllerMessage extends BaseMsg {
             dir = direction;
         }
         public void Do(HoneybadgerV6 badger){
-            badger.SetMotor(RPI.DRIVE_BACK_LEFT, BadgerPWMProvider.DRIVE_BACK_LEFT, dir,throttle);
+            badger.setDriveMotor(RPI.DRIVE_BACK_LEFT, BadgerPWMProvider.DRIVE_BACK_LEFT, dir,throttle);
         }
     }
     public static class DEBUG_MOTOR_BR extends DEBUG_MOTOR{
@@ -140,7 +140,7 @@ public class ControllerMessage extends BaseMsg {
             dir = direction;
         }
         public void Do(HoneybadgerV6 badger){
-            badger.SetMotor(RPI.DRIVE_BACK_RIGHT, BadgerPWMProvider.DRIVE_BACK_RIGHT, dir,throttle);
+            badger.setDriveMotor(RPI.DRIVE_BACK_RIGHT, BadgerPWMProvider.DRIVE_BACK_RIGHT, dir,throttle);
         }
     }
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

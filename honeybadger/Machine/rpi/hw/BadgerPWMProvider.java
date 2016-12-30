@@ -20,39 +20,48 @@ public class BadgerPWMProvider extends PCA9685GpioProvider{
     public static Pin DRIVE_BACK_LEFT = PCA9685Pin.PWM_02;
     public static Pin DRIVE_BACK_RIGHT = PCA9685Pin.PWM_03;
 
+    public static Pin CONVEYOR_A = PCA9685Pin.PWM_04;
+    public static Pin CONVEYOR_B = PCA9685Pin.PWM_05;
+
+    public static Pin VACUUM_ROLLER = PCA9685Pin.PWM_06;
+
+    public static Pin CLIMBING_MOTOR = PCA9685Pin.PWM_11;
+
+    /**
+     * List of all the motors attached to the TLE H-Bridge Chip.
+     * These need to all be set to HIGH on boot time.
+     */
     public static Pin[] DriveMotors = {
             DRIVE_FRONT_LEFT,DRIVE_FRONT_RIGHT,
-            DRIVE_BACK_LEFT,DRIVE_BACK_RIGHT
+            DRIVE_BACK_LEFT,DRIVE_BACK_RIGHT,
+            //Conveyors are also driven by the TLE H-Bridge.
+            CONVEYOR_A,CONVEYOR_B,
+            //Vacuum roller as well
+            VACUUM_ROLLER,
+            //And the climbing motor too
+            CLIMBING_MOTOR,
     };
 
     public static Pin FLYWHEEL_A = PCA9685Pin.PWM_09;
     public static Pin FLYWHEEL_B =PCA9685Pin.PWM_10;
 
-
-    //TODO: MAP and VERIFY!
-    public static Pin CONVEYOR_A = PCA9685Pin.PWM_04;
-    public static Pin CONVEYOR_B = PCA9685Pin.PWM_05;
-    public static Pin VACUUM_ROLLER = PCA9685Pin.PWM_06;
-    public static Pin CLIMBING_WHEEL = PCA9685Pin.PWM_07;
-
-//    public static Pin CLIMBING_ARM = PCA9685Pin.PWM_09;
-//    public static Pin CLIMBING_WRIST = PCA9685Pin.PWM_10;
-//    public static Pin SHOOTING_AIM_ADJUST = PCA9685Pin.PWM_11;
-    //End MAP and VERIFY range.
-
-
+    /**
+     * List of other motors that can be set to normal LOW when the PWM boots.
+     * These are not directly attached to the TLE Chip.
+     */
     public static Pin[] OtherMotors = {
-            CONVEYOR_A,
-            CONVEYOR_B,
-            VACUUM_ROLLER,
             FLYWHEEL_A,
             FLYWHEEL_B,
-//            CLIMBING_ARM,
-//            CLIMBING_WRIST,
-//            SHOOTING_AIM_ADJUST,
     };
 
+    /**
+     * Map of all the PWM pins as their presented integer.
+     */
     protected static HashMap<Integer,Pin> PinNumberMap;
+
+    /**
+     * Map of the PWM Pins as referred to in this class, by string.
+     */
     protected static HashMap<String,Pin> PinNameMap;
 
     public BadgerPWMProvider(I2CBus bus, int address) throws IOException{
@@ -80,6 +89,9 @@ public class BadgerPWMProvider extends PCA9685GpioProvider{
         PinNameMap.put("FR",DRIVE_FRONT_RIGHT);
         PinNameMap.put("BL",DRIVE_BACK_LEFT);
         PinNameMap.put("BR",DRIVE_BACK_RIGHT);
+
+        PinNameMap.put("CONVEYOR_A",CONVEYOR_A);
+        PinNameMap.put("CONVEYOR_B",CONVEYOR_B);
     }
 
     @Override

@@ -169,13 +169,20 @@ public class HoneybadgerV6 {
         //Stop the flywheels
         motorController.setPWM(BadgerPWMProvider.FLYWHEEL_A, BadgerMotorController.FLYWHEEL_PERCENT_MIN);
         motorController.setPWM(BadgerPWMProvider.FLYWHEEL_B, BadgerMotorController.FLYWHEEL_PERCENT_MIN);
-
-        //TODO: Stop conveyors, vacuum roller
     }
 
-    public void SetMotor(Pin DirPin, Pin PWMPin, int direction, float throttle){
+    public void setDriveMotor(Pin DirPin, Pin PWMPin, int direction, float throttle){
         motorController.setDriveMotorDirection(DirPin, direction);
         motorController.setDriveMotorSpeed(PWMPin, throttle);
+    }
+
+    public void setConveyor(int direction, float throttle){
+        int opposingDir = direction==0? 1 : 0;
+        motorController.setDriveMotorDirection(RPI.CONVEYOR_A,direction);
+        motorController.setDriveMotorDirection(RPI.CONVEYOR_B,opposingDir);
+
+        motorController.setDriveMotorSpeed(BadgerPWMProvider.CONVEYOR_A,throttle);
+        motorController.setDriveMotorSpeed(BadgerPWMProvider.CONVEYOR_B,throttle);
     }
 
     public void setFlywheelSpeed(float speed){
