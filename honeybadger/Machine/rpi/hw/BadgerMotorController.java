@@ -1,14 +1,22 @@
 package Machine.rpi.hw;
 
-import com.pi4j.gpio.extension.pca.PCA9685GpioProvider;
+import Machine.rpi.NetworkDebuggable;
 import com.pi4j.io.gpio.*;
 import com.pi4j.io.i2c.I2CBus;
 import com.pi4j.io.i2c.I2CFactory;
 
+import static Machine.Common.Utils.Log;
+
 /***
  * Simple class to manage the I2C communication with the PCA9685.
  */
-public class BadgerMotorController{
+public class BadgerMotorController extends NetworkDebuggable{
+    /**
+     * Boolean to check that the expected RPi hardware is present and ready
+     */
+    private boolean IsReady;
+
+    private boolean DriveMotorLimiting;
 
     /**
      * Array of each of the provisioned PCA9685 PWM Outputs
@@ -23,7 +31,7 @@ public class BadgerMotorController{
     /**
      * Object that represents the PCA9685. Is used mostly to set PWM of it's pins
      */
-    private PCA9685GpioProvider PCAprovider;
+    private BadgerPWMProvider PWMProvider;
 
     /**
      * Object that represents the RaspberryPI. Is used mostly to set the PinState of it's pins (HIGH or LOW)
@@ -35,7 +43,12 @@ public class BadgerMotorController{
     /**
      * Absolute max ON PWN value. Essentially caps PWM signal for drive motors at 80%
      */
-    private static final int MaxOffPWM = 3275;
+    private static final int DriveMaxPWM = 3275;
+
+    /**
+     * Absolute max ON PWN value. Essentially caps PWM signal for drive motors at 80%
+     */
+    private static final int DriveMinPWM = 850;
 
     /**
      * Constant that defines integer representation of clockwise rotation
@@ -49,46 +62,67 @@ public class BadgerMotorController{
 
     /**
      * Initializes the BadgerI2C class and creates it's provider
-     * @throws Exception Yes, this may throw some exception (See random sample code from internet for more details)
      */
-    //@SuppressWarnings("WeakerAccess")
-    public BadgerMotorController() throws Exception{
-        I2CBus bus = I2CFactory.getInstance(I2CBus.BUS_1);
-        this.GPIO = GpioFactory.getInstance();
-        PCAprovider = new PCA9685GpioProvider(bus, 0x40);
-        RPIProvider = new RaspiGpioProvider();
-        this.provisionPwmOutputs();
-        this.provisionDigitalOutputs();
-        this.PCAprovider.reset();
+    public BadgerMotorController(){
+        IsReady = false;
+        DriveMotorLimiting = true;
+        try {
+            Log("Enabling I2C Bus");
+            I2CBus bus = I2CFactory.getInstance(I2CBus.BUS_1);
+
+            Log("Enabling GPIO");
+            this.GPIO = GpioFactory.getInstance();
+
+            Log("Locking GPIO Provider");
+            RPIProvider = GpioFactory.getDefaultProvider();
+
+            Log("Creating BadgerPWM Provider");
+            PWMProvider = new BadgerPWMProvider(bus, 0x40);
+
+            Log("Provisioning Outputs");
+            this.provisionPwmOutputs();
+            this.provisionDigitalOutputs();
+
+            PWMProvider.reset();
+            setFlywheelSpeed(BadgerPWMProvider.FLYWHEEL_A,0.0f);
+            setFlywheelSpeed(BadgerPWMProvider.FLYWHEEL_B,0.0f);
+
+            IsReady = true;
+            Log("Badger Motor Controller Ready");
+        }
+        catch (Exception e){
+            //TODO: Should be a harder warning
+            e.printStackTrace();
+            System.out.println("ERROR: THE EXPECTED DEVICES WERE NOT AVAILABLE");
+        }
     }
 
     /**
      * Closes the bus for I2C comms and effectively shuts down communication with the PCA9685
      */
     public void shutdown() {
-        PCAprovider.shutdown();
+        PWMProvider.shutdown();
     }
 
     /**
      * Provisions the PWM Pins and gives them descriptive names, because why not
      */
     private void provisionPwmOutputs() {
-        GpioPinPwmOutput[] myOutputs;
-        myOutputs = new GpioPinPwmOutput[]{
-                GPIO.provisionPwmOutputPin(PCAprovider, PCAChip.DRIVE_FRONT_LEFT, "Front Left - FL-H"),
-                GPIO.provisionPwmOutputPin(PCAprovider, PCAChip.DRIVE_FRONT_RIGHT, "Front Right - FR-H"),
-                GPIO.provisionPwmOutputPin(PCAprovider, PCAChip.DRIVE_BACK_LEFT, "Back Left - BL-H"),
-                GPIO.provisionPwmOutputPin(PCAprovider, PCAChip.DRIVE_BACK_RIGHT, "Back Right - BR-H"),
-                GPIO.provisionPwmOutputPin(PCAprovider, PCAChip.CONVEYOR_A, "Conveyor A - CV1"),
-                GPIO.provisionPwmOutputPin(PCAprovider, PCAChip.CONVEYOR_B, "Conveyor B - CV2"),
-                GPIO.provisionPwmOutputPin(PCAprovider, PCAChip.VACUUM_ROLLER, "Vacuum Roller - VAC"),
-                GPIO.provisionPwmOutputPin(PCAprovider, PCAChip.FLYWHEEL_A, "Flywheel A - BS1"),
-                GPIO.provisionPwmOutputPin(PCAprovider, PCAChip.FLYWHEEL_B, "Flywheel B - BS2"),
-                GPIO.provisionPwmOutputPin(PCAprovider, PCAChip.CLIMBING_ARM, "Climbing Arm - RND1"),
-                GPIO.provisionPwmOutputPin(PCAprovider, PCAChip.CLIMBING_WRIST, "Climbing Wrist - RND2"),
-                GPIO.provisionPwmOutputPin(PCAprovider, PCAChip.SHOOTING_AIM_ADJUST, "Shooting aim adjust - RND3")
+        this.PWMOutputs = new GpioPinPwmOutput[]{
+                GPIO.provisionPwmOutputPin(PWMProvider, BadgerPWMProvider.DRIVE_FRONT_LEFT, "Front Left - FL-H"),
+                GPIO.provisionPwmOutputPin(PWMProvider, BadgerPWMProvider.DRIVE_FRONT_RIGHT, "Front Right - FR-H"),
+                GPIO.provisionPwmOutputPin(PWMProvider, BadgerPWMProvider.DRIVE_BACK_LEFT, "Back Left - BL-H"),
+                GPIO.provisionPwmOutputPin(PWMProvider, BadgerPWMProvider.DRIVE_BACK_RIGHT, "Back Right - BR-H"),
+
+                GPIO.provisionPwmOutputPin(PWMProvider, BadgerPWMProvider.CONVEYOR_A, "Conveyor A - CV1"),
+                GPIO.provisionPwmOutputPin(PWMProvider, BadgerPWMProvider.CONVEYOR_B, "Conveyor B - CV2"),
+                GPIO.provisionPwmOutputPin(PWMProvider, BadgerPWMProvider.VACUUM_ROLLER, "Vacuum Roller - VAC"),
+                GPIO.provisionPwmOutputPin(PWMProvider, BadgerPWMProvider.FLYWHEEL_A, "Flywheel A - BS1"),
+                GPIO.provisionPwmOutputPin(PWMProvider, BadgerPWMProvider.FLYWHEEL_B, "Flywheel B - BS2"),
+                GPIO.provisionPwmOutputPin(PWMProvider, BadgerPWMProvider.CLIMBING_ARM, "Climbing Arm - RND1"),
+                GPIO.provisionPwmOutputPin(PWMProvider, BadgerPWMProvider.CLIMBING_WRIST, "Climbing Wrist - RND2"),
+                GPIO.provisionPwmOutputPin(PWMProvider, BadgerPWMProvider.SHOOTING_AIM_ADJUST, "Shooting aim adjust - RND3")
         };
-        this.PWMOutputs = myOutputs;
     }
 
     /**
@@ -112,23 +146,39 @@ public class BadgerMotorController{
      * Actual speed of the motor is maxed out at at 80% at Ryan's request
      * therefore, percentage parameter is used to scale motor speed based on the Max PWM value.
      * @param pin PCA9685Pin for the motor whose speed will be set
-     * @param speed Speed to set the motor too, int value from 0 to 100
+     * @param speedPercent Speed to set the motor too, int value from 0 to 100
      */
-    //TODO: TEST THIS METHOD WITH A MOTOR
-    public void setTLEMotorSpeed(Pin pin, int speed) {
+    public void setDriveMotorSpeed(Pin pin, float speedPercent) {
+        if(!IsReady){
+            return;
+        }
 
-        if (speed < 0 || speed > 100){
-            System.out.println("[BadgerMotorController.setDriveSpeed] Speed percentage out of range. Must be INT between 0 and " +
+        boolean shouldMovePin = (pin==BadgerPWMProvider.DRIVE_BACK_LEFT || pin==BadgerPWMProvider.DRIVE_BACK_RIGHT
+                || pin ==BadgerPWMProvider.DRIVE_FRONT_LEFT || pin==BadgerPWMProvider.DRIVE_FRONT_RIGHT);
+
+        if(!shouldMovePin){
+            return;
+        }
+
+        if (speedPercent < 0 || speedPercent > 100){
+            Log("[BadgerMotorController.setDriveSpeed] Speed percentage out of range. Must be INT between 0 and " +
                     "100");
             return;
         }
 
-        //Get the scaled PWM value based on the MaxONPWM value;
-        int PWMOffTime = MaxOffPWM * (speed/100);
-        int PWMOnTime = 4095-MaxOffPWM;
+        //TODO: REVIEW!!!
+        float percent = speedPercent/100.f;
+        int PWMtime = (int)(DriveMaxPWM - ((1-percent)*DriveMaxPWM));
+        //Overdrive option
+        if(DriveMotorLimiting){
+            PWMtime += DriveMinPWM;
+        }
 
-        this.PCAprovider.setPwm(pin, PWMOnTime, PWMOffTime);
+        this.PWMProvider.setPwm(pin, 0, PWMtime);
+    }
 
+    public void STOP(Pin pin){
+        this.PWMProvider.setAlwaysOn(pin);
     }
 
     /**
@@ -137,7 +187,11 @@ public class BadgerMotorController{
      * @param direction Direction in which the motor will rotate. EX: BadgerMotorController.CLOCKWISE or BadgerMotorController.COUNTER_CLOCKWISE
      */
     //TODO: TEST THIS METHOD WITH A MOTOR
-    public void setTLEMotorDirection(Pin pin, int direction) {
+    public void setDriveMotorDirection(Pin pin, int direction) {
+        if(!IsReady){
+            return;
+        }
+
         if (direction == CLOCKWISE)
             this.RPIProvider.setState(pin, PinState.LOW);
         else if (direction == COUNTER_CLOCKWISE)
@@ -146,5 +200,54 @@ public class BadgerMotorController{
             System.out.println("[BadgerMotorController.setMotorDirection] Invalid motor direction given");
     }
 
+    public void setFlywheelSpeed(Pin pin, float throttle){
+        if(!IsReady){
+            return;
+        }
+        //Get the scaled PWM value based on the MaxONPWM value;
+        float scaledThrottle = 4095*throttle/100.f;
+        int PWMOffTime = (int)scaledThrottle;
+        int PWMOnTime = 4095-PWMOffTime;
+        Log(String.format("PWM OFF: %d | PWM ON %d", PWMOffTime, PWMOnTime));
 
+        SendDebugMessage(String.format("FLYWHEEL PWM OFF: %d | PWM ON %d", PWMOffTime, PWMOnTime));
+
+        this.PWMProvider.setPwm(pin, PWMOnTime, PWMOffTime);
+    }
+
+    public void setPWM(Pin pin, float value){
+        if(!IsReady){
+            return;
+        }
+
+        float scaledThrottle = BadgerPWMProvider.PWM_MAX * (value / 100.f);
+        int PWMOffTime = (int)scaledThrottle;
+        PWMOffTime = PWMOffTime<1? 1 : PWMOffTime;
+
+        SendDebugMessage(String.format("PWM:%s - value: %f",pin.getName(),value));
+        this.PWMProvider.setPwm(pin, 0, PWMOffTime);
+    }
+
+    public void setAbsPWM(Pin pin, int val){
+        if(!IsReady){
+            return;
+        }
+        this.PWMProvider.setPwm(pin,val);
+    }
+
+    public Pin getPWMPin(int num){
+        return PWMProvider.getPinByNumber(num);
+    }
+
+    public Pin getPWMPin(String str){
+        return PWMProvider.getPinByName(str);
+    }
+
+    public Pin getGPIOPin(int num){
+        return null;
+    }
+
+    public Pin getGPIOPin(String str){
+        return RPI.getPinByName(str);
+    }
 }
