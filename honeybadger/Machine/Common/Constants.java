@@ -7,6 +7,7 @@ public class Constants {
     public enum PLATFORM{
         NO_INFO,
         BADGER_PI,
+        MOCK_PI,
         DESKTOP,
     }
 
