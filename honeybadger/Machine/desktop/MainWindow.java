@@ -39,7 +39,18 @@ public class MainWindow extends JDialog {
         Prompt.setText(promptChar);
 
         try {
-            //TODO: Additional debug here. Might have to load some system libs
+            //Choose and load the dlls for the correct arch
+            String arch = System.getProperty("os.arch");
+            System.out.println(arch);
+            if(arch.contains("x86")){
+                System.loadLibrary("opencv_java310");
+                System.loadLibrary("opencv_ffmpeg310");
+            }
+            else{
+                System.loadLibrary("opencv_java310_64");
+                System.loadLibrary("opencv_ffmpeg310_64");
+            }
+
             videoPanel.image = ImageIO.read(new File("maxresdefault.jpg"));
             Mat original = new Mat(videoPanel.image.getHeight(), videoPanel.image.getWidth(), CvType.CV_8UC3);
             original.put(0,0,((DataBufferByte) JPanelOpenCV.image.getRaster().getDataBuffer()).getData());

@@ -22,22 +22,6 @@ public class JPanelOpenCV extends JPanel{
     public static BufferedImage image;
 
     public static void main (String args[]) throws InterruptedException{
-
-        String arch = System.getProperty("os.arch");
-        System.out.println(arch);
-
-        //Choose and load the dlls for the correct arch
-        if(arch.contains("x86")){
-            System.loadLibrary("opencv_java310");
-            System.loadLibrary("opencv_ffmpeg310");
-        }
-        else{
-            System.loadLibrary("opencv_java310_64");
-            System.loadLibrary("opencv_ffmpeg310_64");
-        }
-
-        System.loadLibrary("libopencv_core.so.3.1.0");
-
         JPanelOpenCV t = new JPanelOpenCV();
        
        // VideoCapture camera = new VideoCapture();
