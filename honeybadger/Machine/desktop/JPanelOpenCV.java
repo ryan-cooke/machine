@@ -19,22 +19,9 @@ import org.opencv.videoio.VideoCapture;
 import org.opencv.videoio.VideoWriter;
     
 public class JPanelOpenCV extends JPanel{
-    static BufferedImage image;
+    public static BufferedImage image;
+
     public static void main (String args[]) throws InterruptedException{
-
-        String arch = System.getProperty("os.arch");
-        System.out.println(arch);
-
-        //Choose and load the dlls for the correct arch
-        if(arch.contains("x86")){
-            System.loadLibrary("opencv_java310");
-            System.loadLibrary("opencv_ffmpeg310");
-        }
-        else{
-            System.loadLibrary("opencv_java310_64");
-            System.loadLibrary("opencv_ffmpeg310_64");
-        }
-
         JPanelOpenCV t = new JPanelOpenCV();
        
        // VideoCapture camera = new VideoCapture();
