@@ -4,10 +4,13 @@ import Machine.Common.Network.BaseMsg;
 import Machine.Common.Utils;
 import Machine.rpi.HoneybadgerV6;
 
+import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Set;
+
+import static Machine.Common.Utils.Log;
 
 /**
  * Class to send debug, plain-text commands.
@@ -19,13 +22,20 @@ public class TextCommandMessage extends BaseMsg {
     protected static void GenerateMap(){
         CommandMap = new HashMap<>();
 
-        CommandMap.put("setPWM",new CMD.setPWM());
-        CommandMap.put("setAbsPWM",new CMD.setAbsPWM());
-        CommandMap.put("sweepPWM", new CMD.sweepPWM());
-        CommandMap.put("setMotor",new CMD.setMotor());
-        CommandMap.put("servo", new CMD.servo());
-        CommandMap.put("flywheel", new CMD.flywheel());
-        CommandMap.put("stop", new CMD.stop());
+        //Populate with all commands
+        Class[] commandList = CMD.class.getClasses();
+        for (Class registeredCommand:commandList) {
+            if(Modifier.isAbstract(registeredCommand.getModifiers())){
+                continue;
+            }
+
+            try {
+                CommandMap.put(registeredCommand.getSimpleName(), (IBadgerFunction) registeredCommand.newInstance());
+            }catch (Exception e){
+                Log("Unable to correctly generate command mapping");
+            }
+        }
+
     }
 
     public TextCommandMessage(String msg){

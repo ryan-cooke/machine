@@ -2,6 +2,7 @@ package Machine.Common.Network.Command;
 
 import Machine.rpi.HoneybadgerV6;
 import Machine.rpi.hw.BadgerMotorController;
+import Machine.rpi.hw.BadgerPWMProvider;
 import com.pi4j.io.gpio.Pin;
 
 import java.util.Arrays;
@@ -24,7 +25,9 @@ public class CMD {
             BMC = badger.getMotorController();
             if(!areParametersValid(params)){
                 //Error and stop
-                Log(String.format("Unable to invoke setPWM with \'%s\'", Arrays.toString(params)));
+                Log(String.format("Unable to invoke \'%s\' with params \'%s\'",
+                        this.getClass().getSimpleName(),
+                        Arrays.toString(params)));
                 return false;
             }
             return true;
@@ -196,13 +199,18 @@ public class CMD {
                 return false;
             }
 
-            //TODO: Implement
+            float range = (float)(BadgerPWMProvider.FLYWHEEL_PWM_MAX-BadgerPWMProvider.FLYWHEEL_PWM_MIN);
+            float percent = Float.parseFloat(params[0]);
+            float throttle = range*percent/100.f;
+
+            BMC.setPWM(BadgerPWMProvider.FLYWHEEL_A,throttle);
+            BMC.setPWM(BadgerPWMProvider.FLYWHEEL_B,throttle);
             return true;
         }
 
         @Override
         public String Explain() {
-            return "\"flywheel <Percent throttle>\"";
+            return "\"flywheel <Percent throttle of flywheel range>\"";
         }
 
         @Override

@@ -173,7 +173,7 @@ public class BadgerNetworkServer {
                 while(KeepAlive && !shouldClose && !shouldQuit){
                     message = ReceiveMessage();
                     //only for DEBUG
-                    Log(message);
+                    Log(String.format("RX: %s",message));
                     shouldClose = message.contains("close");
                     shouldQuit = message.contains("quit");
                 }
