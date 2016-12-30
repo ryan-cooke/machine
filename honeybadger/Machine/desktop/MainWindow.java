@@ -5,6 +5,7 @@ import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
+import sun.applet.Main;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -16,6 +17,11 @@ import java.io.File;
 import java.util.ArrayList;
 
 public class MainWindow extends JDialog {
+    private static MainWindow singleton;
+
+    private NetworkConnector networkBus;
+
+    private Thread networkThread;
 
     private JPanel contentPane;
     private JButton buttonReboot;
@@ -29,7 +35,7 @@ public class MainWindow extends JDialog {
     private ArrayList<String> inputHistory;
     private int inputOffset;
 
-    public MainWindow() {
+    private MainWindow() {
         setContentPane(contentPane);
         setModal(true);
         getRootPane().setDefaultButton(buttonReboot);
@@ -133,7 +139,6 @@ public class MainWindow extends JDialog {
         });
 
         // call onPressExit() on ESCAPE
-        //TODO: Remove?
         contentPane.registerKeyboardAction(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 onPressExit();
@@ -150,6 +155,7 @@ public class MainWindow extends JDialog {
 
     private void onPressReboot() {
         //TODO: Send a network command to quit.
+
     }
 
     private void onPressExit() {
@@ -164,15 +170,29 @@ public class MainWindow extends JDialog {
         }
     }
 
+    synchronized public static void writeToMessageFeed(String input){
+        singleton.messageFeed.append(input);
+        singleton.messageFeed.append("\n");
+    }
+
     public static void main(String[] args) {
+        //Get the IP first.
+        String ConnectionIP = JOptionPane.showInputDialog(
+                "Honeybadger IP: ",
+                "192.168.0.1");
+        if(ConnectionIP==null){
+            System.exit(0);
+        }
+
         //Try changing the theme
         try {
             UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
         }catch (Exception e){}
+        singleton = new MainWindow();
+        singleton.networkBus = new NetworkConnector(ConnectionIP,2017);
 
-        MainWindow dialog = new MainWindow();
-        dialog.pack();
-        dialog.setVisible(true);
+        singleton.pack();
+        singleton.setVisible(true);
         System.exit(0);
     }
 }
