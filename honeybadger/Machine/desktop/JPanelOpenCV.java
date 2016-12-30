@@ -19,7 +19,7 @@ import org.opencv.videoio.VideoCapture;
 import org.opencv.videoio.VideoWriter;
     
 public class JPanelOpenCV extends JPanel{
-    static BufferedImage image;
+    public static BufferedImage image;
 
     public static void main (String args[]) throws InterruptedException{
 
@@ -35,6 +35,8 @@ public class JPanelOpenCV extends JPanel{
             System.loadLibrary("opencv_java310_64");
             System.loadLibrary("opencv_ffmpeg310_64");
         }
+
+        System.loadLibrary("libopencv_core.so.3.1.0");
 
         JPanelOpenCV t = new JPanelOpenCV();
        
