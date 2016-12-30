@@ -7,7 +7,9 @@ import Machine.rpi.hw.BadgerMotorController;
 import com.pi4j.io.gpio.Pin;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.Set;
 
 /**
  * Class to send debug, plain-text commands.
@@ -57,5 +59,19 @@ public class TextCommandMessage extends BaseMsg {
             //Send a critical message
             badger.sendMessageToDesktop(String.format("Error calling %s",command[0]));
         }
+    }
+
+    public static Set<String> getCommandListName(){
+        if(CommandMap==null){
+            GenerateMap();
+        }
+        return CommandMap.keySet();
+    }
+
+    public static Collection<IBadgerFunction> getCommandHandlers(){
+        if(CommandMap==null){
+            GenerateMap();
+        }
+        return CommandMap.values();
     }
 }

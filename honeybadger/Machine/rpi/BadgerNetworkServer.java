@@ -149,11 +149,15 @@ public class BadgerNetworkServer {
 
     public void Run(){
         //Main loop
-        String message="";
+        boolean shouldClose = false;
+        boolean shouldQuit = false;
         do{
+            String message="";
+            shouldClose=false;
+            shouldQuit=false;
+
             SetupNetwork();
             WaitForConnect();
-
             if(Handshake()){
                 //Setup the regular message sender
                 final ScheduledFuture<?> PeriodicSenderHandle = ScheduledManager.scheduleAtFixedRate(
@@ -166,10 +170,12 @@ public class BadgerNetworkServer {
                         3,10, TimeUnit.SECONDS
                 );
 
-                while(KeepAlive && !message.contains("quit") && !message.endsWith("close")){
+                while(KeepAlive && !shouldClose && !shouldQuit){
                     message = ReceiveMessage();
                     //only for DEBUG
                     Log(message);
+                    shouldClose = message.contains("close");
+                    shouldQuit = message.contains("quit");
                 }
                 Log("Cancelling PeriodicSender");
                 PeriodicSenderHandle.cancel(true);
@@ -184,7 +190,7 @@ public class BadgerNetworkServer {
 
             Log("Cleaning up connections");
             CloseAll();
-        }while(!message.contains("quit"));
+        }while(!shouldQuit);
 
         Log("Stopping BadgerNetworkServer Run");
     }

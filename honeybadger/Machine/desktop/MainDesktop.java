@@ -1,9 +1,14 @@
 package Machine.desktop;
 
+import Machine.Common.Network.Command.IBadgerFunction;
 import Machine.Common.Network.Command.TextCommandMessage;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Scanner;
+import java.util.Set;
 
+import static Machine.Common.Network.Command.TextCommandMessage.getCommandHandlers;
 import static Machine.Common.Utils.Log;
 import static Machine.Common.Utils.Prompt;
 
@@ -62,15 +67,32 @@ public class MainDesktop {
             readMessages.start();
             while (keepAlive) {
                 input = Prompt('>', Kb);
-                Log(String.format("Sending \"%s\"", input));
 
                 //TODO: Cleanup the cases below
-
                 if(input.contains("CMD")){
-                    Log(String.format("Sending TextCommandMessage \'%s\'",input.substring(4)));
-                    nc.SendMessage(new TextCommandMessage(input.substring(4)));
+                    //Check that it is not followed by something else
+                    String[] keywords = input.split(" ");
+                    if(keywords.length>1){
+                        if(keywords[1].contains("LIST")){
+                            Set<String> commands = TextCommandMessage.getCommandListName();
+                            Log("Known command that can be called with CMD");
+                            Log(String.format("   %s", Arrays.toString(commands.toArray())));
+                        }
+                        else if(keywords[1].contains("HELP")){
+                            Log("Explaining Commands");
+                            Collection<IBadgerFunction> functors = TextCommandMessage.getCommandHandlers();
+                            for(IBadgerFunction functor : functors){
+                                Log(String.format("\t%s | call: %s",functor.getClass().getSimpleName(),functor.Explain()));
+                            }
+                        }
+                        else {
+                            Log(String.format("Sending TextCommandMessage \'%s\'", input.substring(4)));
+                            nc.SendMessage(new TextCommandMessage(input.substring(4)));
+                        }
+                    }
                 }
                 else{
+                    Log(String.format("Sending \"%s\"", input));
                     nc.SendMessage(input);
                 }
 
