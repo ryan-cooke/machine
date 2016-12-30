@@ -1,14 +1,9 @@
 package Machine.desktop;
 
 import Machine.Common.Network.BaseMsg;
-import Machine.Common.Network.ControllerMessage;
 import Machine.Common.Utils;
-
-import Machine.rpi.hw.BadgerMotorController;
+import Machine.Common.Network.ControllerMessage;
 import ch.aplu.xboxcontroller.*;
-
-import java.nio.file.SecureDirectoryStream;
-import java.util.ArrayList;
 
 
 public class Controller extends XboxControllerAdapter{
@@ -30,33 +25,149 @@ public class Controller extends XboxControllerAdapter{
         connector.SendMessage(msg);
     }
 
-    public static class controllerState{
-        static int buttonPressed = 0; // Number of buttons currently pressed
-        static boolean button[] = new boolean[15]; // The 16 buttons pressed if true
-        static double leftThumb = 0.0;
-        static char leftThumbDir = 'Z'; // N, E, S, W for directions.
-        static double rightThumb = 0.0;
-        static char rightThumbDir = 'Z';
-        static double leftMag = 0.0;
-        static double rightMag = 0.0;
+    public static class controllerState extends BaseMsg{
+        static int buttonsPressed = 0; // Number of buttons currently pressed
+        //A =0, B=1, X=2, Y=3, Back=4, Start=5, rBumper=6,lBumper=7, lThumb=8, rThumb=9,
+        //Ndpad=10,Edpad=11,Sdpad=12,Wdpad=13,ltriiger=14,rtrigger=15
+        private static boolean buttons[] = new boolean[15]; // The 16 buttons pressed if true
+        private static double leftThumb = 0.0;
+        private static char leftThumbDir = 'Z'; // N, E, S, W for directions.
+        private static double rightThumb = 0.0;
+        private static char rightThumbDir = 'Z';
+        private static double leftMag = 0.0;
+        private static double rightMag = 0.0;
 
+        public static int getButtonsPressed() {
+            return buttonsPressed;
+        }
+
+        public static boolean[] getButtons() {
+            return buttons;
+        }
+
+        public static double getLeftThumb() {
+            return leftThumb;
+        }
+
+        public static char getLeftThumbDir() {
+            return leftThumbDir;
+        }
+
+        public static double getRightThumb() {
+            return rightThumb;
+        }
+
+        public static char getRightThumbDir() {
+            return rightThumbDir;
+        }
+
+        public static double getLeftMag() {
+            return leftMag;
+        }
+
+        public static double getRightMag() {
+            return rightMag;
+        }
+    }
+
+    public void sendActions(){
+        if(controllerState.buttons[0]){
+            SendMessage(new ControllerMessage(new ControllerMessage.MoveBack(100)));
+        }
+        if(controllerState.buttons[1]){
+            SendMessage(new ControllerMessage(new ControllerMessage.MoveRight(100)));
+        }
+        if(controllerState.buttons[2]){
+            SendMessage(new ControllerMessage(new ControllerMessage.MoveLeft(100)));
+        }
+        if(controllerState.buttons[3]){
+            SendMessage(new ControllerMessage(new ControllerMessage.MoveRight(100)));
+        }
+        if(controllerState.buttons[4]){
+            SendMessage(new ControllerMessage(new ControllerMessage.Stop()));
+        }
+        if(controllerState.buttons[5]){
+            SendMessage(new ControllerMessage(new ControllerMessage.Stop()));
+        }
+        if(controllerState.buttons[6]){
+            SendMessage(new ControllerMessage(new ControllerMessage.Stop()));
+        }
+        if(controllerState.buttons[7]){
+            SendMessage(new ControllerMessage(new ControllerMessage.Stop()));
+        }
+        if(controllerState.buttons[8]){
+            SendMessage(new ControllerMessage(new ControllerMessage.Stop()));
+        }
+        if(controllerState.buttons[9]){
+            SendMessage(new ControllerMessage(new ControllerMessage.Stop()));
+        }
+        if(controllerState.buttons[10]){
+            SendMessage(new ControllerMessage(new ControllerMessage.Stop()));
+        }
+        if(controllerState.buttons[11]){
+            SendMessage(new ControllerMessage(new ControllerMessage.Stop()));
+        }
+        if(controllerState.buttons[12]){
+            SendMessage(new ControllerMessage(new ControllerMessage.Stop()));
+        }
+        if(controllerState.buttons[13]){
+            SendMessage(new ControllerMessage(new ControllerMessage.Stop()));
+        }
+        if(controllerState.buttons[14]){
+            SendMessage(new ControllerMessage(new ControllerMessage.Stop()));
+        }
+        if(controllerState.buttons[15]){
+            SendMessage(new ControllerMessage(new ControllerMessage.Stop()));
+        }
+        if(controllerState.leftMag > 0.2){
+            switch (controllerState.leftThumbDir) {
+                case 'N':
+                    SendMessage(new ControllerMessage(new ControllerMessage.Stop()));
+                    break;
+                case 'E':
+                    SendMessage(new ControllerMessage(new ControllerMessage.Stop()));
+                    break;
+                case 'S':
+                    SendMessage(new ControllerMessage(new ControllerMessage.Stop()));
+                    break;
+                case 'W':
+                    SendMessage(new ControllerMessage(new ControllerMessage.Stop()));
+                    break;
+            }
+        }
+        if(controllerState.rightMag > 0.2){
+            switch (controllerState.rightThumbDir) {
+                case 'N':
+                    SendMessage(new ControllerMessage(new ControllerMessage.Stop()));
+                    break;
+                case 'E':
+                    SendMessage(new ControllerMessage(new ControllerMessage.Stop()));
+                    break;
+                case 'S':
+                    SendMessage(new ControllerMessage(new ControllerMessage.Stop()));
+                    break;
+                case 'W':
+                    SendMessage(new ControllerMessage(new ControllerMessage.Stop()));
+                    break;
+            }
+        }
     }
 
     public static void press(int button){
-        controllerState.buttonPressed++;
-        controllerState.button[button] = true;
+        controllerState.buttonsPressed++;
+        controllerState.buttons[button] = true;
     }
     
     public static void depress(int button){
-        controllerState.buttonPressed--;
-        controllerState.button[button] = false;
+        controllerState.buttonsPressed--;
+        controllerState.buttons[button] = false;
     }
     
     public void buttonA(boolean pressed)
     {
         // Button 0
         if(pressed){
-//            SendMessage(new ControllerMessage(new ControllerMessage.MoveBack(100)));
+            SendMessage(new ControllerMessage(new ControllerMessage.MoveBack(100)));
             press(0);
         }
         else{
@@ -116,7 +227,7 @@ public class Controller extends XboxControllerAdapter{
     {
         // Button 5
         if (pressed){
-//            SendMessage("Pressed start button");
+//            SendMessage("Pressed start buttons");
             press(5);
         }
         else{
