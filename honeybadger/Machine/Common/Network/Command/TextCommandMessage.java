@@ -1,5 +1,6 @@
 package Machine.Common.Network.Command;
 
+import Machine.Common.Constants;
 import Machine.Common.Network.BaseMsg;
 import Machine.Common.Utils;
 import Machine.rpi.HoneybadgerV6;
@@ -45,7 +46,7 @@ public class TextCommandMessage extends BaseMsg {
     @Override
     public void Execute(Object context) {
         HoneybadgerV6 badger = (HoneybadgerV6) context;
-        if(badger==null || !Utils.DEBUG_MODE_ON){
+        if(badger==null || !Constants.DEBUG_MODE_ON){
             return;
         }
 

@@ -1,5 +1,6 @@
 package Machine.rpi;
 
+import Machine.Common.Constants;
 import Machine.Common.Utils;
 
 /**
@@ -7,7 +8,7 @@ import Machine.Common.Utils;
  */
 public class NetworkDebuggable {
     protected void SendACK(String message){
-        if(Utils.DEBUG_MODE_ON) {
+        if(Constants.DEBUG_MODE_ON) {
             try {
                 HoneybadgerV6.getInstance().sendMessageToDesktop(message);
             } catch (Exception e) {
@@ -17,7 +18,7 @@ public class NetworkDebuggable {
     }
 
     protected void SendDebugMessage(String message){
-        if(Utils.DEBUG_MODE_ON) {
+        if(Constants.DEBUG_MODE_ON) {
             try {
                 HoneybadgerV6.getInstance().sendMessageToDesktop(message);
             } catch (Exception e) {
@@ -27,7 +28,7 @@ public class NetworkDebuggable {
     }
 
     protected void SendCriticalMessage(String message, Exception exception){
-        if(Utils.DEBUG_MODE_ON) {
+        if(Constants.DEBUG_MODE_ON) {
             try {
                 HoneybadgerV6.getInstance().sendCriticalMessageToDesktop(message,exception);
             } catch (Exception e) {

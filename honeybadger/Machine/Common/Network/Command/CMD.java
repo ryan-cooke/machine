@@ -199,12 +199,8 @@ public class CMD {
                 return false;
             }
 
-            float range = (float)(BadgerPWMProvider.FLYWHEEL_PWM_MAX-BadgerPWMProvider.FLYWHEEL_PWM_MIN);
             float percent = Float.parseFloat(params[0]);
-            float throttle = range*percent/100.f;
-
-            BMC.setPWM(BadgerPWMProvider.FLYWHEEL_A,throttle);
-            BMC.setPWM(BadgerPWMProvider.FLYWHEEL_B,throttle);
+            badger.setFlywheelSpeed(percent);
             return true;
         }
 
@@ -234,6 +230,24 @@ public class CMD {
         @Override
         public int MinimumParameterNum() {
             return 0;
+        }
+    }
+
+    public static class ack implements IBadgerFunction{
+        @Override
+        public boolean Invoke(HoneybadgerV6 badger, String[] params) {
+            badger.sendDebugMessageToDesktop(Arrays.toString(params));
+            return true;
+        }
+
+        @Override
+        public String Explain() {
+            return "\'ack <anything>\'";
+        }
+
+        @Override
+        public int MinimumParameterNum() {
+            return 1;
         }
     }
 }

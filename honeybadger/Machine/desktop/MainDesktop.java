@@ -1,5 +1,6 @@
 package Machine.desktop;
 
+import Machine.Common.Constants;
 import Machine.Common.Network.Command.IBadgerFunction;
 import Machine.Common.Network.Command.TextCommandMessage;
 
@@ -31,7 +32,6 @@ public class MainDesktop {
             while(keepAlive && !Thread.currentThread().isInterrupted() && !Net.IsBroken() && Net.HasActiveConnection()){
                 try {
                     Net.ReceiveMessage();
-//                    Log(String.format("Received \'%s\'", Net.ReceiveMessage()));
                 }
                 catch (Exception e){
                     Log("Exception in Message Reader");
@@ -46,6 +46,8 @@ public class MainDesktop {
 
     //Quick test for network
     public static void main(String[] args){
+        Constants.setActivePlatform(Constants.PLATFORM.DESKTOP);
+
         Scanner Kb = new Scanner(System.in);
 
         do {

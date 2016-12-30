@@ -19,8 +19,9 @@ public class RPI {
     public static Pin DRIVE_BACK_RIGHT = RaspiPin.GPIO_24;
 
     protected static HashMap<String,Pin> PinNameMap;
+    protected static HashMap<Integer,Pin> StandardPinNumberMap;
 
-    protected static void CreateMap(){
+    protected static void CreateNameMap(){
         PinNameMap = new HashMap<>(4);
         PinNameMap.put("FL",DRIVE_FRONT_LEFT);
         PinNameMap.put("FR",DRIVE_FRONT_RIGHT);
@@ -28,11 +29,26 @@ public class RPI {
         PinNameMap.put("BR",DRIVE_BACK_RIGHT);
     }
 
+    protected static void CreateRegularNumberMapping(){
+        StandardPinNumberMap = new HashMap<>();
+        StandardPinNumberMap.put(19,DRIVE_BACK_RIGHT);
+        StandardPinNumberMap.put(13,DRIVE_BACK_LEFT);
+        StandardPinNumberMap.put(6,DRIVE_FRONT_RIGHT);
+        StandardPinNumberMap.put(5,DRIVE_FRONT_LEFT);
+    }
+
     public static Pin getPinByName(String str){
         if(PinNameMap==null){
-            CreateMap();
+            CreateNameMap();
         }
         return PinNameMap.get(str);
+    }
+
+    public static Pin getPinByStandardNumber(int num){
+        if(StandardPinNumberMap==null){
+            CreateRegularNumberMapping();
+        }
+        return StandardPinNumberMap.get(num);
     }
 
     //TODO: MAP these out
