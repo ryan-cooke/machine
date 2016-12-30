@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch4jConfig>
-  <dontWrapJar>false</dontWrapJar>
+  <dontWrapJar>true</dontWrapJar>
   <headerType>gui</headerType>
   <jar>bin\BadgerV6-Desktop.jar</jar>
   <outfile>Badger.exe</outfile>
   <errTitle></errTitle>
   <cmdLine></cmdLine>
-  <chdir>.</chdir>
+  <chdir></chdir>
   <priority>normal</priority>
   <downloadUrl>http://java.com/download</downloadUrl>
   <supportUrl></supportUrl>
   <stayAlive>false</stayAlive>
   <restartOnCrash>false</restartOnCrash>
   <manifest></manifest>
-  <icon>C:\Users\alexs\Downloads\launch4j-3.9-win32\bin\icon.ico</icon>
+  <icon>bin\icon.ico</icon>
   <singleInstance>
     <mutexName>EngGamesBadgerController</mutexName>
     <windowTitle></windowTitle>
@@ -26,6 +26,7 @@
     <maxVersion></maxVersion>
     <jdkPreference>preferJre</jdkPreference>
     <runtimeBits>64/32</runtimeBits>
+    <opt>-Djava.library.path=&quot;bin&quot;</opt>
   </jre>
   <splash>
     <file>bin\Splash.bmp</file>
@@ -34,14 +35,14 @@
     <timeoutErr>true</timeoutErr>
   </splash>
   <versionInfo>
-    <fileVersion>0.0.0.1</fileVersion>
-    <txtFileVersion>0.01_ALPHA</txtFileVersion>
-    <fileDescription>Badger Controller version 0.01_ALPHA</fileDescription>
+    <fileVersion>0.0.0.2</fileVersion>
+    <txtFileVersion>0.02_ALPHA</txtFileVersion>
+    <fileDescription>Badger Controller version 0.02_ALPHA</fileDescription>
     <copyright>Engineering Games Concordia - Machine Team</copyright>
-    <productVersion>0.0.0.1</productVersion>
-    <txtProductVersion>0.01_ALPHA</txtProductVersion>
+    <productVersion>0.0.0.2</productVersion>
+    <txtProductVersion>0.02_ALPHA</txtProductVersion>
     <productName>Badger Controller</productName>
-    <companyName>Badger Controller version 0.01_ALPHA</companyName>
+    <companyName>Badger Controller version 0.02_ALPHA</companyName>
     <internalName>BadgerController</internalName>
     <originalFilename>Badger.exe</originalFilename>
     <trademarks></trademarks>
