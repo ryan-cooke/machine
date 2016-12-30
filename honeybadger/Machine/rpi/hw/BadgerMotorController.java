@@ -86,9 +86,9 @@ public class BadgerMotorController extends NetworkDebuggable{
             this.provisionDigitalOutputs();
             PWMProvider.reset();
 
-            Log("Arming flywheels");
-            this.setPWM(BadgerPWMProvider.FLYWHEEL_A,10);
-            this.setPWM(BadgerPWMProvider.FLYWHEEL_B,10);
+            //Log("Arming flywheels");
+            //this.setPWM(BadgerPWMProvider.FLYWHEEL_A,10);
+            //this.setPWM(BadgerPWMProvider.FLYWHEEL_B,10);
 
             SerialServo = new BadgerSmartServoProvider();
 
