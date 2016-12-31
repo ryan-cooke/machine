@@ -8,6 +8,7 @@ public class Constants {
         NO_INFO,
         BADGER_PI,
         DESKTOP,
+        DESKTOP_GUI,
     }
 
     /**

@@ -1,5 +1,6 @@
 package Machine.desktop;
 
+import Machine.Common.Constants;
 import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
@@ -15,7 +16,17 @@ import java.awt.image.DataBufferByte;
 import java.io.File;
 import java.util.ArrayList;
 
+import static Machine.Common.Utils.ErrorLog;
+
 public class MainWindow extends JDialog {
+    private static MainWindow singleton;
+
+    private NetworkConnector networkBus;
+    private NetworkConnector.MessageReader messageReader;
+
+    private Thread networkThread;
+
+    private Thread videoThread;
 
     private JPanel contentPane;
     private JButton buttonReboot;
@@ -29,7 +40,7 @@ public class MainWindow extends JDialog {
     private ArrayList<String> inputHistory;
     private int inputOffset;
 
-    public MainWindow() {
+    private MainWindow() {
         setContentPane(contentPane);
         setModal(true);
         getRootPane().setDefaultButton(buttonReboot);
@@ -73,6 +84,10 @@ public class MainWindow extends JDialog {
                     messageFeed.append("\n");
 
                     inputHistory.add(input);
+                    boolean messageSuccess = singleton.networkBus.HandleMessage(input);
+                    if(!messageSuccess){
+                        resetConnection();
+                    }
                 }
                 inputOffset=0;
             }
@@ -109,6 +124,27 @@ public class MainWindow extends JDialog {
                 previousInputLookup();
             }
         },KeyStroke.getKeyStroke(KeyEvent.VK_DOWN,0),JComponent.WHEN_FOCUSED);
+
+        videoPanel.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                super.mouseClicked(e);
+                if(videoThread==null) {
+                    JPanelOpenCV.instance = videoPanel;
+                    videoThread = new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                videoPanel.main(null);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    });
+                    videoThread.start();
+                }
+            }
+        });
     }
 
     private void registerCallbacks(){
@@ -133,7 +169,6 @@ public class MainWindow extends JDialog {
         });
 
         // call onPressExit() on ESCAPE
-        //TODO: Remove?
         contentPane.registerKeyboardAction(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 onPressExit();
@@ -146,10 +181,18 @@ public class MainWindow extends JDialog {
         if(historyIndex>=0 && historyIndex<inputHistory.size()){
             Prompt.setText(String.format("%s%s",promptChar,inputHistory.get(historyIndex)));
         }
+        //Clamp it otherwise
+        else if(historyIndex<0){
+            inputOffset=inputHistory.size();
+        }
+        else if(historyIndex>=inputHistory.size()){
+            inputOffset=0;
+        }
     }
 
     private void onPressReboot() {
         //TODO: Send a network command to quit.
+
     }
 
     private void onPressExit() {
@@ -164,15 +207,71 @@ public class MainWindow extends JDialog {
         }
     }
 
+    private void resetConnection() {
+        MainWindow.writeToMessageFeed("Connection died. Attempting to reset...");
+        String ConnectionIP = singleton.networkBus.host;
+        singleton.networkBus.End();
+        singleton.messageReader.end();
+
+        singleton.networkBus = new NetworkConnector(ConnectionIP,2017);
+        singleton.messageReader = new NetworkConnector.MessageReader(singleton.networkBus);
+        Thread readMessages = new Thread(singleton.messageReader);
+        readMessages.start();
+    }
+
+    synchronized public static void writeToMessageFeed(String input){
+        if(singleton==null){
+            return;
+        }
+        singleton.messageFeed.append(input);
+        if(!input.endsWith("\n")){
+            singleton.messageFeed.append("\n");
+            singleton.messageFeed.setCaretPosition(singleton.messageFeed.getDocument().getLength());
+        }
+    }
+
+    synchronized public static void dieWithError(String errorMessage) {
+        JOptionPane.showMessageDialog (null, errorMessage,"A death has occured",
+                JOptionPane.ERROR_MESSAGE);
+        System.exit(1);
+    }
+
+    public static String promptForIP(){
+        String ConnectionIP = JOptionPane.showInputDialog(
+                "Honeybadger IP: ",
+                "192.168.0.1");
+
+        if(ConnectionIP==null){
+            JOptionPane.showMessageDialog (null,
+                    "Honeybadger Command requires a network IP to run","IP Needed",
+                    JOptionPane.ERROR_MESSAGE);
+            System.exit(0);
+        }
+
+        return ConnectionIP;
+    }
+
     public static void main(String[] args) {
+        Constants.setActivePlatform(Constants.PLATFORM.DESKTOP_GUI);
+
         //Try changing the theme
         try {
             UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
-        }catch (Exception e){}
+        }catch (Exception e){ErrorLog("Unable to change theme");}
 
-        MainWindow dialog = new MainWindow();
-        dialog.pack();
-        dialog.setVisible(true);
+        //Get the IP first.
+        String ConnectionIP = promptForIP();
+
+        singleton = new MainWindow();
+
+        //TODO: maybe put this in a separate thread?
+        //singleton.networkBus = new NetworkConnector(ConnectionIP,2017);
+        //singleton.messageReader = new NetworkConnector.MessageReader(singleton.networkBus);
+        //Thread readMessages = new Thread(singleton.messageReader);
+        //readMessages.start();
+
+        singleton.pack();
+        singleton.setVisible(true);
         System.exit(0);
     }
 }
