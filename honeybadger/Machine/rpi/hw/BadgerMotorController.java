@@ -37,12 +37,16 @@ public class BadgerMotorController extends NetworkDebuggable{
      */
     private BadgerPWMProvider PWMProvider;
 
+    /**
+     * The Daisy-chained smart servo provider.
+     */
     private BadgerSmartServoProvider SerialServo;
 
     /**
      * Object that represents the RaspberryPI. Is used mostly to set the PinState of it's pins (HIGH or LOW)
      */
     private GpioProvider RPIProvider;
+
 
     private GpioController GPIO;
 

@@ -3,6 +3,7 @@ package Machine.Common.Network.Command;
 import Machine.rpi.HoneybadgerV6;
 import Machine.rpi.hw.BadgerMotorController;
 import Machine.rpi.hw.BadgerPWMProvider;
+import Machine.rpi.hw.RPI;
 import com.pi4j.io.gpio.Pin;
 
 import java.util.Arrays;
@@ -34,6 +35,31 @@ public class CMD {
         }
     }
 
+    public static class setGPIO extends MotorFunction{
+        public setGPIO(){}
+
+        @Override
+        public boolean Invoke(HoneybadgerV6 badger, String[] params) {
+            if(!super.Invoke(badger,params)){
+                return false;
+            }
+
+            Pin namedPin = RPI.getPinByStandardNumber(Integer.parseInt(params[0]));
+            int value = Integer.parseInt(params[1]);
+            BMC.setPWM(namedPin, value);
+            return true;
+        }
+
+        @Override
+        public String Explain() {
+            return "\"CMD setGPIO <GPIO Standard pin num> <1||0>\"";
+        }
+
+        @Override
+        public int MinimumParameterNum() {
+            return 2;
+        }
+    }
 
     public static class setPWM extends MotorFunction{
         public setPWM(){}
