@@ -25,12 +25,12 @@ public class Controller extends XboxControllerAdapter{
 
     private void press(ControllerMessage.Button button){
         controllerState.setButtonsPressed(controllerState.getButtonsPressed()+1);
-        controllerState.getButtons().replace(button, true);
+        controllerState.buttons.replace(button, true);
     }
     
     private void depress(ControllerMessage.Button button){
         controllerState.setButtonsPressed(controllerState.getButtonsPressed()-1);
-        controllerState.getButtons().replace(button, false);
+        controllerState.buttons.replace(button, false);
     }
     
     public void buttonA(boolean pressed)
@@ -140,7 +140,6 @@ public class Controller extends XboxControllerAdapter{
                 case 0:
                     // N
                     press(ControllerMessage.Button.NDPAD);
-//                    SendMessage(new ControllerMessage(new ControllerMessage.DEBUG_MOTOR_FR(BadgerMotorController.CLOCKWISE)));
                     break;
                 case 1:
                     // NE
@@ -148,7 +147,6 @@ public class Controller extends XboxControllerAdapter{
                 case 2:
                     // E
                     press(ControllerMessage.Button.EDPAD);
-//                    SendMessage(new ControllerMessage(new ControllerMessage.DEBUG_MOTOR_BR(BadgerMotorController.CLOCKWISE)));
                     break;
                 case 3:
                     // SE
@@ -156,7 +154,6 @@ public class Controller extends XboxControllerAdapter{
                 case 4:
                     // S
                     press(ControllerMessage.Button.SDPAD);
-//                    SendMessage(new ControllerMessage(new ControllerMessage.DEBUG_MOTOR_FR(BadgerMotorController.COUNTER_CLOCKWISE)));
                     break;
                 case 5:
                     // SW
@@ -164,7 +161,6 @@ public class Controller extends XboxControllerAdapter{
                 case 6:
                     // W
                     press(ControllerMessage.Button.WDPAD);
-//                    SendMessage(new ControllerMessage(new ControllerMessage.DEBUG_MOTOR_BR(BadgerMotorController.COUNTER_CLOCKWISE)));
                     break;
                 case 7:
                     // NW
@@ -176,7 +172,6 @@ public class Controller extends XboxControllerAdapter{
                 case 0:
                     // N
                     depress(ControllerMessage.Button.NDPAD);
-//                    SendMessage(new ControllerMessage(new ControllerMessage.DEBUG_MOTOR_FR(BadgerMotorController.CLOCKWISE)));
                     break;
                 case 1:
                     // NE
@@ -184,7 +179,6 @@ public class Controller extends XboxControllerAdapter{
                 case 2:
                     // E
                     depress(ControllerMessage.Button.EDPAD);
-//                    SendMessage(new ControllerMessage(new ControllerMessage.DEBUG_MOTOR_BR(BadgerMotorController.CLOCKWISE)));
                     break;
                 case 3:
                     // SE
@@ -192,7 +186,6 @@ public class Controller extends XboxControllerAdapter{
                 case 4:
                     // S
                     depress(ControllerMessage.Button.SDPAD);
-//                    SendMessage(new ControllerMessage(new ControllerMessage.DEBUG_MOTOR_FR(BadgerMotorController.COUNTER_CLOCKWISE)));
                     break;
                 case 5:
                     // SW
@@ -200,7 +193,6 @@ public class Controller extends XboxControllerAdapter{
                 case 6:
                     // W
                     depress(ControllerMessage.Button.WDPAD);
-//                    SendMessage(new ControllerMessage(new ControllerMessage.DEBUG_MOTOR_BR(BadgerMotorController.COUNTER_CLOCKWISE)));
                     break;
                 case 7:
                     // NW
@@ -212,28 +204,26 @@ public class Controller extends XboxControllerAdapter{
     public void leftTrigger(double value)
     {
         //value is how hard you press. Between 0-1.0
-        controllerState.setLeftTriggerMag(value);
+        controllerState.leftTriggerMag = value;
     }
 
     public void rightTrigger(double value)
     {
         //value is how hard you press. Between 0-1.0
-        controllerState.setRightTriggerMag(value);
+        controllerState.rightTriggerMag = value;
     }
 
     public void leftThumbMagnitude(double magnitude)
     {
         //magnitude is how hard you press. Between 0-1.0
-//        LeftThumbstick.UpdateMagnitude(magnitude);
-        controllerState.setLeftThumbstickMagnitude(magnitude);
+        controllerState.leftThumbstickMagnitude = magnitude;
     }
 
     public void leftThumbDirection(double direction)
     {
         //direction is angle. Between 0-360.0, at top
-//        LeftThumbstick.UpdateAngleDegrees(direction);
         //@foxtrot94: Would rather this be kept in a vector to avoid code duplication
-        controllerState.setLeftThumbMag(direction);
+        controllerState.leftThumbstickMagnitude = (direction);
         if (direction < 45 || direction > 315){
             controllerState.setLeftThumbDir('N');
         } else if (direction < 135){
@@ -251,14 +241,14 @@ public class Controller extends XboxControllerAdapter{
     {
         //magnitude is how hard you press. Between 0-1.0
 //        RightThumbstick.UpdateMagnitude(magnitude);
-        controllerState.setLeftThumbMag(magnitude);
+        controllerState.rightThumbstickMagnitude = magnitude;
     }
 
     public void rightThumbDirection(double direction)
     {
         //direction is angle. Between 0-360.0, at top
 //        RightThumbstick.UpdateAngleDegrees(direction);
-        controllerState.setRightThumbMag(direction);
+        controllerState.rightThumbstickMagnitude = (direction);
         //@foxtrot94: Would rather this be kept in a vector to avoid code duplication
         if (direction < 45 || direction > 315){
             controllerState.setRightThumbstickDirection('N');
@@ -313,14 +303,14 @@ public class Controller extends XboxControllerAdapter{
 
         ControllerMessageSender = ScheduledManager.scheduleAtFixedRate(
                 () -> {
-                    if(connector.HasActiveConnection()) {
+                    if(connector.HasActiveConnection() && !connector.IsBroken()) {
                         connector.SendMessage(controllerState);
                     }else{
                         ControllerMessageSender.cancel(false); //Don't interrupt yourself.
                         ControllerMessageSender = null;
                     }
                 },
-                100,13, TimeUnit.MILLISECONDS
+                1,1, TimeUnit.SECONDS
         );
     }
 }

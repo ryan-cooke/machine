@@ -8,22 +8,22 @@ import static Machine.Common.Utils.Log;
  * Handles everything related to networking the controller
  */
 public class ControllerMessage extends BaseMsg {
-    private int buttonsPressed; // Number of buttons currently pressed
+    public int buttonsPressed; // Number of buttons currently pressed
     public enum Button {A, B, X, Y, BACK, START, RBUMPER, LBUMPER, RTHUMB,
         LTHUMB, NDPAD, EDPAD, SDPAD, WDPAD, LTRIGGER, RTRIGGER}
 
-    private HashMap<Button, Boolean> buttons; // The 16 buttons pressed if true
+    public HashMap<Button, Boolean> buttons; // The 16 buttons pressed if true
 
-    private double leftThumbstickDirection;
-    private char leftThumbDir; // N, E, S, W for directions.
-    private double rightThumb;
-    private char rightThumbstickDirection;
+    public double leftThumbstickDirection;
+    public char leftThumbDir; // N, E, S, W for directions.
+    public double rightThumb;
+    public char rightThumbstickDirection;
 
-    private double leftThumbstickMagnitude;
-    private double rightThumbstickMagnitude;
+    public double leftThumbstickMagnitude;
+    public double rightThumbstickMagnitude;
 
-    private double leftTriggerMag;
-    private double rightTriggerMag;
+    public double leftTriggerMag;
+    public double rightTriggerMag;
 
 //    private Utils.Vector2D RightThumbstick;
 //    private Utils.Vector2D LeftThumbstick;
@@ -63,80 +63,16 @@ public class ControllerMessage extends BaseMsg {
         return buttonsPressed;
     }
 
-    public  HashMap<Button, Boolean> getButtons() {
-        return buttons;
-    }
-
-    public double getLeftThumbstickDirection() {
-        return leftThumbstickDirection;
-    }
-
-    public char getLeftThumbDir() {
-        return leftThumbDir;
-    }
-
-    public double getRightThumb() {
-        return rightThumb;
-    }
-
-    public char getRightThumbstickDirection() {
-        return rightThumbstickDirection;
-    }
-
-    public double getLeftThumbstickMagnitude() {
-        return leftThumbstickMagnitude;
-    }
-
-    public double getRightThumbstickMagnitude() {
-        return rightThumbstickMagnitude;
-    }
-
     public void setButtonsPressed(int buttonsPressed) {
         this.buttonsPressed = buttonsPressed;
-    }
-
-    public void setButtons(HashMap<Button, Boolean> buttons) {
-        this.buttons = buttons;
-    }
-
-    public void setLeftThumbMag(double leftThumb) {
-        this.leftThumbstickDirection = leftThumb;
     }
 
     public void setLeftThumbDir(char leftThumbDir) {
         this.leftThumbDir = leftThumbDir;
     }
 
-    public void setRightThumbMag(double rightThumb) {
-        this.rightThumb = rightThumb;
-    }
-
     public void setRightThumbstickDirection(char rightThumbstickDirection) {
         this.rightThumbstickDirection = rightThumbstickDirection;
-    }
-
-    public void setLeftThumbstickMagnitude(double leftThumbstickMagnitude) {
-        this.leftThumbstickMagnitude = leftThumbstickMagnitude;
-    }
-
-    public void setRightThumbstickMagnitude(double rightThumbstickMagnitude) {
-        this.rightThumbstickMagnitude = rightThumbstickMagnitude;
-    }
-
-    public double getLeftTriggerMag() {
-        return leftTriggerMag;
-    }
-
-    public void setLeftTriggerMag(double leftTriggerMag) {
-        this.leftTriggerMag = leftTriggerMag;
-    }
-
-    public double getRightTriggerMag() {
-        return rightTriggerMag;
-    }
-
-    public void setRightTriggerMag(double rightTriggerMag) {
-        this.rightTriggerMag = rightTriggerMag;
     }
 
     @Override
@@ -145,6 +81,11 @@ public class ControllerMessage extends BaseMsg {
 
         //
         Log(this.toString());
+    }
+
+    @Override
+    public String getPayload() {
+        return "ControllerMessage";
     }
 
     @Override
