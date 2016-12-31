@@ -70,24 +70,6 @@ public class MainDesktop {
                 //TODO: Cleanup the cases below
                 nc.SendMessage(input);
 
-                if(input.contains("ramp up")){
-                    for (float i = 0; i < 1; i+=0.005) {
-                        nc.SendMessage(new ControllerMessage(new ControllerMessage.Shoot(i)));
-                        try {
-                            Thread.sleep(1500);
-                        }
-                        catch (Exception e){
-
-                        }
-                    }
-                }
-
-                if(input.contains("SEND")){
-                    float level = Kb.nextFloat();
-                    level = level/100.f;
-                    Log(String.format("Sending %f",level));
-                    nc.SendMessage(new ControllerMessage(new ControllerMessage.Shoot((float)level)));
-                }
 
                 if(input.contains("CMD")){
                     Log(String.format("Sending TextCommandMessage \'%s\'",input.substring(4)));
