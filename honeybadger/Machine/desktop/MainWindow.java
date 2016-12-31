@@ -151,6 +151,13 @@ public class MainWindow extends JDialog {
         if(historyIndex>=0 && historyIndex<inputHistory.size()){
             Prompt.setText(String.format("%s%s",promptChar,inputHistory.get(historyIndex)));
         }
+        //Clamp it otherwise
+        else if(historyIndex<0){
+            inputOffset=inputHistory.size();
+        }
+        else if(historyIndex>=inputHistory.size()){
+            inputOffset=0;
+        }
     }
 
     private void onPressReboot() {
@@ -176,19 +183,25 @@ public class MainWindow extends JDialog {
     }
 
     public static void main(String[] args) {
+        //Try changing the theme
+        try {
+            UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
+        }catch (Exception e){}
+
         //Get the IP first.
         String ConnectionIP = JOptionPane.showInputDialog(
                 "Honeybadger IP: ",
                 "192.168.0.1");
         if(ConnectionIP==null){
+            JOptionPane.showMessageDialog (null,
+                    "Honeybadger Command requires a network IP to run","IP Needed",
+                    JOptionPane.ERROR_MESSAGE);
             System.exit(0);
         }
 
-        //Try changing the theme
-        try {
-            UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
-        }catch (Exception e){}
         singleton = new MainWindow();
+
+        //TODO: maybe put this in a separate thread?
         singleton.networkBus = new NetworkConnector(ConnectionIP,2017);
 
         singleton.pack();
