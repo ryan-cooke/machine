@@ -80,8 +80,6 @@ public class MainWindow extends JDialog {
                 String input = Prompt.getText().substring(2);
                 if(input.length()>0) {
                     Prompt.setText(promptChar);
-                    messageFeed.append(input);
-                    messageFeed.append("\n");
 
                     inputHistory.add(input);
                     boolean messageSuccess = singleton.networkBus.HandleMessage(input);
@@ -265,10 +263,10 @@ public class MainWindow extends JDialog {
         singleton = new MainWindow();
 
         //TODO: maybe put this in a separate thread?
-        //singleton.networkBus = new NetworkConnector(ConnectionIP,2017);
-        //singleton.messageReader = new NetworkConnector.MessageReader(singleton.networkBus);
-        //Thread readMessages = new Thread(singleton.messageReader);
-        //readMessages.start();
+        singleton.networkBus = new NetworkConnector(ConnectionIP,2017);
+        singleton.messageReader = new NetworkConnector.MessageReader(singleton.networkBus);
+        Thread readMessages = new Thread(singleton.messageReader);
+        readMessages.start();
 
         singleton.pack();
         singleton.setVisible(true);
