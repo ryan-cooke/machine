@@ -1,5 +1,7 @@
 package Machine.Common.Network;
 
+import Machine.Common.Constants;
+
 import java.io.Serializable;
 
 /**
@@ -21,7 +23,10 @@ public class BaseMsg implements Serializable, INetCommand {
     }
 
     public void Execute(Object context){
-        System.out.format("BaseMessage: %s\n",payload);
+        //Don't do anything unless we're in verbose mode.
+        if(Constants.VERBOSE_MESSAGING) {
+            System.out.format("BaseMessage: %s\n", payload);
+        }
     }
 
 }

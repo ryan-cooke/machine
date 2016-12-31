@@ -1,5 +1,7 @@
 package Machine.Common;
 
+import Machine.desktop.MainWindow;
+
 import java.util.Calendar;
 import java.util.Scanner;
 
@@ -7,10 +9,6 @@ import java.util.Scanner;
  * Some common Utilities that might be needed
  */
 public class Utils {
-    /**
-     * Check to see if debug mode is on.
-     */
-    public static boolean DEBUG_MODE_ON = true;
 
     public static class Vector2D{
         public double x,y;
@@ -48,7 +46,26 @@ public class Utils {
     public static void Log(String log){
         //Very lazy, just needed a quick timestamp
         java.sql.Timestamp ts = new java.sql.Timestamp(Calendar.getInstance().getTime().getTime());
-        System.out.format("%s: %s\n", ts, log);
+        String formatted = String.format("%s: %s\n", ts, log);
+        System.out.format(formatted);
+        if(Constants.getActivePlatform()== Constants.PLATFORM.DESKTOP_GUI){
+            MainWindow.writeToMessageFeed(formatted);
+        }
+    }
+
+    public static void ErrorLog(String message){
+        //Very lazy, just needed a quick timestamp
+        java.sql.Timestamp ts = new java.sql.Timestamp(Calendar.getInstance().getTime().getTime());
+        String formatted = String.format("%s: %s\n", ts, message);
+        System.out.format(formatted);
+        System.err.format(formatted);
+        if(Constants.getActivePlatform() == Constants.PLATFORM.DESKTOP_GUI){
+            MainWindow.writeToMessageFeed(formatted);
+        }
+
+        //Print immediately
+        System.err.flush();
+        System.out.flush();
     }
 
     public static String Prompt(char symbol, Scanner kb){

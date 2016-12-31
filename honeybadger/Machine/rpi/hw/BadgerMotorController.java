@@ -1,5 +1,6 @@
 package Machine.rpi.hw;
 
+import Machine.rpi.HoneybadgerV6;
 import Machine.rpi.NetworkDebuggable;
 import com.pi4j.io.gpio.*;
 import com.pi4j.io.i2c.I2CBus;
@@ -16,6 +17,9 @@ public class BadgerMotorController extends NetworkDebuggable{
      */
     private boolean IsReady;
 
+    /**
+     * Determines whether to limit the drive motor speed to "safe" voltages
+     */
     private boolean DriveMotorLimiting;
 
     /**
@@ -33,6 +37,8 @@ public class BadgerMotorController extends NetworkDebuggable{
      */
     private BadgerPWMProvider PWMProvider;
 
+    private BadgerSmartServoProvider SerialServo;
+
     /**
      * Object that represents the RaspberryPI. Is used mostly to set the PinState of it's pins (HIGH or LOW)
      */
@@ -41,14 +47,28 @@ public class BadgerMotorController extends NetworkDebuggable{
     private GpioController GPIO;
 
     /**
-     * Absolute max ON PWN value. Essentially caps PWM signal for drive motors at 80%
+     * Reference MAX PWM for the Drive Motors
      */
-    private static final int DriveMaxPWM = 3275;
+    private static final int DRIVE_PWM_MAX = 3245;
 
     /**
-     * Absolute max ON PWN value. Essentially caps PWM signal for drive motors at 80%
+     * Reference MIN PWM for the Drive motors
+     * Any value lower than this will set the motors to OVERDRIVE
      */
-    private static final int DriveMinPWM = 850;
+    private static final int DRIVE_PWM_MIN = 850;
+
+    /**
+     * Lowest percent for Flywheel PWM to be set.
+     * Calling setPWM on the flywheel motors with this value will arm them.
+     * Subsequent calls to setPWM  with this value will stop the motors from spinning.
+     */
+    public static final int FLYWHEEL_PERCENT_MIN = 10;
+
+    /**
+     * Highest percent for Flywheel PWM to be set.
+     * DANGER! NEVER SET AT THIS VALUE IMMEDIATELY IN ONE SHOT!
+     */
+    public static final int FLYWHEEL_PERCENT_MAX = 90;
 
     /**
      * Constant that defines integer representation of clockwise rotation
@@ -82,10 +102,9 @@ public class BadgerMotorController extends NetworkDebuggable{
             Log("Provisioning Outputs");
             this.provisionPwmOutputs();
             this.provisionDigitalOutputs();
-
             PWMProvider.reset();
-            setFlywheelSpeed(BadgerPWMProvider.FLYWHEEL_A,0.0f);
-            setFlywheelSpeed(BadgerPWMProvider.FLYWHEEL_B,0.0f);
+
+            SerialServo = new BadgerSmartServoProvider();
 
             IsReady = true;
             Log("Badger Motor Controller Ready");
@@ -93,7 +112,9 @@ public class BadgerMotorController extends NetworkDebuggable{
         catch (Exception e){
             //TODO: Should be a harder warning
             e.printStackTrace();
-            System.out.println("ERROR: THE EXPECTED DEVICES WERE NOT AVAILABLE");
+            String message = "ERROR: THE EXPECTED DEVICES WERE NOT AVAILABLE";
+            HoneybadgerV6.getInstance().sendCriticalMessageToDesktop(message,e);
+            Log(message);
         }
     }
 
@@ -119,9 +140,9 @@ public class BadgerMotorController extends NetworkDebuggable{
                 GPIO.provisionPwmOutputPin(PWMProvider, BadgerPWMProvider.VACUUM_ROLLER, "Vacuum Roller - VAC"),
                 GPIO.provisionPwmOutputPin(PWMProvider, BadgerPWMProvider.FLYWHEEL_A, "Flywheel A - BS1"),
                 GPIO.provisionPwmOutputPin(PWMProvider, BadgerPWMProvider.FLYWHEEL_B, "Flywheel B - BS2"),
-                GPIO.provisionPwmOutputPin(PWMProvider, BadgerPWMProvider.CLIMBING_ARM, "Climbing Arm - RND1"),
-                GPIO.provisionPwmOutputPin(PWMProvider, BadgerPWMProvider.CLIMBING_WRIST, "Climbing Wrist - RND2"),
-                GPIO.provisionPwmOutputPin(PWMProvider, BadgerPWMProvider.SHOOTING_AIM_ADJUST, "Shooting aim adjust - RND3")
+//                GPIO.provisionPwmOutputPin(PWMProvider, BadgerPWMProvider.CLIMBING_ARM, "Climbing Arm - RND1"),
+//                GPIO.provisionPwmOutputPin(PWMProvider, BadgerPWMProvider.CLIMBING_WRIST, "Climbing Wrist - RND2"),
+//                GPIO.provisionPwmOutputPin(PWMProvider, BadgerPWMProvider.SHOOTING_AIM_ADJUST, "Shooting aim adjust - RND3")
         };
     }
 
@@ -168,17 +189,19 @@ public class BadgerMotorController extends NetworkDebuggable{
 
         //TODO: REVIEW!!!
         float percent = speedPercent/100.f;
-        int PWMtime = (int)(DriveMaxPWM - ((1-percent)*DriveMaxPWM));
+        int PWMtime = (int)(DRIVE_PWM_MAX - ((percent)* DRIVE_PWM_MAX));
         //Overdrive option
         if(DriveMotorLimiting){
-            PWMtime += DriveMinPWM;
+            PWMtime += DRIVE_PWM_MIN;
         }
 
         this.PWMProvider.setPwm(pin, 0, PWMtime);
     }
 
-    public void STOP(Pin pin){
-        this.PWMProvider.setAlwaysOn(pin);
+    public void stopDriveMotors(){
+        for(Pin motor : BadgerPWMProvider.DriveMotors) {
+            this.PWMProvider.setAlwaysOn(motor);
+        }
     }
 
     /**
@@ -200,21 +223,6 @@ public class BadgerMotorController extends NetworkDebuggable{
             System.out.println("[BadgerMotorController.setMotorDirection] Invalid motor direction given");
     }
 
-    public void setFlywheelSpeed(Pin pin, float throttle){
-        if(!IsReady){
-            return;
-        }
-        //Get the scaled PWM value based on the MaxONPWM value;
-        float scaledThrottle = 4095*throttle/100.f;
-        int PWMOffTime = (int)scaledThrottle;
-        int PWMOnTime = 4095-PWMOffTime;
-        Log(String.format("PWM OFF: %d | PWM ON %d", PWMOffTime, PWMOnTime));
-
-        SendDebugMessage(String.format("FLYWHEEL PWM OFF: %d | PWM ON %d", PWMOffTime, PWMOnTime));
-
-        this.PWMProvider.setPwm(pin, PWMOnTime, PWMOffTime);
-    }
-
     public void setPWM(Pin pin, float value){
         if(!IsReady){
             return;
@@ -228,11 +236,22 @@ public class BadgerMotorController extends NetworkDebuggable{
         this.PWMProvider.setPwm(pin, 0, PWMOffTime);
     }
 
+    public void setServoPosition(int servoID, int position){
+        if(!IsReady){
+            return;
+        }
+        this.SerialServo.SetPosition((byte)(servoID&0xFF),250,position);
+    }
+
     public void setAbsPWM(Pin pin, int val){
         if(!IsReady){
             return;
         }
         this.PWMProvider.setPwm(pin,val);
+    }
+
+    public void setOverdrive(boolean active){
+        DriveMotorLimiting = !active;
     }
 
     public Pin getPWMPin(int num){
@@ -244,7 +263,7 @@ public class BadgerMotorController extends NetworkDebuggable{
     }
 
     public Pin getGPIOPin(int num){
-        return null;
+        return RPI.getPinByStandardNumber(num);
     }
 
     public Pin getGPIOPin(String str){

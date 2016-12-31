@@ -1,15 +1,18 @@
 package Machine.rpi;
 
+import Machine.Common.Constants;
+
 import java.net.InetAddress;
 
 import static Machine.Common.Utils.Log;
 
 /**
- * Driver code for Pi
+ * Entry Point for the Badger Code running on the Raspberry Pi
  */
 public class MainPi {
-    //Quick test for network
     public static void main(String[] args){
+        Constants.setActivePlatform(Constants.PLATFORM.BADGER_PI);
+
         //Setup the server
         try {
             Log("Starting server at IP: " + InetAddress.getLocalHost().toString());
