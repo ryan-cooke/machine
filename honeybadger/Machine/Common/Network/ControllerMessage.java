@@ -1,5 +1,6 @@
 package Machine.Common.Network;
 
+import Machine.Common.Utils;
 import Machine.desktop.Controller;
 
 import java.io.Serializable;
@@ -16,21 +17,21 @@ public class ControllerMessage extends BaseMsg implements Serializable {
 
     public int buttonsPressed; // Number of buttons currently pressed
 
-    public HashMap<Button, Boolean> buttons; // The 16 buttons pressed if true
+    public HashMap<Button, Boolean> buttons; // The 14 buttons pressed if true
 
-    public double leftThumbstickDirection;
-    public char leftThumbDir; // N, E, S, W for directions.
-    public double rightThumb;
+    public double leftThumbstickRotation;
+    public char leftThumbstickDirection; // N, E, S, W for directions.
+    public double rightThumbstickRotation;
     public char rightThumbstickDirection;
 
     public double leftThumbstickMagnitude;
     public double rightThumbstickMagnitude;
 
-    public double leftTriggerMag;
-    public double rightTriggerMag;
+    public double leftTriggerMagnitude;
+    public double rightTriggerMagnitude;
 
-//    private Utils.Vector2D RightThumbstick;
-//    private Utils.Vector2D LeftThumbstick;
+    public Utils.Vector2D RightThumbstick;
+    public Utils.Vector2D LeftThumbstick;
 
     public void Initialize(){
         buttons = new HashMap<>();
@@ -48,19 +49,17 @@ public class ControllerMessage extends BaseMsg implements Serializable {
         buttons.put(Button.EDPAD, false);
         buttons.put(Button.SDPAD, false);
         buttons.put(Button.WDPAD, false);
-//        buttons.put(Button.LTRIGGER, false);
-//        buttons.put(Button.RTRIGGER, false);
 
         buttonsPressed = 0;
-        leftThumbDir = 'Z';
+        leftThumbstickDirection = 'Z';
         rightThumbstickDirection = 'Z';
         leftThumbstickMagnitude = 0.0;
         rightThumbstickMagnitude = 0.0;
-        rightThumb = 0.0;
-        leftThumbstickDirection =0.0;
+        rightThumbstickRotation = 0.0;
+        leftThumbstickRotation =0.0;
 
-        leftTriggerMag = 0.0;
-        rightTriggerMag = 0.0;
+        leftTriggerMagnitude = 0.0;
+        leftTriggerMagnitude = 0.0;
     }
 
     public ControllerMessage(){
@@ -71,39 +70,39 @@ public class ControllerMessage extends BaseMsg implements Serializable {
             String payload,
             HashMap<Button,Boolean> buttons,
             int buttonsPressed,
-            double leftThumbstickDirection,
-            char leftThumbDir,
-            double rightThumb,
+            char leftThumbstickDirection,
             char rightThumbstickDirection,
+            double rightThumbstickRotation,
+            double leftThumbstickRotation,
             double leftThumbstickMagnitude,
             double rightThumbstickMagnitude,
-            double leftTriggerMag,
-            double rightTriggerMag
+            double leftTriggerMagnitude,
+            double rightTriggerMagnitude
     ){
         super(payload);
         this.buttons = buttons;
         this.buttonsPressed = buttonsPressed;
         this.leftThumbstickDirection = leftThumbstickDirection;
-        this.leftThumbDir = leftThumbDir;
-        this.rightThumb = rightThumb;
         this.rightThumbstickDirection = rightThumbstickDirection;
+        this.leftThumbstickRotation = leftThumbstickRotation;
+        this.rightThumbstickRotation = rightThumbstickRotation;
         this.leftThumbstickMagnitude = leftThumbstickMagnitude;
         this.rightThumbstickMagnitude = rightThumbstickMagnitude;
-        this.leftTriggerMag = leftTriggerMag;
-        this.rightTriggerMag = rightTriggerMag;
+        this.leftTriggerMagnitude = leftTriggerMagnitude;
+        this.rightTriggerMagnitude = rightTriggerMagnitude;
     }
 
     public ControllerMessage(ControllerMessage that){
         this.buttons = new HashMap<>(that.buttons);
         this.buttonsPressed = that.buttonsPressed;
         this.leftThumbstickDirection = that.leftThumbstickDirection;
-        this.leftThumbDir = that.leftThumbDir;
-        this.rightThumb = that.rightThumb;
         this.rightThumbstickDirection = that.rightThumbstickDirection;
         this.leftThumbstickMagnitude = that.leftThumbstickMagnitude;
         this.rightThumbstickMagnitude = that.rightThumbstickMagnitude;
-        this.leftTriggerMag = that.leftTriggerMag;
-        this.rightTriggerMag = that.rightTriggerMag;
+        this.leftThumbstickRotation = that.leftThumbstickRotation;
+        this.rightThumbstickRotation = that.rightThumbstickRotation;
+        this.leftTriggerMagnitude = that.leftTriggerMagnitude;
+        this.rightTriggerMagnitude = that.rightTriggerMagnitude;
     }
 
     public int getButtonsPressed() {
@@ -115,7 +114,7 @@ public class ControllerMessage extends BaseMsg implements Serializable {
     }
 
     public void setLeftThumbDir(char leftThumbDir) {
-        this.leftThumbDir = leftThumbDir;
+        this.leftThumbstickDirection = leftThumbDir;
     }
 
     public void setRightThumbstickDirection(char rightThumbstickDirection) {
@@ -151,10 +150,10 @@ public class ControllerMessage extends BaseMsg implements Serializable {
         //Triggers
         buffer.append("Triggers: ");
         buffer.append("L=");
-        buffer.append(this.leftTriggerMag);
+        buffer.append(this.leftTriggerMagnitude);
         buffer.append(" | ");
         buffer.append("R=");
-        buffer.append(this.rightTriggerMag);
+        buffer.append(this.rightTriggerMagnitude);
         buffer.append("\n");
 
         //Thumbsticks
@@ -163,12 +162,16 @@ public class ControllerMessage extends BaseMsg implements Serializable {
         buffer.append(this.leftThumbstickMagnitude);
         buffer.append(" | Dir=");
         buffer.append(this.leftThumbstickDirection);
+        buffer.append(" | Rot=");
+        buffer.append(this.leftThumbstickRotation);
         buffer.append("\n");
 
         buffer.append("Right: Mag=");
         buffer.append(this.rightThumbstickMagnitude);
         buffer.append(" | Dir=");
         buffer.append(this.rightThumbstickDirection);
+        buffer.append(" | Rot=");
+        buffer.append(this.rightThumbstickRotation);
         buffer.append("\n");
 
         return buffer.toString();

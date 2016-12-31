@@ -204,26 +204,30 @@ public class Controller extends XboxControllerAdapter{
     public void leftTrigger(double value)
     {
         //value is how hard you press. Between 0-1.0
-        controllerState.leftTriggerMag = value;
+        controllerState.leftTriggerMagnitude = value;
     }
 
     public void rightTrigger(double value)
     {
         //value is how hard you press. Between 0-1.0
-        controllerState.rightTriggerMag = value;
+        controllerState.rightTriggerMagnitude = value;
     }
 
     public void leftThumbMagnitude(double magnitude)
     {
         //magnitude is how hard you press. Between 0-1.0
         controllerState.leftThumbstickMagnitude = magnitude;
+        if( magnitude < 0.2){
+            controllerState.leftThumbstickDirection = 'Z';
+            controllerState.leftThumbstickRotation = 0.0;
+        }
     }
 
     public void leftThumbDirection(double direction)
     {
         //direction is angle. Between 0-360.0, at top
         //@foxtrot94: Would rather this be kept in a vector to avoid code duplication
-        controllerState.leftThumbstickMagnitude = (direction);
+        controllerState.leftThumbstickRotation = (direction);
         if (direction < 45 || direction > 315){
             controllerState.setLeftThumbDir('N');
         } else if (direction < 135){
@@ -242,13 +246,17 @@ public class Controller extends XboxControllerAdapter{
         //magnitude is how hard you press. Between 0-1.0
 //        RightThumbstick.UpdateMagnitude(magnitude);
         controllerState.rightThumbstickMagnitude = magnitude;
+        if( magnitude < 0.2){
+            controllerState.rightThumbstickDirection = 'Z';
+            controllerState.rightThumbstickRotation = 0.0;
+        }
     }
 
     public void rightThumbDirection(double direction)
     {
         //direction is angle. Between 0-360.0, at top
 //        RightThumbstick.UpdateAngleDegrees(direction);
-        controllerState.rightThumbstickMagnitude = (direction);
+        controllerState.rightThumbstickRotation = (direction);
         //@foxtrot94: Would rather this be kept in a vector to avoid code duplication
         if (direction < 45 || direction > 315){
             controllerState.setRightThumbstickDirection('N');
