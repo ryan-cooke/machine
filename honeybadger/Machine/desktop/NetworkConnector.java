@@ -11,6 +11,8 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Set;
 
+import static Machine.Common.Utils.Log;
+
 /**
  * Creates a connection and sends messages down the wire
  */

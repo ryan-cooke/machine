@@ -236,7 +236,7 @@ public class MainWindow extends JDialog {
         System.exit(1);
     }
 
-    public static void promptForIP(){
+    public static String promptForIP(){
         String ConnectionIP = JOptionPane.showInputDialog(
                 "Honeybadger IP: ",
                 "192.168.0.1");
@@ -247,6 +247,8 @@ public class MainWindow extends JDialog {
                     JOptionPane.ERROR_MESSAGE);
             System.exit(0);
         }
+
+        return ConnectionIP;
     }
 
     public static void main(String[] args) {
@@ -258,15 +260,15 @@ public class MainWindow extends JDialog {
         }catch (Exception e){ErrorLog("Unable to change theme");}
 
         //Get the IP first.
-        promptForIP();
+        String ConnectionIP = promptForIP();
 
         singleton = new MainWindow();
 
         //TODO: maybe put this in a separate thread?
-        singleton.networkBus = new NetworkConnector(ConnectionIP,2017);
-        singleton.messageReader = new NetworkConnector.MessageReader(singleton.networkBus);
-        Thread readMessages = new Thread(singleton.messageReader);
-        readMessages.start();
+        //singleton.networkBus = new NetworkConnector(ConnectionIP,2017);
+        //singleton.messageReader = new NetworkConnector.MessageReader(singleton.networkBus);
+        //Thread readMessages = new Thread(singleton.messageReader);
+        //readMessages.start();
 
         singleton.pack();
         singleton.setVisible(true);
