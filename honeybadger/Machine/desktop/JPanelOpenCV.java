@@ -20,6 +20,7 @@ import org.opencv.videoio.VideoWriter;
     
 public class JPanelOpenCV extends JPanel{
     public static BufferedImage image;
+    public static JPanelOpenCV instance;
 
     public static void main (String args[]) throws InterruptedException{
         JPanelOpenCV t = new JPanelOpenCV();
@@ -87,7 +88,7 @@ public class JPanelOpenCV extends JPanel{
         frameb.setTitle("streamB");
         frameb.setSize(640, 480 + 30);
         frameb.setLocation(0, 0);
-        frameb.setVisible(true);
+//        frameb.setVisible(true);
         
         JFrame framea = new JFrame();
         Disp a = new Disp(MatToBufferedImage(frame));
@@ -95,10 +96,8 @@ public class JPanelOpenCV extends JPanel{
         framea.setTitle("streamA");
         framea.setSize(640, 480 + 30);
         framea.setLocation(0, 0);
-        framea.setVisible(true);
-        
-        
-        
+//        framea.setVisible(true);
+
         BackgroundSubtractorMOG2 mBGSub = Video.createBackgroundSubtractorMOG2();
         int count =0;
         double rstTime = System.currentTimeMillis();
@@ -140,7 +139,15 @@ public class JPanelOpenCV extends JPanel{
         	frameb.validate();
         	frameb.repaint();
         	if(secondsRec<0){break;}
-        	 
+
+            //@foxtrot94: resize whatever stream to 640x480
+            Mat reduced = new Mat();
+            Size newSize = new Size(640,480);
+            Imgproc.resize(frame,reduced,newSize);
+            image = MatToBufferedImage(reduced);
+            instance.invalidate();
+            instance.repaint();
+            //@foxtrot94: END
         	
         }
         

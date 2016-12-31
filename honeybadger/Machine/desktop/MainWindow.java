@@ -6,7 +6,6 @@ import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
-import sun.applet.Main;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -25,6 +24,8 @@ public class MainWindow extends JDialog {
     private NetworkConnector networkBus;
 
     private Thread networkThread;
+
+    private Thread videoThread;
 
     private JPanel contentPane;
     private JButton buttonReboot;
@@ -118,6 +119,27 @@ public class MainWindow extends JDialog {
                 previousInputLookup();
             }
         },KeyStroke.getKeyStroke(KeyEvent.VK_DOWN,0),JComponent.WHEN_FOCUSED);
+
+        videoPanel.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                super.mouseClicked(e);
+                if(videoThread==null) {
+                    JPanelOpenCV.instance = videoPanel;
+                    videoThread = new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                videoPanel.main(null);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    });
+                    videoThread.start();
+                }
+            }
+        });
     }
 
     private void registerCallbacks(){
@@ -190,6 +212,19 @@ public class MainWindow extends JDialog {
         }
     }
 
+    public static void promptForIP(){
+        String ConnectionIP = JOptionPane.showInputDialog(
+                "Honeybadger IP: ",
+                "192.168.0.1");
+
+        if(ConnectionIP==null){
+            JOptionPane.showMessageDialog (null,
+                    "Honeybadger Command requires a network IP to run","IP Needed",
+                    JOptionPane.ERROR_MESSAGE);
+            System.exit(0);
+        }
+    }
+
     public static void main(String[] args) {
         Constants.setActivePlatform(Constants.PLATFORM.DESKTOP_GUI);
 
@@ -199,23 +234,21 @@ public class MainWindow extends JDialog {
         }catch (Exception e){ErrorLog("Unable to change theme");}
 
         //Get the IP first.
-        String ConnectionIP = JOptionPane.showInputDialog(
-                "Honeybadger IP: ",
-                "192.168.0.1");
-        if(ConnectionIP==null){
-            JOptionPane.showMessageDialog (null,
-                    "Honeybadger Command requires a network IP to run","IP Needed",
-                    JOptionPane.ERROR_MESSAGE);
-            System.exit(0);
-        }
+        promptForIP();
 
         singleton = new MainWindow();
 
         //TODO: maybe put this in a separate thread?
-        singleton.networkBus = new NetworkConnector(ConnectionIP,2017);
+//        singleton.networkBus = new NetworkConnector(ConnectionIP,2017);
 
         singleton.pack();
+
         singleton.setVisible(true);
+        try{
+            while (singleton.isActive()) {
+                Thread.sleep(60000);
+            }
+        }catch (Exception e){e.printStackTrace();}
         System.exit(0);
     }
 }

@@ -6,6 +6,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 
+import static Machine.Common.Utils.ErrorLog;
 import static Machine.Common.Utils.Log;
 
 /**
@@ -56,7 +57,8 @@ public class NetworkConnector {
         }
 
         if(connection==null){
-            System.exit(1);
+            ErrorLog("Connection unsuccessful.");
+            return;
         }
 
         Log(String.format("Connection to %s:%s established successfully",Host,connectPort));
