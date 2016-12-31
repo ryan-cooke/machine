@@ -1,5 +1,6 @@
 package Machine.desktop;
 
+import Machine.Common.Constants;
 import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
@@ -15,6 +16,8 @@ import java.awt.event.*;
 import java.awt.image.DataBufferByte;
 import java.io.File;
 import java.util.ArrayList;
+
+import static Machine.Common.Utils.ErrorLog;
 
 public class MainWindow extends JDialog {
     private static MainWindow singleton;
@@ -178,15 +181,22 @@ public class MainWindow extends JDialog {
     }
 
     synchronized public static void writeToMessageFeed(String input){
+        if(singleton==null){
+            return;
+        }
         singleton.messageFeed.append(input);
-        singleton.messageFeed.append("\n");
+        if(!input.endsWith("\n")){
+            singleton.messageFeed.append("\n");
+        }
     }
 
     public static void main(String[] args) {
+        Constants.setActivePlatform(Constants.PLATFORM.DESKTOP_GUI);
+
         //Try changing the theme
         try {
             UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
-        }catch (Exception e){}
+        }catch (Exception e){ErrorLog("Unable to change theme");}
 
         //Get the IP first.
         String ConnectionIP = JOptionPane.showInputDialog(

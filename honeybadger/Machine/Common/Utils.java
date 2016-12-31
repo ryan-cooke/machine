@@ -1,5 +1,7 @@
 package Machine.Common;
 
+import Machine.desktop.MainWindow;
+
 import java.util.Calendar;
 import java.util.Scanner;
 
@@ -44,14 +46,22 @@ public class Utils {
     public static void Log(String log){
         //Very lazy, just needed a quick timestamp
         java.sql.Timestamp ts = new java.sql.Timestamp(Calendar.getInstance().getTime().getTime());
-        System.out.format("%s: %s\n", ts, log);
+        String formatted = String.format("%s: %s\n", ts, log);
+        System.out.format(formatted);
+        if(Constants.getActivePlatform()== Constants.PLATFORM.DESKTOP_GUI){
+            MainWindow.writeToMessageFeed(formatted);
+        }
     }
 
     public static void ErrorLog(String message){
         //Very lazy, just needed a quick timestamp
         java.sql.Timestamp ts = new java.sql.Timestamp(Calendar.getInstance().getTime().getTime());
-        System.out.format("%s: %s\n", ts, message);
-        System.err.format("%s: %s\n", ts, message);
+        String formatted = String.format("%s: %s\n", ts, message);
+        System.out.format(formatted);
+        System.err.format(formatted);
+        if(Constants.getActivePlatform() == Constants.PLATFORM.DESKTOP_GUI){
+            MainWindow.writeToMessageFeed(formatted);
+        }
 
         //Print immediately
         System.err.flush();
