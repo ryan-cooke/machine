@@ -81,6 +81,11 @@ public class BadgerNetworkServer {
     }
 
     protected void SendMessage(BaseMsg message){
+        if(outStream==null){
+            //There's no one connected. don't send a message
+            return;
+        }
+
         LastSentMessage = message;
         try {
             outStream.writeObject(LastSentMessage);
@@ -93,6 +98,12 @@ public class BadgerNetworkServer {
     }
 
     protected String ReceiveMessage(){
+        if(inStream==null){
+            //There's no one connected. Don't keep this connection alive.
+            KeepAlive=false;
+            return "";
+        }
+
         try{
             LastReceivedMessage = (BaseMsg) inStream.readObject();
 
@@ -138,11 +149,15 @@ public class BadgerNetworkServer {
 
     public void Run(){
         //Main loop
-        String message="";
+        boolean shouldClose = false;
+        boolean shouldQuit = false;
         do{
+            String message="";
+            shouldClose=false;
+            shouldQuit=false;
+
             SetupNetwork();
             WaitForConnect();
-
             if(Handshake()){
                 //Setup the regular message sender
                 final ScheduledFuture<?> PeriodicSenderHandle = ScheduledManager.scheduleAtFixedRate(
@@ -155,10 +170,12 @@ public class BadgerNetworkServer {
                         3,10, TimeUnit.SECONDS
                 );
 
-                while(KeepAlive && !message.contains("quit") && !message.endsWith("close")){
+                while(KeepAlive && !shouldClose && !shouldQuit){
                     message = ReceiveMessage();
                     //only for DEBUG
-                    Log(message);
+                    Log(String.format("RX: %s",message));
+                    shouldClose = message.contains("close");
+                    shouldQuit = message.contains("quit");
                 }
                 Log("Cancelling PeriodicSender");
                 PeriodicSenderHandle.cancel(true);
@@ -173,7 +190,7 @@ public class BadgerNetworkServer {
 
             Log("Cleaning up connections");
             CloseAll();
-        }while(!message.contains("quit"));
+        }while(!shouldQuit);
 
         Log("Stopping BadgerNetworkServer Run");
     }

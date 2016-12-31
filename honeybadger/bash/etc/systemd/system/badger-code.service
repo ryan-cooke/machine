@@ -1,0 +1,9 @@
+[Unit]
+Description=Badger Hot Java
+
+[Service]
+Type=simple
+ExecStart=/usr/scripts/java-hot-reload.sh
+
+[Install]
+WantedBy=multi-user.target

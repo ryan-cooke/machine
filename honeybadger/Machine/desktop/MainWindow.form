@@ -110,6 +110,7 @@
                   <background color="-13880265"/>
                   <doubleBuffered value="true"/>
                   <editable value="false"/>
+                  <foreground color="-1"/>
                 </properties>
               </component>
             </children>
