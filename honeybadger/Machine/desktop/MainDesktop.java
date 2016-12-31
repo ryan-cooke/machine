@@ -1,12 +1,15 @@
 package Machine.desktop;
 
-import Machine.Common.Network.ControllerMessage;
-import Machine.Common.Network.ReflectionMessage;
-import Machine.Common.Network.TextCommandMessage;
-import Machine.desktop.NetworkConnector;
+import Machine.Common.Constants;
+import Machine.Common.Network.Command.IBadgerFunction;
+import Machine.Common.Network.Command.TextCommandMessage;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Scanner;
+import java.util.Set;
 
+import static Machine.Common.Network.Command.TextCommandMessage.getCommandHandlers;
 import static Machine.Common.Utils.Log;
 import static Machine.Common.Utils.Prompt;
 
@@ -29,7 +32,6 @@ public class MainDesktop {
             while(keepAlive && !Thread.currentThread().isInterrupted() && !Net.IsBroken() && Net.HasActiveConnection()){
                 try {
                     Net.ReceiveMessage();
-//                    Log(String.format("Received \'%s\'", Net.ReceiveMessage()));
                 }
                 catch (Exception e){
                     Log("Exception in Message Reader");
@@ -44,6 +46,8 @@ public class MainDesktop {
 
     //Quick test for network
     public static void main(String[] args){
+        Constants.setActivePlatform(Constants.PLATFORM.DESKTOP);
+
         Scanner Kb = new Scanner(System.in);
 
         do {
@@ -65,38 +69,33 @@ public class MainDesktop {
             readMessages.start();
             while (keepAlive) {
                 input = Prompt('>', Kb);
-                Log(String.format("Sending \"%s\"", input));
 
                 //TODO: Cleanup the cases below
-                nc.SendMessage(input);
-
-                if(input.contains("ramp up")){
-                    for (float i = 0; i < 1; i+=0.005) {
-                        nc.SendMessage(new ControllerMessage(new ControllerMessage.Shoot(i)));
-                        try {
-                            Thread.sleep(1500);
+                if(input.contains("CMD")){
+                    //Check that it is not followed by something else
+                    String[] keywords = input.split(" ");
+                    if(keywords.length>1){
+                        if(keywords[1].contains("LIST")){
+                            Set<String> commands = TextCommandMessage.getCommandListName();
+                            Log("Known command that can be called with CMD");
+                            Log(String.format("   %s", Arrays.toString(commands.toArray())));
                         }
-                        catch (Exception e){
-
+                        else if(keywords[1].contains("HELP")){
+                            Log("Explaining Commands");
+                            Collection<IBadgerFunction> functors = TextCommandMessage.getCommandHandlers();
+                            for(IBadgerFunction functor : functors){
+                                Log(String.format("\t%s | call: %s",functor.getClass().getSimpleName(),functor.Explain()));
+                            }
+                        }
+                        else {
+                            Log(String.format("Sending TextCommandMessage \'%s\'", input.substring(4)));
+                            nc.SendMessage(new TextCommandMessage(input.substring(4)));
                         }
                     }
                 }
-
-                if(input.contains("SEND")){
-                    float level = Kb.nextFloat();
-                    level = level/100.f;
-                    Log(String.format("Sending %f",level));
-                    nc.SendMessage(new ControllerMessage(new ControllerMessage.Shoot((float)level)));
-                }
-
-                if(input.contains("CMD")){
-                    Log(String.format("Sending TextCommandMessage \'%s\'",input.substring(4)));
-                    nc.SendMessage(new TextCommandMessage(input.substring(4)));
-                }
-
-                if(input.contains("CALL")){
-                    Log(String.format("Sending ReflectionMessage \'%s\'",input.substring(5)));
-                    nc.SendMessage(new ReflectionMessage(input.substring(5)));
+                else{
+                    Log(String.format("Sending \"%s\"", input));
+                    nc.SendMessage(input);
                 }
 
                 //Exit if we said "quit"

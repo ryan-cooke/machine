@@ -1,6 +1,8 @@
 package Machine.rpi;
 
 import Machine.Common.Network.BaseMsg;
+import Machine.Common.Network.ErrorMessage;
+import Machine.Common.Network.StatusMessage;
 import Machine.rpi.hw.BadgerMotorController;
 import Machine.rpi.hw.BadgerPWMProvider;
 import Machine.rpi.hw.RPI;
@@ -13,12 +15,19 @@ import static Machine.Common.Utils.Log;
  * Contains methods that represent all the physical actions the badger can execute
  */
 public class HoneybadgerV6 {
+    /**
+     * The one and only Honeybadger
+     */
     private static HoneybadgerV6 Singleton;
 
-    //Interact with the hardware
+    /**
+     * Object used to interact with most of the underlying hardware
+     */
     private BadgerMotorController motorController;
 
-    //Send and receive messages over the network being hosted on the pi
+    /**
+     * Object used to create and manage networking capabilities
+     */
     private BadgerNetworkServer networkServer;
 
     /**
@@ -37,9 +46,17 @@ public class HoneybadgerV6 {
 
     public BadgerMotorController getMotorController() { return motorController; }
 
-    public static HoneybadgerV6 getInstance() throws Exception{
+    public static HoneybadgerV6 getInstance(){
         if(Singleton==null){
-            Singleton = new HoneybadgerV6();
+            try {
+                Singleton = new HoneybadgerV6();
+            }
+            catch (Exception e){
+                Log("Encountered Unhandled Exception while making the honeybadger");
+                System.err.flush();
+                System.out.flush();
+                Log("HALT AND CATCH FIRE.");
+            }
         }
 
         return Singleton;
@@ -146,10 +163,14 @@ public class HoneybadgerV6 {
     }
 
     public void STOP(){
-        motorController.STOP(BadgerPWMProvider.DRIVE_FRONT_LEFT);
-        motorController.STOP(BadgerPWMProvider.DRIVE_BACK_LEFT);
-        motorController.STOP(BadgerPWMProvider.DRIVE_FRONT_RIGHT);
-        motorController.STOP(BadgerPWMProvider.DRIVE_BACK_RIGHT);
+        //KILL the Drive Motors
+        motorController.stopDriveMotors();
+
+        //Stop the flywheels
+        motorController.setPWM(BadgerPWMProvider.FLYWHEEL_A, BadgerMotorController.FLYWHEEL_PERCENT_MIN);
+        motorController.setPWM(BadgerPWMProvider.FLYWHEEL_B, BadgerMotorController.FLYWHEEL_PERCENT_MIN);
+
+        //TODO: Stop conveyors, vacuum roller
     }
 
     public void SetMotor(Pin DirPin, Pin PWMPin, int direction, float throttle){
@@ -158,12 +179,26 @@ public class HoneybadgerV6 {
     }
 
     public void setFlywheelSpeed(float speed){
-        motorController.setFlywheelSpeed(BadgerPWMProvider.FLYWHEEL_A,speed);
-        motorController.setFlywheelSpeed(BadgerPWMProvider.FLYWHEEL_B,speed);
+        float range = (float)(BadgerMotorController.FLYWHEEL_PERCENT_MAX -BadgerMotorController.FLYWHEEL_PERCENT_MIN);
+        float throttle = range*speed/100.f;
+
+        motorController.setPWM(BadgerPWMProvider.FLYWHEEL_A,throttle);
+        motorController.setPWM(BadgerPWMProvider.FLYWHEEL_B,throttle);
     }
 
-    public void sendToDesktop(String msg){
+    public void sendMessageToDesktop(String msg){
         networkServer.SendMessage(new BaseMsg(msg));
+    }
+
+    public void sendDebugMessageToDesktop(String msg){
+        StatusMessage message = new StatusMessage(msg);
+        message.appendDeviceStatus(this);
+
+        networkServer.SendMessage(message);
+    }
+
+    public void sendCriticalMessageToDesktop(String msg, Exception except){
+        networkServer.SendMessage(new ErrorMessage(msg,except));
     }
 
     /**

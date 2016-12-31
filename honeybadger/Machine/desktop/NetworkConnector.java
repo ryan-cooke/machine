@@ -93,7 +93,7 @@ public class NetworkConnector {
                 Log("Bad Message!");
             }
             //Don't execute for now
-            //LastReceivedMessage.Execute(null);
+            LastReceivedMessage.Execute(null);
 
             exceptionOccurred = connection.isClosed();
             return LastReceivedMessage.getPayload();

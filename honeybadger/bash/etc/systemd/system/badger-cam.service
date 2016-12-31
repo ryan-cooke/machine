@@ -1,0 +1,9 @@
+[Unit]
+Description=Badger Camera Video Server
+
+[Service]
+Type=simple
+ExecStart=/usr/scripts/start-mjpg-streamer.sh
+
+[Install]
+WantedBy=multi-user.target

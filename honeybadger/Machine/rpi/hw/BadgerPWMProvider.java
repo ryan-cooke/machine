@@ -25,16 +25,21 @@ public class BadgerPWMProvider extends PCA9685GpioProvider{
             DRIVE_BACK_LEFT,DRIVE_BACK_RIGHT
     };
 
+    public static Pin FLYWHEEL_A = PCA9685Pin.PWM_09;
+    public static Pin FLYWHEEL_B =PCA9685Pin.PWM_10;
+
+
+    //TODO: MAP and VERIFY!
     public static Pin CONVEYOR_A = PCA9685Pin.PWM_04;
     public static Pin CONVEYOR_B = PCA9685Pin.PWM_05;
     public static Pin VACUUM_ROLLER = PCA9685Pin.PWM_06;
     public static Pin CLIMBING_WHEEL = PCA9685Pin.PWM_07;
-    public static Pin FLYWHEEL_A = PCA9685Pin.PWM_07;
-    public static Pin FLYWHEEL_B =PCA9685Pin.PWM_08;
-    //TODO: Map the rest
-    public static Pin CLIMBING_ARM = PCA9685Pin.PWM_09;
-    public static Pin CLIMBING_WRIST = PCA9685Pin.PWM_10;
-    public static Pin SHOOTING_AIM_ADJUST = PCA9685Pin.PWM_11;
+
+//    public static Pin CLIMBING_ARM = PCA9685Pin.PWM_09;
+//    public static Pin CLIMBING_WRIST = PCA9685Pin.PWM_10;
+//    public static Pin SHOOTING_AIM_ADJUST = PCA9685Pin.PWM_11;
+    //End MAP and VERIFY range.
+
 
     public static Pin[] OtherMotors = {
             CONVEYOR_A,
@@ -42,9 +47,9 @@ public class BadgerPWMProvider extends PCA9685GpioProvider{
             VACUUM_ROLLER,
             FLYWHEEL_A,
             FLYWHEEL_B,
-            CLIMBING_ARM,
-            CLIMBING_WRIST,
-            SHOOTING_AIM_ADJUST,
+//            CLIMBING_ARM,
+//            CLIMBING_WRIST,
+//            SHOOTING_AIM_ADJUST,
     };
 
     protected static HashMap<Integer,Pin> PinNumberMap;
@@ -64,9 +69,11 @@ public class BadgerPWMProvider extends PCA9685GpioProvider{
         PinNumberMap.put(8,PCA9685Pin.PWM_08);
         PinNumberMap.put(9,PCA9685Pin.PWM_09);
         PinNumberMap.put(10,PCA9685Pin.PWM_10);
-//        PinNumberMap.put(11,PCA9685Pin.PWM_11);
-//        PinNumberMap.put(12,PCA9685Pin.PWM_12);
-//        PinNumberMap.put(13,PCA9685Pin.PWM_13);
+        PinNumberMap.put(11,PCA9685Pin.PWM_11);
+        PinNumberMap.put(12,PCA9685Pin.PWM_12);
+        PinNumberMap.put(13,PCA9685Pin.PWM_13);
+        PinNumberMap.put(14,PCA9685Pin.PWM_14);
+        PinNumberMap.put(15,PCA9685Pin.PWM_15);
 
         PinNameMap = new HashMap<>(4);
         PinNameMap.put("FL",DRIVE_FRONT_LEFT);
