@@ -79,8 +79,6 @@ public class MainWindow extends JDialog {
                 String input = Prompt.getText().substring(2);
                 if(input.length()>0) {
                     Prompt.setText(promptChar);
-//                  messageFeed.append(input);
-//                  messageFeed.append("\n");
                     inputHistory.add(input);
                     boolean messageSuccess = singleton.networkBus.HandleMessage(input);
                     if(!messageSuccess){
