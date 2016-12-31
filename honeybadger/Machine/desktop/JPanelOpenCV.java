@@ -19,22 +19,10 @@ import org.opencv.videoio.VideoCapture;
 import org.opencv.videoio.VideoWriter;
     
 public class JPanelOpenCV extends JPanel{
-    static BufferedImage image;
+    public static BufferedImage image;
+    public static JPanelOpenCV instance;
+
     public static void main (String args[]) throws InterruptedException{
-
-        String arch = System.getProperty("os.arch");
-        System.out.println(arch);
-
-        //Choose and load the dlls for the correct arch
-        if(arch.contains("x86")){
-            System.loadLibrary("opencv_java310");
-            System.loadLibrary("opencv_ffmpeg310");
-        }
-        else{
-            System.loadLibrary("opencv_java310_64");
-            System.loadLibrary("opencv_ffmpeg310_64");
-        }
-
         JPanelOpenCV t = new JPanelOpenCV();
        
        // VideoCapture camera = new VideoCapture();
@@ -61,7 +49,7 @@ public class JPanelOpenCV extends JPanel{
         double fps = 10;
         
         Size s = new Size(640,480);
-        System.out.println("the fourcc code it "+fourcc);
+//        System.out.println("the fourcc code it "+fourcc);
         //VideoWriter rec = new VideoWriter();
        // if(rec.open(fileName, fourcc, fps, s)){System.out.println("true");}else{System.out.println("false");}
         //rec.open(fileName, -1, fps, s);
@@ -71,47 +59,45 @@ public class JPanelOpenCV extends JPanel{
         if(!camera.isOpened()){
             System.out.println("Error 1 again");
         }
-        else { 
-        	
-        	
-        	
-        	
-        	
-            
-          /*  while(true){      	  
-            	 
+        else {
+
+
+
+
+
+
+          /*  while(true){
+
                 if (camera.read(frame)){
                 	BufferedImage image = t.MatToBufferedImage(frame);
                 	t.window(image, "Original Image", 0, 0);
                     System.out.println(image.getWidth());
                     System.out.println(image.getHeight());
-                   
+
                  //   t.window(t.grayscale(image), "Processed Image", 40, 60);
                     //t.window(t.loadImage("ImageName"), "Image loaded", 0, 0);
                    break;
                 }
-                
+
             }   */
         }
-        
-        JFrame frameb = new JFrame();
-        Disp b = new Disp(MatToBufferedImage(frame));
-        frameb.getContentPane().add(b);
-        frameb.setTitle("streamB");
-        frameb.setSize(640, 480 + 30);
-        frameb.setLocation(0, 0);
-        frameb.setVisible(true);
-        
-        JFrame framea = new JFrame();
-        Disp a = new Disp(MatToBufferedImage(frame));
-        framea.getContentPane().add(a);
-        framea.setTitle("streamA");
-        framea.setSize(640, 480 + 30);
-        framea.setLocation(0, 0);
-        framea.setVisible(true);
-        
-        
-        
+
+//        JFrame frameb = new JFrame();
+//        Disp b = new Disp(MatToBufferedImage(frame));
+//        frameb.getContentPane().add(b);
+//        frameb.setTitle("streamB");
+//        frameb.setSize(640, 480 + 30);
+//        frameb.setLocation(0, 0);
+//        frameb.setVisible(true);
+
+//        JFrame framea = new JFrame();
+//        Disp a = new Disp(MatToBufferedImage(frame));
+//        framea.getContentPane().add(a);
+//        framea.setTitle("streamA");
+//        framea.setSize(640, 480 + 30);
+//        framea.setLocation(0, 0);
+//        framea.setVisible(true);
+
         BackgroundSubtractorMOG2 mBGSub = Video.createBackgroundSubtractorMOG2();
         int count =0;
         double rstTime = System.currentTimeMillis();
@@ -122,7 +108,7 @@ public class JPanelOpenCV extends JPanel{
         	camera.read(frame);
         //	rec.write(frame);
         	original = frame.clone();
-        	
+
         	//-------BackGroudSubtraction---------//
         	diffFrame = new Mat(frame.size(), CvType.CV_8UC1);
         	//processFrame(camera, frame,diffFrame,mBGSub);
@@ -132,34 +118,42 @@ public class JPanelOpenCV extends JPanel{
         	//-----search for circles-----//
         	//original = searchCircle(original,original);
         	//-----end----//
-        	if(System.currentTimeMillis()-rstTime>1000){System.out.println(count);rstTime=System.currentTimeMillis();count=0;secondsRec--;}
-        	
+//        	if(System.currentTimeMillis()-rstTime>1000){System.out.println(count);rstTime=System.currentTimeMillis();count=0;secondsRec--;}
+
         	image = t.MatToBufferedImage(frame);
-        	a.setImage(MatToBufferedImage(original));
-        	b.setImage(MatToBufferedImage(frame));
-        	
-        	
-        	framea.getContentPane().add(a);
-        	frameb.getContentPane().add(b);
-        	
-        	Thread.sleep(10);
-        	count++;
-        	//System.out.println("tick");
-        	framea.invalidate();
-        	framea.validate();
-        	framea.repaint();
-        	
-        	frameb.invalidate();
-        	frameb.validate();
-        	frameb.repaint();
-        	if(secondsRec<0){break;}
-        	 
-        	
+//        	a.setImage(MatToBufferedImage(original));
+//        	b.setImage(MatToBufferedImage(frame));
+//
+//
+//        	framea.getContentPane().add(a);
+//        	frameb.getContentPane().add(b);
+//
+//        	Thread.sleep(10);
+//        	count++;
+//        	//System.out.println("tick");
+//        	framea.invalidate();
+//        	framea.validate();
+//        	framea.repaint();
+//
+//        	frameb.invalidate();
+//        	frameb.validate();
+//        	frameb.repaint();
+//        	if(secondsRec<0){break;}
+
+            //@foxtrot94: resize whatever stream to 640x480
+            Mat reduced = new Mat();
+            Size newSize = new Size(640,480);
+            Imgproc.resize(frame,reduced,newSize);
+            image = MatToBufferedImage(reduced);
+            instance.invalidate();
+            instance.repaint();
+            //@foxtrot94: END
+
         }
         
-       // rec.release();
-        camera.release();
-        System.exit(0);
+        //rec.release();
+        //camera.release();
+        //System.exit(0);
         
        // camera.release();
     }

@@ -9,6 +9,7 @@ public class Constants {
         BADGER_PI,
         MOCK_PI,
         DESKTOP,
+        DESKTOP_GUI,
     }
 
     /**
