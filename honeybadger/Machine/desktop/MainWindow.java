@@ -23,6 +23,7 @@ public class MainWindow extends JDialog {
     private static MainWindow singleton;
 
     private NetworkConnector networkBus;
+    private NetworkConnector.MessageReader messageReader;
 
     private Thread networkThread;
 
@@ -78,10 +79,13 @@ public class MainWindow extends JDialog {
                 String input = Prompt.getText().substring(2);
                 if(input.length()>0) {
                     Prompt.setText(promptChar);
-                    messageFeed.append(input);
-                    messageFeed.append("\n");
-
+//                  messageFeed.append(input);
+//                  messageFeed.append("\n");
                     inputHistory.add(input);
+                    boolean messageSuccess = singleton.networkBus.HandleMessage(input);
+                    if(!messageSuccess){
+                        resetConnection();
+                    }
                 }
                 inputOffset=0;
             }
@@ -180,6 +184,18 @@ public class MainWindow extends JDialog {
         }
     }
 
+    private void resetConnection() {
+        MainWindow.writeToMessageFeed("Connection died. Attempting to reset...");
+        String ConnectionIP = singleton.networkBus.host;
+        singleton.networkBus.End();
+        singleton.messageReader.end();
+
+        singleton.networkBus = new NetworkConnector(ConnectionIP,2017);
+        singleton.messageReader = new NetworkConnector.MessageReader(singleton.networkBus);
+        Thread readMessages = new Thread(singleton.messageReader);
+        readMessages.start();
+    }
+
     synchronized public static void writeToMessageFeed(String input){
         if(singleton==null){
             return;
@@ -187,7 +203,14 @@ public class MainWindow extends JDialog {
         singleton.messageFeed.append(input);
         if(!input.endsWith("\n")){
             singleton.messageFeed.append("\n");
+            singleton.messageFeed.setCaretPosition(singleton.messageFeed.getDocument().getLength());
         }
+    }
+
+    synchronized public static void dieWithError(String errorMessage) {
+        JOptionPane.showMessageDialog (null, errorMessage,"A death has occured",
+                JOptionPane.ERROR_MESSAGE);
+        System.exit(1);
     }
 
     public static void main(String[] args) {
@@ -213,6 +236,9 @@ public class MainWindow extends JDialog {
 
         //TODO: maybe put this in a separate thread?
         singleton.networkBus = new NetworkConnector(ConnectionIP,2017);
+        singleton.messageReader = new NetworkConnector.MessageReader(singleton.networkBus);
+        Thread readMessages = new Thread(singleton.messageReader);
+        readMessages.start();
 
         singleton.pack();
         singleton.setVisible(true);
