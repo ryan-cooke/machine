@@ -1,169 +1,113 @@
 package Machine.Common.Network;
 
-import Machine.rpi.HoneybadgerV6;
-import Machine.rpi.hw.BadgerMotorController;
-import Machine.rpi.hw.BadgerPWMProvider;
-import Machine.rpi.hw.RPI;
-
-import java.io.Serializable;
-
-import static Machine.Common.Utils.Log;
+import java.util.HashMap;
 
 /**
  * Handles everything related to networking the controller
  */
 public class ControllerMessage extends BaseMsg {
-    /**
-     * Inner interface to define a new controller action that a honeybadger must do
-     */
-    public interface ControllerAction{
-        void Do(HoneybadgerV6 badger);
+    private int buttonsPressed; // Number of buttons currently pressed
+    public enum Button {A, B, X, Y, BACK, START, RBUMPER, LBUMPER, RTHUMB,
+        LTHUMB, NDPAD, EDPAD, SDPAD, WDPAD, LTRIGGER, RTRIGGER}
+
+    private HashMap<Button, Boolean> buttons; // The 16 buttons pressed if true
+
+    private double leftThumb;
+    private char leftThumbDir; // N, E, S, W for directions.
+    private double rightThumb;
+    private char rightThumbDir;
+    private double leftMag;
+    private double rightMag;
+
+    public ControllerMessage(){
+        buttons = new HashMap<>();
+        buttons.put(Button.A, false);
+        buttons.put(Button.B, false);
+        buttons.put(Button.X, false);
+        buttons.put(Button.Y, false);
+        buttons.put(Button.BACK, false);
+        buttons.put(Button.START, false);
+        buttons.put(Button.RBUMPER, false);
+        buttons.put(Button.LBUMPER, false);
+        buttons.put(Button.RTHUMB, false);
+        buttons.put(Button.LTHUMB, false);
+        buttons.put(Button.NDPAD, false);
+        buttons.put(Button.EDPAD, false);
+        buttons.put(Button.SDPAD, false);
+        buttons.put(Button.WDPAD, false);
+        buttons.put(Button.LTRIGGER, false);
+        buttons.put(Button.RTRIGGER, false);
+
+        buttonsPressed = 0;
+        leftThumbDir = 'Z';
+        rightThumbDir = 'Z';
+        leftMag = 0.0;
+        rightMag = 0.0;
+        rightThumb = 0.0;
+        leftThumb=0.0;
     }
 
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // START Controller Action Commands
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    public static class MoveForward implements ControllerAction, Serializable{
-        float throttle;
-
-        public MoveForward(float throttle){
-            this.throttle=throttle;
-        }
-
-        public void Do(HoneybadgerV6 badger){
-            badger.moveForward(throttle);
-        }
-
-        @Override
-        public String toString(){
-            return "Pressed A";
-        }
+    public int getButtonsPressed() {
+        return buttonsPressed;
     }
 
-    public static class MoveLeft implements ControllerAction, Serializable{
-        float throttle;
-
-        public MoveLeft(float throttle){
-            this.throttle=throttle;
-        }
-
-        public void Do(HoneybadgerV6 badger){
-            badger.strafeLeft(throttle);
-        }
+    public  HashMap<Button, Boolean> getButtons() {
+        return buttons;
     }
 
-    public static class MoveRight implements ControllerAction, Serializable{
-        float throttle;
-
-        public MoveRight(float throttle){
-            this.throttle=throttle;
-        }
-
-        public void Do(HoneybadgerV6 badger){
-            badger.strafeRight(throttle);
-        }
+    public  double getLeftThumb() {
+        return leftThumb;
     }
 
-    public static class MoveBack implements ControllerAction, Serializable{
-        float throttle;
-
-        public MoveBack(float throttle){
-            this.throttle=throttle;
-        }
-
-        public void Do(HoneybadgerV6 badger){
-            badger.moveBackward(throttle);
-        }
+    public  char getLeftThumbDir() {
+        return leftThumbDir;
     }
 
-    public static class Shoot implements ControllerAction, Serializable{
-        float throttle;
-
-        public Shoot(float throttle){
-            this.throttle=throttle;
-        }
-
-        public void Do(HoneybadgerV6 badger){
-            badger.setFlywheelSpeed(throttle);
-        }
+    public  double getRightThumb() {
+        return rightThumb;
     }
 
-    public static class Stop implements ControllerAction, Serializable{
-        public void Do(HoneybadgerV6 badger){
-            badger.STOP();
-        }
+    public  char getRightThumbDir() {
+        return rightThumbDir;
     }
 
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // START Debug Commands
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    public static class DEBUG_MOTOR implements ControllerAction, Serializable{
-        protected int dir;
-        public static float throttle;
-        DEBUG_MOTOR(){
-            dir=0;
-            throttle=100;
-        }
-        public void Do(HoneybadgerV6 badger){
-            badger.SetMotor(RPI.DRIVE_FRONT_LEFT, BadgerPWMProvider.DRIVE_FRONT_LEFT, BadgerMotorController.COUNTER_CLOCKWISE,throttle);
-        }
+    public  double getLeftMag() {
+        return leftMag;
     }
 
-    public static class DEBUG_MOTOR_FL extends DEBUG_MOTOR{
-        public DEBUG_MOTOR_FL(int direction){
-            dir = direction;
-        }
-        public void Do(HoneybadgerV6 badger){
-            badger.SetMotor(RPI.DRIVE_FRONT_LEFT, BadgerPWMProvider.DRIVE_FRONT_LEFT, dir,throttle);
-        }
+    public double getRightMag() {
+        return rightMag;
     }
 
-    public static class DEBUG_MOTOR_FR extends DEBUG_MOTOR{
-        public DEBUG_MOTOR_FR(int direction){
-            dir = direction;
-        }
-        public void Do(HoneybadgerV6 badger){
-            badger.SetMotor(RPI.DRIVE_FRONT_RIGHT, BadgerPWMProvider.DRIVE_FRONT_RIGHT, dir,throttle);
-        }
-    }
-    public static class DEBUG_MOTOR_BL extends DEBUG_MOTOR{
-        public DEBUG_MOTOR_BL(int direction){
-            dir = direction;
-        }
-        public void Do(HoneybadgerV6 badger){
-            badger.SetMotor(RPI.DRIVE_BACK_LEFT, BadgerPWMProvider.DRIVE_BACK_LEFT, dir,throttle);
-        }
-    }
-    public static class DEBUG_MOTOR_BR extends DEBUG_MOTOR{
-        public DEBUG_MOTOR_BR(int direction){
-            dir = direction;
-        }
-        public void Do(HoneybadgerV6 badger){
-            badger.SetMotor(RPI.DRIVE_BACK_RIGHT, BadgerPWMProvider.DRIVE_BACK_RIGHT, dir,throttle);
-        }
-    }
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // END Controller Action Commands
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    private ControllerAction Action;
-
-    public ControllerMessage(ControllerAction someAction){
-        Action = someAction;
-        payload = someAction.getClass().getName();
+    public void setButtonsPressed(int buttonsPressed) {
+        this.buttonsPressed = buttonsPressed;
     }
 
-    @Override
-    public void Execute(Object context) {
-        HoneybadgerV6 badger = (HoneybadgerV6) context;
-        if(badger==null){
-            Log(String.format("Unable to execute %s",this.payload));
-            //TODO: Send some error message back
-            return;
-        }
+    public void setButtons(HashMap<Button, Boolean> buttons) {
+        this.buttons = buttons;
+    }
 
-        // Execute
-        Action.Do(badger);
+    public void setLeftThumb(double leftThumb) {
+        this.leftThumb = leftThumb;
+    }
+
+    public void setLeftThumbDir(char leftThumbDir) {
+        this.leftThumbDir = leftThumbDir;
+    }
+
+    public void setRightThumb(double rightThumb) {
+        this.rightThumb = rightThumb;
+    }
+
+    public void setRightThumbDir(char rightThumbDir) {
+        this.rightThumbDir = rightThumbDir;
+    }
+
+    public void setLeftMag(double leftMag) {
+        this.leftMag = leftMag;
+    }
+
+    public void setRightMag(double rightMag) {
+        this.rightMag = rightMag;
     }
 }
