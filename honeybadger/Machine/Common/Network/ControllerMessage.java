@@ -1,5 +1,8 @@
 package Machine.Common.Network;
 
+import Machine.desktop.Controller;
+
+import java.io.Serializable;
 import java.util.HashMap;
 
 import static Machine.Common.Utils.Log;
@@ -7,10 +10,11 @@ import static Machine.Common.Utils.Log;
 /**
  * Handles everything related to networking the controller
  */
-public class ControllerMessage extends BaseMsg {
-    public int buttonsPressed; // Number of buttons currently pressed
+public class ControllerMessage extends BaseMsg implements Serializable {
     public enum Button {A, B, X, Y, BACK, START, RBUMPER, LBUMPER, RTHUMB,
         LTHUMB, NDPAD, EDPAD, SDPAD, WDPAD, LTRIGGER, RTRIGGER}
+
+    public int buttonsPressed; // Number of buttons currently pressed
 
     public HashMap<Button, Boolean> buttons; // The 16 buttons pressed if true
 
@@ -28,7 +32,7 @@ public class ControllerMessage extends BaseMsg {
 //    private Utils.Vector2D RightThumbstick;
 //    private Utils.Vector2D LeftThumbstick;
 
-    public ControllerMessage(){
+    public void Initialize(){
         buttons = new HashMap<>();
         buttons.put(Button.A, false);
         buttons.put(Button.B, false);
@@ -59,6 +63,49 @@ public class ControllerMessage extends BaseMsg {
         rightTriggerMag = 0.0;
     }
 
+    public ControllerMessage(){
+        //Empty constructor
+    }
+
+    public ControllerMessage(
+            String payload,
+            HashMap<Button,Boolean> buttons,
+            int buttonsPressed,
+            double leftThumbstickDirection,
+            char leftThumbDir,
+            double rightThumb,
+            char rightThumbstickDirection,
+            double leftThumbstickMagnitude,
+            double rightThumbstickMagnitude,
+            double leftTriggerMag,
+            double rightTriggerMag
+    ){
+        super(payload);
+        this.buttons = buttons;
+        this.buttonsPressed = buttonsPressed;
+        this.leftThumbstickDirection = leftThumbstickDirection;
+        this.leftThumbDir = leftThumbDir;
+        this.rightThumb = rightThumb;
+        this.rightThumbstickDirection = rightThumbstickDirection;
+        this.leftThumbstickMagnitude = leftThumbstickMagnitude;
+        this.rightThumbstickMagnitude = rightThumbstickMagnitude;
+        this.leftTriggerMag = leftTriggerMag;
+        this.rightTriggerMag = rightTriggerMag;
+    }
+
+    public ControllerMessage(ControllerMessage that){
+        this.buttons = new HashMap<>(that.buttons);
+        this.buttonsPressed = that.buttonsPressed;
+        this.leftThumbstickDirection = that.leftThumbstickDirection;
+        this.leftThumbDir = that.leftThumbDir;
+        this.rightThumb = that.rightThumb;
+        this.rightThumbstickDirection = that.rightThumbstickDirection;
+        this.leftThumbstickMagnitude = that.leftThumbstickMagnitude;
+        this.rightThumbstickMagnitude = that.rightThumbstickMagnitude;
+        this.leftTriggerMag = that.leftTriggerMag;
+        this.rightTriggerMag = that.rightTriggerMag;
+    }
+
     public int getButtonsPressed() {
         return buttonsPressed;
     }
@@ -77,9 +124,6 @@ public class ControllerMessage extends BaseMsg {
 
     @Override
     public void Execute(Object context) {
-        super.Execute(context);
-
-        //
         Log(this.toString());
     }
 
@@ -88,14 +132,18 @@ public class ControllerMessage extends BaseMsg {
         return "ControllerMessage";
     }
 
-    @Override
     public String toString(){
         //Return the Controller state
         StringBuffer buffer = new StringBuffer();
-        for(Button aButton : this.buttons.keySet()){
+        for(Button aButton : Button.values()){
+            if(!this.buttons.containsKey(aButton)){
+                continue;
+            }
+
+            boolean value = this.buttons.get(aButton);
             buffer.append(aButton.toString());
             buffer.append("=");
-            buffer.append(this.buttons.get(aButton)?"1":"0");
+            buffer.append(value?"1":"0");
             buffer.append("; ");
         }
         buffer.append("\n");

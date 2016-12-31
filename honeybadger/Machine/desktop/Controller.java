@@ -287,6 +287,7 @@ public class Controller extends XboxControllerAdapter{
         ScheduledManager = Executors.newScheduledThreadPool(1);
 
         controllerState = new ControllerMessage();
+        controllerState.Initialize();
 
         connectedController.addXboxControllerListener(this);
         connectedController.setLeftThumbDeadZone(0.2);
@@ -304,7 +305,8 @@ public class Controller extends XboxControllerAdapter{
         ControllerMessageSender = ScheduledManager.scheduleAtFixedRate(
                 () -> {
                     if(connector.HasActiveConnection() && !connector.IsBroken()) {
-                        connector.SendMessage(controllerState);
+                        Log(controllerState.toString());
+                        connector.SendMessage(new ControllerMessage(controllerState));
                     }else{
                         ControllerMessageSender.cancel(false); //Don't interrupt yourself.
                         ControllerMessageSender = null;
