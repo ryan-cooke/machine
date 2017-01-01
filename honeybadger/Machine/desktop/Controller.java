@@ -284,7 +284,15 @@ public class Controller extends XboxControllerAdapter{
     public Controller(NetworkConnector messageConnector)
     {
         connector = messageConnector;
-        //TODO: CHOOSE BETWEEN 32 AND 64 BIT!
+
+        String arch = System.getProperty("os.arch");
+        System.out.println(arch);
+        if(arch.contains("x86")){
+            path="xboxcontroller.dll";
+        }
+        else{
+            path="xboxcontroller64.dll";
+        }
         connectedController = new XboxController(
                 System.getProperty("user.dir") +"\\"+path ,
                 1,
