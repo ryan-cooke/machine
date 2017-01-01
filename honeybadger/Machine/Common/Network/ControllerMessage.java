@@ -2,6 +2,7 @@ package Machine.Common.Network;
 
 import Machine.Common.Utils;
 import Machine.desktop.Controller;
+import Machine.rpi.HoneybadgerV6;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -123,7 +124,17 @@ public class ControllerMessage extends BaseMsg implements Serializable {
 
     @Override
     public void Execute(Object context) {
-        Log(this.toString());
+        HoneybadgerV6 badger = (HoneybadgerV6) context;
+        if (badger == null) {
+            Log(this.toString());
+            return;
+        }
+
+        //If the badger wasn't null, do actions dependent on the object
+        //TODO: Do all of them.
+        badger.updateMovement(leftThumbstickDirection, (float) leftThumbstickMagnitude * 100.f);
+
+//        badger.
     }
 
     @Override

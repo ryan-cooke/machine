@@ -30,6 +30,10 @@ public class HoneybadgerV6 {
      */
     private BadgerNetworkServer networkServer;
 
+    private float FlywheelThrottleA;
+
+    private float FlywheelThrottleB;
+
     /**
      * Makes a new Honeybadger (this is version 6). Guaranteed not to give a shit
      * @throws Exception But honey badger don't give a shit
@@ -37,6 +41,9 @@ public class HoneybadgerV6 {
     private HoneybadgerV6() throws Exception {
         motorController = new BadgerMotorController();
         networkServer = new BadgerNetworkServer(this);
+
+        FlywheelThrottleA = 0.f;
+        FlywheelThrottleB = 0.f;
         Log("Made the BadgerV6");
     }
 
@@ -64,6 +71,73 @@ public class HoneybadgerV6 {
 
     private void shutdown() {
         this.motorController.shutdown();
+    }
+
+    /**
+     * TODO: @foxtrot94
+     * @param dir
+     * @param throttle
+     */
+    public void updateMovement(char dir, float throttle){
+        //Change to a map with lambdas or something...
+        switch (dir){
+            case 'N':{ //up
+                moveForward(throttle);
+            }
+            case 'W':{ //left
+                strafeLeft(throttle);
+            }
+            case 'E':{ //right
+                strafeRight(throttle);
+            }
+            case 'S':{ //down
+                moveBackward(throttle);
+            }
+            case 'Z':{ //no dir
+                moveForward(0);
+            }
+            default:{
+                sendDebugMessageToDesktop("Movement update not understood!");
+            }
+        }
+    }
+
+    public void handleButton(boolean pressed){
+
+    }
+
+    private void increaseFlywheelSpeed(float step){
+        final float minFlywheelPower = 10.f;
+        //TODO: verify
+        final float maxFlywheelPowerA = 25.f;
+        final float maxFlywheelPowerB = 20.f;
+
+        boolean shouldIncrease = step > 0.001f;
+        if(shouldIncrease){
+            FlywheelThrottleB += step;
+            FlywheelThrottleA += step;
+        }
+        else{
+            FlywheelThrottleB -= step;
+            FlywheelThrottleA -= step;
+        }
+
+        //Verify and clamp
+//        FlywheelThrottleA =
+
+
+        motorController.setPWM(BadgerPWMProvider.FLYWHEEL_A,FlywheelThrottleA);
+        motorController.setPWM(BadgerPWMProvider.FLYWHEEL_B,FlywheelThrottleB);
+    }
+
+    private void armFlywheel(){
+        motorController.setPWM(BadgerPWMProvider.FLYWHEEL_A,BadgerMotorController.FLYWHEEL_PERCENT_MIN);
+        motorController.setPWM(BadgerPWMProvider.FLYWHEEL_B,BadgerMotorController.FLYWHEEL_PERCENT_MIN);
+    }
+
+    private void disarmFlywheel(){
+        motorController.setPWM(BadgerPWMProvider.FLYWHEEL_A,0);
+        motorController.setPWM(BadgerPWMProvider.FLYWHEEL_A,0);
     }
 
     /**

@@ -38,7 +38,6 @@ public class Utils {
         }
 
         public String toString(){
-//            return String.format("Angle: %f | Mag: %f",Angle,Magnitude);
             return String.format("X: %f | Y: %f", x,y);
         }
     }

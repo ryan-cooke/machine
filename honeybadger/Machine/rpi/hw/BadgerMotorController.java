@@ -66,13 +66,13 @@ public class BadgerMotorController extends NetworkDebuggable{
      * Calling setPWM on the flywheel motors with this value will arm them.
      * Subsequent calls to setPWM  with this value will stop the motors from spinning.
      */
-    public static final int FLYWHEEL_PERCENT_MIN = 10;
+    public static final float FLYWHEEL_PERCENT_MIN = 10.f;
 
     /**
      * Highest percent for Flywheel PWM to be set.
      * DANGER! NEVER SET AT THIS VALUE IMMEDIATELY IN ONE SHOT!
      */
-    public static final int FLYWHEEL_PERCENT_MAX = 90;
+    public static final float FLYWHEEL_PERCENT_MAX = 90.f;
 
     /**
      * Constant that defines integer representation of clockwise rotation
