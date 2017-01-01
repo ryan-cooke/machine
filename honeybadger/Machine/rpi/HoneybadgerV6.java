@@ -34,6 +34,8 @@ public class HoneybadgerV6 {
 
     private float FlywheelThrottleB;
 
+    private boolean IsMoving;
+
     /**
      * Makes a new Honeybadger (this is version 6). Guaranteed not to give a shit
      * @throws Exception But honey badger don't give a shit
@@ -44,6 +46,7 @@ public class HoneybadgerV6 {
 
         FlywheelThrottleA = 0.f;
         FlywheelThrottleB = 0.f;
+        IsMoving = false;
         Log("Made the BadgerV6");
     }
 
@@ -79,34 +82,51 @@ public class HoneybadgerV6 {
      * @param throttle
      */
     public void updateMovement(char dir, float throttle){
+
         //Change to a map with lambdas or something...
         switch (dir){
             case 'N':{ //up
                 moveForward(throttle);
+                break;
             }
             case 'W':{ //left
                 strafeLeft(throttle);
+                break;
             }
             case 'E':{ //right
                 strafeRight(throttle);
+                break;
             }
             case 'S':{ //down
                 moveBackward(throttle);
+                break;
             }
             case 'Z':{ //no dir
                 moveForward(0);
+                IsMoving = false;
+                break;
             }
             default:{
                 sendDebugMessageToDesktop("Movement update not understood!");
+                IsMoving = false;
+                break;
             }
         }
     }
 
     public void handleButton(boolean pressed){
-
+        //TODO:
     }
 
-    private void increaseFlywheelSpeed(float step){
+    public void moveConveyor(float throttle){
+        if(throttle>75){
+            throttle = 75.f;
+        }
+        motorController.setDriveMotorSpeed(BadgerPWMProvider.CONVEYOR_A,throttle);
+        motorController.setDriveMotorSpeed(BadgerPWMProvider.CONVEYOR_B,throttle);
+    }
+
+    public void increaseFlywheelSpeed(float step){
         final float minFlywheelPower = 10.f;
         //TODO: verify
         final float maxFlywheelPowerA = 25.f;
@@ -130,12 +150,12 @@ public class HoneybadgerV6 {
         motorController.setPWM(BadgerPWMProvider.FLYWHEEL_B,FlywheelThrottleB);
     }
 
-    private void armFlywheel(){
+    public void armFlywheel(){
         motorController.setPWM(BadgerPWMProvider.FLYWHEEL_A,BadgerMotorController.FLYWHEEL_PERCENT_MIN);
         motorController.setPWM(BadgerPWMProvider.FLYWHEEL_B,BadgerMotorController.FLYWHEEL_PERCENT_MIN);
     }
 
-    private void disarmFlywheel(){
+    public void disarmFlywheel(){
         motorController.setPWM(BadgerPWMProvider.FLYWHEEL_A,0);
         motorController.setPWM(BadgerPWMProvider.FLYWHEEL_A,0);
     }
