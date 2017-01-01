@@ -114,10 +114,9 @@ public class BadgerMotorController extends NetworkDebuggable{
             Log("Badger Motor Controller Ready");
         }
         catch (Exception e){
-            //TODO: Should be a harder warning
             e.printStackTrace();
             String message = "ERROR: THE EXPECTED DEVICES WERE NOT AVAILABLE";
-            HoneybadgerV6.getInstance().sendCriticalMessageToDesktop(message,e);
+            //HoneybadgerV6.getInstance().sendCriticalMessageToDesktop(message,e);
             Log(message);
         }
     }
@@ -145,9 +144,8 @@ public class BadgerMotorController extends NetworkDebuggable{
                 GPIO.provisionPwmOutputPin(PWMProvider, BadgerPWMProvider.VACUUM_ROLLER, "Vacuum Roller - VAC"),
                 GPIO.provisionPwmOutputPin(PWMProvider, BadgerPWMProvider.FLYWHEEL_A, "Flywheel A - BS1"),
                 GPIO.provisionPwmOutputPin(PWMProvider, BadgerPWMProvider.FLYWHEEL_B, "Flywheel B - BS2"),
-//                GPIO.provisionPwmOutputPin(PWMProvider, BadgerPWMProvider.CLIMBING_ARM, "Climbing Arm - RND1"),
-//                GPIO.provisionPwmOutputPin(PWMProvider, BadgerPWMProvider.CLIMBING_WRIST, "Climbing Wrist - RND2"),
-//                GPIO.provisionPwmOutputPin(PWMProvider, BadgerPWMProvider.SHOOTING_AIM_ADJUST, "Shooting aim adjust - RND3")
+
+                GPIO.provisionPwmOutputPin(PWMProvider, BadgerPWMProvider.CLIMBING_MOTOR,"Climbing Motor - CM"),
         };
     }
 
