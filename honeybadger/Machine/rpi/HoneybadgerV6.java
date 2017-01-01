@@ -114,6 +114,40 @@ public class HoneybadgerV6 {
         }
     }
 
+    /**
+     *
+     * @param leftDir
+     * @param dir
+     * @param throttle
+     */
+    public void updateRotation(char leftDir, char dir, int throttle){
+        if( leftDir == 'Z'){
+            switch (dir){
+                case 'N':{
+                    break;
+                }
+                case 'W':{
+                    spinLeft(throttle);
+                    break;
+                }
+                case 'E':{
+                    spinRight(throttle);
+                    break;
+                }
+                case 'S':{
+                    break;
+                }
+                case 'Z':{
+                    moveForward(0);
+                    break;
+                }
+                default:{
+                    sendDebugMessageToDesktop("Rotation update not understood");
+                }
+            }
+        }
+    }
+
     public void handleButton(boolean pressed){
         //TODO:
     }

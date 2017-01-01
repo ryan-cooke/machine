@@ -144,6 +144,7 @@ public class ControllerMessage extends BaseMsg implements Serializable {
         badger.setFlywheelSpeed((float)rightTriggerMagnitude);
         badger.moveConveyor((float)leftTriggerMagnitude);
 
+        badger.updateRotation(leftThumbstickDirection, rightThumbstickDirection, (int) leftThumbstickMagnitude*100);
         //TODO: handle more buttons
     }
 
