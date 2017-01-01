@@ -132,7 +132,7 @@ public class ControllerMessage extends BaseMsg implements Serializable {
 
         //If the badger wasn't null, do actions dependent on the object
         //TODO: Do all of them.
-        badger.updateMovement(leftThumbstickDirection, (float) leftThumbstickMagnitude * 100.f);
+        badger.updateMovement(leftThumbstickDirection, rightThumbstickDirection, (float) leftThumbstickMagnitude * 100.f);
         badger.updateRotation(leftThumbstickDirection, rightThumbstickDirection, (int) leftThumbstickMagnitude*100);
 //        badger.
     }

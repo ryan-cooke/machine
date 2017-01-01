@@ -76,9 +76,10 @@ public class HoneybadgerV6 {
     /**
      * TODO: @foxtrot94
      * @param dir
+     * @param rightDir
      * @param throttle
      */
-    public void updateMovement(char dir, float throttle){
+    public void updateMovement(char dir, char rightDir, float throttle){
         //Change to a map with lambdas or something...
         switch (dir){
             case 'N':{ //up
@@ -98,7 +99,9 @@ public class HoneybadgerV6 {
                 break;
             }
             case 'Z':{ //no dir
-                moveForward(0);
+                if(rightDir == 'Z'){
+                    moveForward(0);
+                }
                 break;
             }
             default:{
@@ -107,6 +110,12 @@ public class HoneybadgerV6 {
         }
     }
 
+    /**
+     *
+     * @param leftDir
+     * @param dir
+     * @param throttle
+     */
     public void updateRotation(char leftDir, char dir, int throttle){
         if( leftDir == 'Z'){
             switch (dir){
@@ -122,6 +131,10 @@ public class HoneybadgerV6 {
                     break;
                 }
                 case 'S':{
+                    break;
+                }
+                case 'Z':{
+                    moveForward(0);
                     break;
                 }
                 default:{
