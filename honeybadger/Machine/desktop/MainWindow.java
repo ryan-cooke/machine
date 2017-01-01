@@ -128,7 +128,7 @@ public class MainWindow extends JDialog {
             public void mouseClicked(MouseEvent e) {
                 super.mouseClicked(e);
                 if(videoThread==null) {
-                    JPanelOpenCV.instance = videoPanel;
+//                    JPanelOpenCV.instance = videoPanel;
                     videoThread = new Thread(new Runnable() {
                         @Override
                         public void run() {
