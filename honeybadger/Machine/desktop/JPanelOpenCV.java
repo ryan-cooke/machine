@@ -34,24 +34,38 @@ import org.opencv.videoio.VideoWriter;
 public class JPanelOpenCV extends JPanel{
 
     static BufferedImage image;
+    Scalar lowerBlack = new Scalar(0,0,0);
+    Scalar upperBlack = new Scalar(180,255,90);
+
+    Scalar lowerBlue = new Scalar(5,140,100);
+    Scalar upperBlue = new Scalar(20,255,255);
+
+    Scalar lowerb = new Scalar(35,140,60);
+    Scalar upperb = new Scalar(70,255,255);
 
     public static void main (String args[]) throws InterruptedException{
 
+        JPanelOpenCV j1 = new JPanelOpenCV();
+        j1.startLoop();
 
 
-        // System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
+
+
+
+    }
+
+
+    public void startLoop()
+    {
         System.loadLibrary("opencv_java310");
         System.loadLibrary("opencv_ffmpeg310_64");
         JPanelOpenCV t = new JPanelOpenCV();
 
-        // VideoCapture camera = new VideoCapture();
-        //%%%%%%%%% VideoCapture camera = new VideoCapture("http://96.10.1.168/mjpg/1/video.mjpg");        //VideoCapture camera = new VideoCapture("http://150.214.93.55:8090/?action=stream.mjpg");
+
         //******VideoCapture camera = new VideoCapture("http://192.168.1.117:8090/?action=stream.mjpg");
-        //camera.open("http://192.168.2.86:8090/?action=stream");
-        // VideoCapture camera = new VideoCapture("http://192.168.2.86:8090/?action=stream.mjpg");
-        // camera.open(192.168.2.86:8090/?action=stream?dummy=param.mjpg);
+
         VideoCapture camera = new VideoCapture(1);
-        //VideoCapture camera = new VideoCapture("C:\\Users\\josep\\Desktop\\OpenCv\\10fpsStreettest2.avi");
+
         Disp j = new Disp(image);
 
         Mat original = new Mat();
@@ -59,72 +73,19 @@ public class JPanelOpenCV extends JPanel{
         Mat diffFrame = null;
         camera.read(frame);
 
-        //connected components
 
-
-
-
-        //Video Writer
-        // String fileName = "C:\\Users\\josep\\Desktop\\OpenCv\\10fpsStreettest3.avi";
         int fourcc = VideoWriter.fourcc('I','Y','U','V');
         double fps = 10;
 
         Size s = new Size(640,480);
         System.out.println("the fourcc code it "+fourcc);
-        //VideoWriter rec = new VideoWriter();
-        // if(rec.open(fileName, fourcc, fps, s)){System.out.println("true");}else{System.out.println("false");}
-        //rec.open(fileName, -1, fps, s);
 
-        //if(!rec.isOpened()){System.out.println("something wrong with video file");}
 
         if(!camera.isOpened()){
             System.out.println("Error 1 again");
         }
         else {
-
-
-
-
-
-
-
-          /*  while(true){
-
-                if (camera.read(frame)){
-                	BufferedImage image = t.MatToBufferedImage(frame);
-                	t.window(image, "Original Image", 0, 0);
-                    System.out.println(image.getWidth());
-                    System.out.println(image.getHeight());
-
-                 //   t.window(t.grayscale(image), "Processed Image", 40, 60);
-
-                    //t.window(t.loadImage("ImageName"), "Image loaded", 0, 0);
-
-                   break;
-                }
-
-            }   */
         }
-
-        JFrame frameb = new JFrame();
-        Disp b = new Disp(MatToBufferedImage(frame));
-        frameb.getContentPane().add(b);
-        frameb.setTitle("streamB");
-        frameb.setSize(640, 480 + 30);
-        frameb.setLocation(0, 0);
-        frameb.setVisible(true);
-
-        JFrame framea = new JFrame();
-        Disp a = new Disp(MatToBufferedImage(frame));
-        framea.getContentPane().add(a);
-        framea.setTitle("streamA");
-        framea.setSize(640, 480 + 30);
-        framea.setLocation(0, 0);
-        framea.setVisible(true);
-
-
-
-        BackgroundSubtractorMOG2 mBGSub = Video.createBackgroundSubtractorMOG2();
         int count =0;
         double rstTime = System.currentTimeMillis();
         int secondsRec=300;
@@ -132,90 +93,56 @@ public class JPanelOpenCV extends JPanel{
         {
 
             camera.read(frame);
-            //	rec.write(frame);
-            original = frame.clone();
-
-            //-------BackGroudSubtraction---------//
-            diffFrame = new Mat(frame.size(), CvType.CV_8UC1);
-            //processFrame(camera, frame,diffFrame,mBGSub);
-            //frame = diffFrame.clone();
-            //-----search-----------//
-            //original = searchForMovement(diffFrame, original);
-            //-----search for circles-----//
-            //original = searchCircle(original,original);
-            //-----end----//
-            //COLOR FILTERING//
-
-
-            Mat hsv = original.clone();
-            Mat hsv2 = original.clone();
-            Mat hsv3 = original.clone();
-            Mat hough = original.clone();
-
-            Scalar lowerBlack = new Scalar(0,0,0);
-            Scalar upperBlack = new Scalar(180,255,90);
-
-            Scalar lowerBlue = new Scalar(5,140,100);
-            Scalar upperBlue = new Scalar(20,255,255);
-
-            Scalar lowerb = new Scalar(35,140,60);
-            Scalar upperb = new Scalar(70,255,255);
-
-            Imgproc.cvtColor(original,hsv,Imgproc.COLOR_RGB2HSV);
-
-
-            hsv2 = hsv.clone();
-            hsv3 = hsv.clone();
-
-            Core.inRange(hsv, lowerb, upperb, hsv);
-            Core.inRange(hsv2, lowerBlue, upperBlue, hsv2);
-            Core.inRange(hsv3, lowerBlack, upperBlack, hsv3);
-
-            hsv=erodeDilate(hsv,10,3);
-            hsv2=erodeDilate(hsv2,10,3);
-            hsv3=erodeDilate(hsv3,10,3);
-
-
-            //	frame=searchForMovement(hsv,frame,"green");
-            //	frame=searchForMovement(hsv2,frame,"blue");
-
-            frame=searchLine(hough,frame);
-            frame=drawCrosshair(frame, 30, 250, 250,new Scalar(0,0,255));
-
-
-
-
+            color(lowerb,upperb,upperBlue,lowerBlue,frame);
             if(System.currentTimeMillis()-rstTime>1000){System.out.println(count);rstTime=System.currentTimeMillis();count=0;secondsRec--;}
-
             image = t.MatToBufferedImage(frame);
-            a.setImage(MatToBufferedImage(hsv3));
-            b.setImage(MatToBufferedImage(frame));
-
-
-            framea.getContentPane().add(a);
-            frameb.getContentPane().add(b);
-
-            Thread.sleep(10);
+            try {
+                Thread.sleep(10);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
             count++;
-            //System.out.println("tick");
-            framea.invalidate();
-            framea.validate();
-            framea.repaint();
-
-            frameb.invalidate();
-            frameb.validate();
-            frameb.repaint();
             if(secondsRec<0){break;}
 
 
         }
 
-        // rec.release();
+
         camera.release();
         System.exit(0);
-
-        // camera.release();
     }
+
+    public void color(Scalar greenMin, Scalar greenMax,Scalar blueMin,Scalar blueMax,Mat frame) {
+        Mat original = frame.clone();
+        Mat hsv = original.clone();
+        Mat hsv2 = original.clone();
+        Mat hsv3 = original.clone();
+        Mat hough = original.clone();
+
+        Imgproc.cvtColor(original,hsv,Imgproc.COLOR_RGB2HSV);
+
+
+        hsv2 = hsv.clone();
+        hsv3 = hsv.clone();
+
+        Core.inRange(hsv, lowerb, upperb, hsv);
+        Core.inRange(hsv2, lowerBlue, upperBlue, hsv2);
+        Core.inRange(hsv3, lowerBlack, upperBlack, hsv3);
+
+        hsv=erodeDilate(hsv,10,3);
+        hsv2=erodeDilate(hsv2,10,3);
+        hsv3=erodeDilate(hsv3,10,3);
+
+
+        frame=searchForMovement(hsv,frame,"green");
+        frame=searchForMovement(hsv2,frame,"blue");
+
+        frame=searchLine(hough,frame);
+        frame=drawCrosshair(frame, 30, 250, 250,new Scalar(0,0,255));
+    }
+
+
+
 
     @Override
     public void paint(Graphics g) {
