@@ -82,22 +82,25 @@ public class HoneybadgerV6 {
      * @param throttle
      */
     public void updateMovement(char dir, float throttle){
-
         //Change to a map with lambdas or something...
         switch (dir){
             case 'N':{ //up
+                IsMoving = true;
                 moveForward(throttle);
                 break;
             }
             case 'W':{ //left
+                IsMoving = true;
                 strafeLeft(throttle);
                 break;
             }
             case 'E':{ //right
+                IsMoving = true;
                 strafeRight(throttle);
                 break;
             }
             case 'S':{ //down
+                IsMoving = true;
                 moveBackward(throttle);
                 break;
             }
@@ -121,7 +124,7 @@ public class HoneybadgerV6 {
      * @param throttle
      */
     public void updateRotation(char leftDir, char dir, int throttle){
-        if( leftDir == 'Z'){
+        if( IsMoving == false){
             switch (dir){
                 case 'N':{
                     break;
@@ -138,7 +141,6 @@ public class HoneybadgerV6 {
                     break;
                 }
                 case 'Z':{
-                    moveForward(0);
                     break;
                 }
                 default:{
