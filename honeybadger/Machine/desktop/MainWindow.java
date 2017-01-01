@@ -265,6 +265,8 @@ public class MainWindow extends JDialog {
         //TODO: maybe put this in a separate thread?
         singleton.networkBus = new NetworkConnector(ConnectionIP,2017);
         singleton.messageReader = new NetworkConnector.MessageReader(singleton.networkBus);
+
+        Controller Xbox = new Controller(singleton.networkBus);
         Thread readMessages = new Thread(singleton.messageReader);
         readMessages.start();
 

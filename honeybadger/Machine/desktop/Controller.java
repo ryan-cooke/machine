@@ -321,7 +321,7 @@ public class Controller extends XboxControllerAdapter{
         ControllerMessageSender = ScheduledManager.scheduleAtFixedRate(
                 () -> {
                     if(connector.HasActiveConnection() && !connector.IsBroken()) {
-                        Log(controllerState.toString());
+                        //Log(controllerState.toString());
                         connector.SendMessage(new ControllerMessage(controllerState));
                     }else{
                         ControllerMessageSender.cancel(false); //Don't interrupt yourself.
