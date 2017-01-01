@@ -83,21 +83,50 @@ public class HoneybadgerV6 {
         switch (dir){
             case 'N':{ //up
                 moveForward(throttle);
+                break;
             }
             case 'W':{ //left
                 strafeLeft(throttle);
+                break;
             }
             case 'E':{ //right
                 strafeRight(throttle);
+                break;
             }
             case 'S':{ //down
                 moveBackward(throttle);
+                break;
             }
             case 'Z':{ //no dir
                 moveForward(0);
+                break;
             }
             default:{
                 sendDebugMessageToDesktop("Movement update not understood!");
+            }
+        }
+    }
+
+    public void updateRotation(char leftDir, char dir, int throttle){
+        if( leftDir == 'Z'){
+            switch (dir){
+                case 'N':{
+                    break;
+                }
+                case 'W':{
+                    spinLeft(throttle);
+                    break;
+                }
+                case 'E':{
+                    spinRight(throttle);
+                    break;
+                }
+                case 'S':{
+                    break;
+                }
+                default:{
+                    sendDebugMessageToDesktop("Rotation update not understood");
+                }
             }
         }
     }
