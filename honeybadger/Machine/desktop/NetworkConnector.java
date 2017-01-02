@@ -2,6 +2,7 @@ package Machine.desktop;
 
 import Machine.Common.Network.BaseMsg;
 import Machine.Common.Network.Command.IBadgerFunction;
+import Machine.Common.Network.Command.ShellCommandMessage;
 import Machine.Common.Network.Command.TextCommandMessage;
 
 import java.io.ObjectInputStream;
@@ -178,6 +179,10 @@ public class NetworkConnector {
                     this.SendMessage(new TextCommandMessage(input.substring(4)));
                 }
             }
+        }
+        else if(input.startsWith("SH")){
+            MainWindow.writeToMessageFeed(String.format("Sending Shell Message \'%s\'", input.substring(3)));
+            this.SendMessage(new ShellCommandMessage(input.substring(3)));
         }
         else{
             MainWindow.writeToMessageFeed(String.format("Sending \"%s\"", input));
