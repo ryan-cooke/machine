@@ -38,6 +38,9 @@ public class JPanelOpenCV extends JPanel {
     private Scalar lowerb = new Scalar(35, 140, 60);
     private Scalar upperb = new Scalar(70, 255, 255);
 
+    private int erode=3;
+    private int dilate=10;
+
     private static String ConnectURL;
     private static boolean ShouldDraw;
 
@@ -50,6 +53,9 @@ public class JPanelOpenCV extends JPanel {
         ConnectURL = String.format("http://%s:8090/?action=stream", host);
         ShouldDraw = true;
     }
+
+    public void setDilate(int d){dilate=d;}
+    public void setErode(int e){erode=e;}
 
     public void setGreen(Scalar upper, Scalar lower) {
         lowerb = lower;
@@ -140,9 +146,9 @@ public class JPanelOpenCV extends JPanel {
         Core.inRange(hsv2, lowerBlue, upperBlue, hsv2);
         Core.inRange(hsv3, lowerBlack, upperBlack, hsv3);
 
-        hsv = erodeDilate(hsv, 10, 3);
-        hsv2 = erodeDilate(hsv2, 10, 3);
-        hsv3 = erodeDilate(hsv3, 10, 3);
+        hsv = erodeDilate(hsv, dilate, erode);
+        hsv2 = erodeDilate(hsv2, dilate, erode);
+        hsv3 = erodeDilate(hsv3, dilate, erode);
 
         frame = searchForMovement(hsv, frame, "green");
         frame = searchForMovement(hsv2, frame, "blue");
