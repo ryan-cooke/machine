@@ -46,7 +46,7 @@ public class TextCommandMessage extends BaseMsg {
     @Override
     public void Execute(Object context) {
         HoneybadgerV6 badger = (HoneybadgerV6) context;
-        if(badger==null || !Constants.DEBUG_MODE_ON){
+        if(badger==null){
             return;
         }
 
@@ -59,22 +59,17 @@ public class TextCommandMessage extends BaseMsg {
         IBadgerFunction function = CommandMap.get(command[0]);
 
         //Call the function on the badger and catch possible exceptions
-        boolean success = false;
         try {
-            success = function.Invoke(badger, callParameters);
+            boolean success = function.Invoke(badger, callParameters);
+
+            String message = success?
+                    String.format("Call to %s successful",command[0])
+                    : String.format("Error calling %s",command[0]);
+
+            badger.sendDebugMessageToDesktop(message);
         }catch (Exception e){
             e.printStackTrace();
             badger.sendCriticalMessageToDesktop(String.format("Error invoking %s",payload),e);
-            return;
-        }
-
-        if(success){
-            //Send an ACK message
-            badger.sendMessageToDesktop(String.format("Call to %s successful",command[0]));
-        }
-        else{
-            //Send a critical message
-            badger.sendDebugMessageToDesktop(String.format("Error calling %s",command[0]));
         }
     }
 

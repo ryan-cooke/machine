@@ -1,6 +1,7 @@
 package Machine.Common.Network;
 
 import Machine.Common.Utils;
+import Machine.desktop.Controller;
 import Machine.rpi.HoneybadgerV6;
 
 import java.io.Serializable;

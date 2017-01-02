@@ -24,15 +24,6 @@ public class Disp extends JPanel{
 	public void paint(Graphics g) {
         g.drawImage(image, 0, 0, this);
     }
-	public void window(BufferedImage img, String text, int x, int y) {
-        JFrame frame0 = new JFrame();
-        frame0.getContentPane().add(new JPanelOpenCV(img));
-        frame0.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame0.setTitle(text);
-        frame0.setSize(img.getWidth(), img.getHeight() + 30);
-        frame0.setLocation(x, y);
-        frame0.setVisible(true);
-    }
 	
 	public BufferedImage MatToBufferedImage(Mat frame) {
         //Mat() to BufferedImage

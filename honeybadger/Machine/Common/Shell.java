@@ -36,6 +36,8 @@ public class Shell {
             latestProcess = osShell.exec(command);
             StringBuffer buffer = new StringBuffer();
             BufferedReader reader = new BufferedReader(new InputStreamReader(latestProcess.getInputStream()));
+
+            //TODO: FIX! timeouts aren't working :/
             boolean completedNormally = latestProcess.waitFor(latestTimeout, TimeUnit.MILLISECONDS);
 
             String line;
@@ -46,8 +48,12 @@ public class Shell {
             if(!completedNormally){
                 buffer.append("PROCESS TERMINATED DUE TO TIMEOUT");
             }
-
+            latestStandardOut = buffer.toString();
             Log(String.format("Successfully executed \'%s\'",command));
         }catch (Exception e){e.printStackTrace();}
+    }
+
+    public String getLatestStandardOut() {
+        return latestStandardOut;
     }
 }
