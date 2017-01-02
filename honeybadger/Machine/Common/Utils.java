@@ -42,6 +42,18 @@ public class Utils {
         }
     }
 
+    public static float Clamp(float value, float min, float max){
+        return Math.min(Math.max(value,min),max);
+    }
+
+    public static double Clamp(double value, double min, double max){
+        return Math.min(Math.max(value,min),max);
+    }
+
+    public static int Clamp(int value, int min, int max){
+        return Math.min(Math.max(value,min),max);
+    }
+
     public static void Log(String log){
         //Very lazy, just needed a quick timestamp
         java.sql.Timestamp ts = new java.sql.Timestamp(Calendar.getInstance().getTime().getTime());

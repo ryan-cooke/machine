@@ -218,29 +218,6 @@ public class CMD {
         }
     }
 
-    public static class flywheel extends MotorFunction{
-        @Override
-        public boolean Invoke(HoneybadgerV6 badger, String[] params) {
-            if(!super.Invoke(badger,params)){
-                return false;
-            }
-
-            float percent = Float.parseFloat(params[0]);
-            badger.setFlywheelSpeed(percent);
-            return true;
-        }
-
-        @Override
-        public String Explain() {
-            return "\"flywheel <Percent throttle of flywheel range>\"";
-        }
-
-        @Override
-        public int MinimumParameterNum() {
-            return 1;
-        }
-    }
-
     public static class setConveyor extends MotorFunction{
         @Override
         public boolean Invoke(HoneybadgerV6 badger, String[] params) {
