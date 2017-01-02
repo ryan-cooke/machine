@@ -1,6 +1,7 @@
 package Machine.desktop;
 
 import Machine.Common.Constants;
+import Machine.Common.Shell;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.Size;
@@ -27,6 +28,7 @@ public class MainWindow {
 
     private Thread networkThread;
     private Thread videoThread;
+    private Thread updaterThread;
 
     private JPanel contentPane;
     private JButton buttonReboot;
@@ -35,6 +37,7 @@ public class MainWindow {
     private JMenuBar menuBar;
     private JMenu file;
     private JMenu view;
+    private JMenuItem update;
     private JMenuItem exit;
     private JMenuItem fontSizeIncrease;
     private JMenuItem fontSizeDecrease;
@@ -48,6 +51,7 @@ public class MainWindow {
     private double fontSize;
     private JMenuItem openCVConfigMenuItem;
 
+    private static String ConnectionIP;
 
     private MainWindow() {
 
@@ -60,7 +64,7 @@ public class MainWindow {
         mainFrame.setLayout(new GridLayout(1, 1));
         mainFrame.addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent windowEvent) {
-                System.exit(0);
+                onPressExit();
             }
         });
 
@@ -109,9 +113,11 @@ public class MainWindow {
                     Prompt.setText(promptChar);
 
                     inputHistory.add(input);
-                    boolean messageSuccess = singleton.networkBus.HandleMessage(input);
-                    if (!messageSuccess) {
-                        resetConnection();
+                    if(singleton.networkBus!=null) {
+                        boolean messageSuccess = singleton.networkBus.HandleMessage(input);
+                        if (!messageSuccess) {
+                            resetConnection();
+                        }
                     }
                 }
                 inputOffset = 0;
@@ -157,7 +163,7 @@ public class MainWindow {
                 super.mouseClicked(e);
                 if (videoThread == null) {
                     MainWindow.writeToMessageFeed("Opening video stream...");
-//                    JPanelOpenCV.instance = videoPanel;
+                    JPanelOpenCV.instance = videoPanel;
                     videoThread = new Thread(new Runnable() {
                         @Override
                         public void run() {
@@ -191,6 +197,15 @@ public class MainWindow {
         exit.setMnemonic(KeyEvent.VK_E);
         exit.setToolTipText("If you really need a tool tip for this button, you shouldn't be in engineering");
 
+        update = new JMenuItem("Update badger");
+        update.setToolTipText("Update the Honeybadger V6 remotely");
+        update.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                runRemoteUpdate();
+            }
+        });
+
         openCVConfigMenuItem = new JMenuItem("OpenCV Config");
         openCVConfigMenuItem.setMnemonic(KeyEvent.VK_C);
         openCVConfigMenuItem.setToolTipText("Open the OpenCV Configuration panel");
@@ -220,7 +235,7 @@ public class MainWindow {
 
         menuBar.add(file);
         menuBar.add(view);
-
+        menuBar.add(update);
         mainFrame.setJMenuBar(menuBar);
     }
 
@@ -281,14 +296,6 @@ public class MainWindow {
             }
         });
 
-        /*// call onPressExit() when cross is clicked
-        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-        addWindowListener(new WindowAdapter() {
-            public void windowClosing(WindowEvent e) {
-                onPressExit();
-            }
-        });*/
-
         // call onPressExit() on ESCAPE
         contentPane.registerKeyboardAction(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -310,6 +317,36 @@ public class MainWindow {
         }
     }
 
+    private void runRemoteUpdate(){
+        if(updaterThread!=null){
+            JOptionPane.showMessageDialog(null,
+                    "An update is in progress. Please wait",
+                    "Update Transmission Error",
+                    JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        //TODO: obfuscate password input!
+        //Will likely need a JOptionPane.showOptionDialog with custom components.
+        String password = JOptionPane.showInputDialog(
+                "Remote host password",
+                "");
+        if (password == null){
+            Log("Cancelling update");
+            return;
+        }
+
+        updaterThread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                boolean success = BadgerUpdater.sendUpdate(ConnectionIP,password);
+                //resetConnection();
+                updaterThread = null;
+            }
+        });
+        updaterThread.start();
+    }
+
     private void onPressReboot() {
         //TODO: Send a network command to quit.
 
@@ -322,14 +359,18 @@ public class MainWindow {
                 JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
 
         if (dialogResult == JOptionPane.YES_OPTION) {
-            //TODO: close all network connections
-//            dispose();
-            System.exit(0);
+            try {
+                networkBus.SendMessage("close");
+                networkBus.End();
+            } catch (Exception e){e.printStackTrace();}
+            finally {
+                System.exit(0);
+            }
         }
     }
 
     private void resetConnection() {
-        MainWindow.writeToMessageFeed("Connection died. Attempting to reset...");
+        Log("Connection died. Attempting to reset...");
         String ConnectionIP = singleton.networkBus.host;
         singleton.networkBus.End();
         singleton.messageReader.end();
@@ -374,6 +415,7 @@ public class MainWindow {
 
     public static void main(String[] args) {
         Constants.setActivePlatform(Constants.PLATFORM.DESKTOP_GUI);
+
         //Try changing the theme
         try {
             UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
@@ -398,7 +440,7 @@ public class MainWindow {
         }
 
         //Get the IP first.
-        String ConnectionIP = promptForIP();
+        ConnectionIP = promptForIP();
 
         singleton = new MainWindow();
 
