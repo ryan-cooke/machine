@@ -88,7 +88,7 @@
         <children>
           <component id="ac0b" class="Machine.desktop.JPanelOpenCV" binding="videoPanel">
             <constraints>
-              <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false">
+              <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="7" hsize-policy="7" anchor="0" fill="0" indent="0" use-parent-layout="false">
                 <minimum-size width="640" height="480"/>
               </grid>
             </constraints>
@@ -110,6 +110,7 @@
                   <background color="-13880265"/>
                   <doubleBuffered value="true"/>
                   <editable value="false"/>
+                  <font/>
                   <foreground color="-1"/>
                 </properties>
               </component>

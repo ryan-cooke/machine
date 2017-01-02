@@ -26,8 +26,9 @@ public class JPanelOpenCV extends JPanel{
         JPanelOpenCV t = new JPanelOpenCV();
        
        // VideoCapture camera = new VideoCapture();
-        VideoCapture camera = new VideoCapture("http://192.168.0.1:8090/?action=stream");        //VideoCapture camera = new VideoCapture("http://150.214.93.55:8090/?action=stream.mjpg");
-        //camera.open("http://192.168.0.1:8090/?action=stream");
+        VideoCapture camera = new VideoCapture("http://96.10.1.168/mjpg/1/video.mjpg");
+//        VideoCapture camera = new VideoCapture("http://192.168.0.1:8090/?action=stream.mjpg");
+        //camera.open("http://192.168.2.86:8090/?action=stream");
        // VideoCapture camera = new VideoCapture("http://192.168.2.86:8090/?action=stream.mjpg");
        // camera.open(192.168.2.86:8090/?action=stream?dummy=param.mjpg);
         //VideoCapture camera = new VideoCapture(0);
