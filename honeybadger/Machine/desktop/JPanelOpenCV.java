@@ -38,6 +38,13 @@ public class JPanelOpenCV extends JPanel {
     private Scalar lowerb = new Scalar(35, 140, 60);
     private Scalar upperb = new Scalar(70, 255, 255);
 
+    private Scalar lowerYellow = new Scalar(90,100,60);
+    private Scalar upperYellow = new Scalar(110,255,255);
+
+    private Scalar lowerRed = new Scalar(110,100,60);
+    private Scalar upperRed = new Scalar(140,255,255);
+
+
     private int erode=3;
     private int dilate=10;
 
@@ -146,12 +153,17 @@ public class JPanelOpenCV extends JPanel {
         Mat hsv = original.clone();
         Mat hsv2 = original.clone();
         Mat hsv3 = original.clone();
+        Mat hsv4 = original.clone();
+        Mat hsv5 = original.clone();
         Mat hough = original.clone();
 
         Imgproc.cvtColor(original, hsv, Imgproc.COLOR_RGB2HSV);
 
         hsv2 = hsv.clone();
         hsv3 = hsv.clone();
+        hsv4 = hsv.clone();
+        hsv5 = hsv.clone();
+
 
         Core.inRange(hsv, lowerb, upperb, hsv);
         Core.inRange(hsv2, lowerBlue, upperBlue, hsv2);
