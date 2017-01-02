@@ -4,14 +4,13 @@ import Machine.Common.Constants;
 import Machine.Common.Network.Command.IBadgerFunction;
 import Machine.Common.Network.Command.TextCommandMessage;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Scanner;
-import java.util.Set;
+import java.net.NetworkInterface;
+import java.util.*;
 
 import static Machine.Common.Network.Command.TextCommandMessage.getCommandHandlers;
 import static Machine.Common.Utils.Log;
 import static Machine.Common.Utils.Prompt;
+import static java.net.NetworkInterface.getNetworkInterfaces;
 
 /**
  * Driver code for Desktop App
@@ -49,6 +48,8 @@ public class MainDesktop {
         Constants.setActivePlatform(Constants.PLATFORM.DESKTOP);
 
         Scanner Kb = new Scanner(System.in);
+        Log("Setting static IP");
+        //CommandLineRunner.SetStaticIP();
 
         do {
             String IP = "192.168.0.1";
@@ -115,6 +116,8 @@ public class MainDesktop {
             nc.End();
             nc = null;
         }while(isActive);
+
+        //CommandLineRunner.SetDHCP();
 
         System.exit(0);
     }

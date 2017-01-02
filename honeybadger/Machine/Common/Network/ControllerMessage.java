@@ -1,169 +1,201 @@
 package Machine.Common.Network;
 
+import Machine.Common.Utils;
+import Machine.desktop.Controller;
 import Machine.rpi.HoneybadgerV6;
-import Machine.rpi.hw.BadgerMotorController;
-import Machine.rpi.hw.BadgerPWMProvider;
-import Machine.rpi.hw.RPI;
 
 import java.io.Serializable;
+import java.util.HashMap;
 
 import static Machine.Common.Utils.Log;
 
 /**
  * Handles everything related to networking the controller
  */
-public class ControllerMessage extends BaseMsg {
-    /**
-     * Inner interface to define a new controller action that a honeybadger must do
-     */
-    public interface ControllerAction{
-        void Do(HoneybadgerV6 badger);
+public class ControllerMessage extends BaseMsg implements Serializable {
+    public enum Button {A, B, X, Y, BACK, START, RBUMPER, LBUMPER, RTHUMB,
+        LTHUMB, NDPAD, EDPAD, SDPAD, WDPAD, LTRIGGER, RTRIGGER}
+
+    public int buttonsPressed; // Number of buttons currently pressed
+
+    public HashMap<Button, Boolean> buttons; // The 14 buttons pressed if true
+
+    public double leftThumbstickRotation;
+    public char leftThumbstickDirection; // N, E, S, W for directions.
+    public double rightThumbstickRotation;
+    public char rightThumbstickDirection;
+
+    public double leftThumbstickMagnitude;
+    public double rightThumbstickMagnitude;
+
+    public double leftTriggerMagnitude;
+    public double rightTriggerMagnitude;
+
+    public Utils.Vector2D RightThumbstick;
+    public Utils.Vector2D LeftThumbstick;
+
+    public void Initialize(){
+        buttons = new HashMap<>();
+        buttons.put(Button.A, false);
+        buttons.put(Button.B, false);
+        buttons.put(Button.X, false);
+        buttons.put(Button.Y, false);
+        buttons.put(Button.BACK, false);
+        buttons.put(Button.START, false);
+        buttons.put(Button.RBUMPER, false);
+        buttons.put(Button.LBUMPER, false);
+        buttons.put(Button.RTHUMB, false);
+        buttons.put(Button.LTHUMB, false);
+        buttons.put(Button.NDPAD, false);
+        buttons.put(Button.EDPAD, false);
+        buttons.put(Button.SDPAD, false);
+        buttons.put(Button.WDPAD, false);
+
+        buttonsPressed = 0;
+        leftThumbstickDirection = 'Z';
+        rightThumbstickDirection = 'Z';
+        leftThumbstickMagnitude = 0.0;
+        rightThumbstickMagnitude = 0.0;
+        rightThumbstickRotation = 0.0;
+        leftThumbstickRotation =0.0;
+
+        leftTriggerMagnitude = 0.0;
+        leftTriggerMagnitude = 0.0;
     }
 
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // START Controller Action Commands
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    public static class MoveForward implements ControllerAction, Serializable{
-        float throttle;
-
-        public MoveForward(float throttle){
-            this.throttle=throttle;
-        }
-
-        public void Do(HoneybadgerV6 badger){
-            badger.moveForward(throttle);
-        }
-
-        @Override
-        public String toString(){
-            return "Pressed A";
-        }
+    public ControllerMessage(){
+        //Empty constructor
     }
 
-    public static class MoveLeft implements ControllerAction, Serializable{
-        float throttle;
-
-        public MoveLeft(float throttle){
-            this.throttle=throttle;
-        }
-
-        public void Do(HoneybadgerV6 badger){
-            badger.strafeLeft(throttle);
-        }
+    public ControllerMessage(
+            String payload,
+            HashMap<Button,Boolean> buttons,
+            int buttonsPressed,
+            char leftThumbstickDirection,
+            char rightThumbstickDirection,
+            double rightThumbstickRotation,
+            double leftThumbstickRotation,
+            double leftThumbstickMagnitude,
+            double rightThumbstickMagnitude,
+            double leftTriggerMagnitude,
+            double rightTriggerMagnitude
+    ){
+        super(payload);
+        this.buttons = buttons;
+        this.buttonsPressed = buttonsPressed;
+        this.leftThumbstickDirection = leftThumbstickDirection;
+        this.rightThumbstickDirection = rightThumbstickDirection;
+        this.leftThumbstickRotation = leftThumbstickRotation;
+        this.rightThumbstickRotation = rightThumbstickRotation;
+        this.leftThumbstickMagnitude = leftThumbstickMagnitude;
+        this.rightThumbstickMagnitude = rightThumbstickMagnitude;
+        this.leftTriggerMagnitude = leftTriggerMagnitude;
+        this.rightTriggerMagnitude = rightTriggerMagnitude;
     }
 
-    public static class MoveRight implements ControllerAction, Serializable{
-        float throttle;
-
-        public MoveRight(float throttle){
-            this.throttle=throttle;
-        }
-
-        public void Do(HoneybadgerV6 badger){
-            badger.strafeRight(throttle);
-        }
+    public ControllerMessage(ControllerMessage that){
+        this.buttons = new HashMap<>(that.buttons);
+        this.buttonsPressed = that.buttonsPressed;
+        this.leftThumbstickDirection = that.leftThumbstickDirection;
+        this.rightThumbstickDirection = that.rightThumbstickDirection;
+        this.leftThumbstickMagnitude = that.leftThumbstickMagnitude;
+        this.rightThumbstickMagnitude = that.rightThumbstickMagnitude;
+        this.leftThumbstickRotation = that.leftThumbstickRotation;
+        this.rightThumbstickRotation = that.rightThumbstickRotation;
+        this.leftTriggerMagnitude = that.leftTriggerMagnitude;
+        this.rightTriggerMagnitude = that.rightTriggerMagnitude;
     }
 
-    public static class MoveBack implements ControllerAction, Serializable{
-        float throttle;
-
-        public MoveBack(float throttle){
-            this.throttle=throttle;
-        }
-
-        public void Do(HoneybadgerV6 badger){
-            badger.moveBackward(throttle);
-        }
+    public int getButtonsPressed() {
+        return buttonsPressed;
     }
 
-    public static class Shoot implements ControllerAction, Serializable{
-        float throttle;
-
-        public Shoot(float throttle){
-            this.throttle=throttle;
-        }
-
-        public void Do(HoneybadgerV6 badger){
-            badger.setFlywheelSpeed(throttle);
-        }
+    public void setButtonsPressed(int buttonsPressed) {
+        this.buttonsPressed = buttonsPressed;
     }
 
-    public static class Stop implements ControllerAction, Serializable{
-        public void Do(HoneybadgerV6 badger){
-            badger.STOP();
-        }
+    public void setLeftThumbDir(char leftThumbDir) {
+        this.leftThumbstickDirection = leftThumbDir;
     }
 
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // START Debug Commands
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    public static class DEBUG_MOTOR implements ControllerAction, Serializable{
-        protected int dir;
-        public static float throttle;
-        DEBUG_MOTOR(){
-            dir=0;
-            throttle=100;
-        }
-        public void Do(HoneybadgerV6 badger){
-            badger.SetMotor(RPI.DRIVE_FRONT_LEFT, BadgerPWMProvider.DRIVE_FRONT_LEFT, BadgerMotorController.COUNTER_CLOCKWISE,throttle);
-        }
-    }
-
-    public static class DEBUG_MOTOR_FL extends DEBUG_MOTOR{
-        public DEBUG_MOTOR_FL(int direction){
-            dir = direction;
-        }
-        public void Do(HoneybadgerV6 badger){
-            badger.SetMotor(RPI.DRIVE_FRONT_LEFT, BadgerPWMProvider.DRIVE_FRONT_LEFT, dir,throttle);
-        }
-    }
-
-    public static class DEBUG_MOTOR_FR extends DEBUG_MOTOR{
-        public DEBUG_MOTOR_FR(int direction){
-            dir = direction;
-        }
-        public void Do(HoneybadgerV6 badger){
-            badger.SetMotor(RPI.DRIVE_FRONT_RIGHT, BadgerPWMProvider.DRIVE_FRONT_RIGHT, dir,throttle);
-        }
-    }
-    public static class DEBUG_MOTOR_BL extends DEBUG_MOTOR{
-        public DEBUG_MOTOR_BL(int direction){
-            dir = direction;
-        }
-        public void Do(HoneybadgerV6 badger){
-            badger.SetMotor(RPI.DRIVE_BACK_LEFT, BadgerPWMProvider.DRIVE_BACK_LEFT, dir,throttle);
-        }
-    }
-    public static class DEBUG_MOTOR_BR extends DEBUG_MOTOR{
-        public DEBUG_MOTOR_BR(int direction){
-            dir = direction;
-        }
-        public void Do(HoneybadgerV6 badger){
-            badger.SetMotor(RPI.DRIVE_BACK_RIGHT, BadgerPWMProvider.DRIVE_BACK_RIGHT, dir,throttle);
-        }
-    }
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // END Controller Action Commands
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    private ControllerAction Action;
-
-    public ControllerMessage(ControllerAction someAction){
-        Action = someAction;
-        payload = someAction.getClass().getName();
+    public void setRightThumbstickDirection(char rightThumbstickDirection) {
+        this.rightThumbstickDirection = rightThumbstickDirection;
     }
 
     @Override
     public void Execute(Object context) {
         HoneybadgerV6 badger = (HoneybadgerV6) context;
-        if(badger==null){
-            Log(String.format("Unable to execute %s",this.payload));
-            //TODO: Send some error message back
+        if (badger == null) {
+            Log(this.toString());
             return;
         }
 
-        // Execute
-        Action.Do(badger);
+        //If the badger wasn't null, do actions dependent on the object
+        //@foxtrot94: minimum needed buttons for today.
+        badger.updateMovement(leftThumbstickDirection, (float) leftThumbstickMagnitude * 100.f);
+
+        if(buttons.get(Button.LBUMPER)){
+            badger.disarmFlywheel();
+        }
+        if(buttons.get(Button.RBUMPER)){
+            badger.armFlywheel();
+        }
+
+        badger.setFlywheelSpeed((float)rightTriggerMagnitude);
+        badger.moveConveyor((float)leftTriggerMagnitude);
+
+        badger.updateRotation(leftThumbstickDirection, rightThumbstickDirection, (int) leftThumbstickMagnitude*100);
+        //TODO: handle more buttons
+    }
+
+    @Override
+    public String getPayload() {
+        return "ControllerMessage";
+    }
+
+    public String toString(){
+        //Return the Controller state
+        StringBuffer buffer = new StringBuffer();
+        for(Button aButton : Button.values()){
+            if(!this.buttons.containsKey(aButton)){
+                continue;
+            }
+
+            boolean value = this.buttons.get(aButton);
+            buffer.append(aButton.toString());
+            buffer.append("=");
+            buffer.append(value?"1":"0");
+            buffer.append("; ");
+        }
+        buffer.append("\n");
+
+        //Triggers
+        buffer.append("Triggers: ");
+        buffer.append("L=");
+        buffer.append(this.leftTriggerMagnitude);
+        buffer.append(" | ");
+        buffer.append("R=");
+        buffer.append(this.rightTriggerMagnitude);
+        buffer.append("\n");
+
+        //Thumbsticks
+        buffer.append("Thumbsticks\n");
+        buffer.append("Left: Mag=");
+        buffer.append(this.leftThumbstickMagnitude);
+        buffer.append(" | Dir=");
+        buffer.append(this.leftThumbstickDirection);
+        buffer.append(" | Rot=");
+        buffer.append(this.leftThumbstickRotation);
+        buffer.append("\n");
+
+        buffer.append("Right: Mag=");
+        buffer.append(this.rightThumbstickMagnitude);
+        buffer.append(" | Dir=");
+        buffer.append(this.rightThumbstickDirection);
+        buffer.append(" | Rot=");
+        buffer.append(this.rightThumbstickRotation);
+        buffer.append("\n");
+
+        return buffer.toString();
     }
 }

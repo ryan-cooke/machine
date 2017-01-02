@@ -17,7 +17,6 @@ public class BadgerSmartServoProvider {
         @Override
         public void dataReceived(SerialDataEvent event) {
             lastReceivedEvent = event;
-            //TODO: Check the ACKS?
         }
 
         public SerialDataEvent getLastReceivedEvent(){ return lastReceivedEvent; }
@@ -77,6 +76,19 @@ public class BadgerSmartServoProvider {
         SetPosition(servoID,(byte)0x05,(byte)(flightTime&0xFF),position);
     }
 
+    /**
+     * Private method to set the position correctly.
+     * Ported to Java and Pi4J. Original C implementation is available for download at XYZrobot's site.
+     * Copyright claim is quoted, as is, below.
+     *
+     *   A1-16.h - Modified for XYZrobot ATmega 1280 control board.
+     *   Copyright (c) 2015 Wei-Shun You. XYZprinting Inc.  All right reserved.
+     *
+     * @param servoID The registered ID of the servo that should move
+     * @param commandByte Byte of the command (can be I_JOG or S_JOG)
+     * @param flightTime Time (in 10s of ms) that the servo should be in flight
+     * @param position The position, between 0 and 1023, that the servo should move to.
+     */
     private void SetPosition(byte servoID, byte commandByte,  byte flightTime, int position){
         //_pID -> SERVO ID to execute this command
         //_CMD -> The SET Position command itself

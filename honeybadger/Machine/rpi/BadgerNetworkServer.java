@@ -118,9 +118,8 @@ public class BadgerNetworkServer {
         catch (Exception e){
             e.printStackTrace();
             KeepAlive=false;
+            return "";
         }
-
-        return "";
     }
 
     protected void CloseAll(){

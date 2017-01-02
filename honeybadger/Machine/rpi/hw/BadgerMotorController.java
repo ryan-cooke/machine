@@ -37,12 +37,16 @@ public class BadgerMotorController extends NetworkDebuggable{
      */
     private BadgerPWMProvider PWMProvider;
 
+    /**
+     * The Daisy-chained smart servo provider.
+     */
     private BadgerSmartServoProvider SerialServo;
 
     /**
      * Object that represents the RaspberryPI. Is used mostly to set the PinState of it's pins (HIGH or LOW)
      */
     private GpioProvider RPIProvider;
+
 
     private GpioController GPIO;
 
@@ -62,13 +66,13 @@ public class BadgerMotorController extends NetworkDebuggable{
      * Calling setPWM on the flywheel motors with this value will arm them.
      * Subsequent calls to setPWM  with this value will stop the motors from spinning.
      */
-    public static final int FLYWHEEL_PERCENT_MIN = 10;
+    public static final float FLYWHEEL_PERCENT_MIN = 10.f;
 
     /**
      * Highest percent for Flywheel PWM to be set.
      * DANGER! NEVER SET AT THIS VALUE IMMEDIATELY IN ONE SHOT!
      */
-    public static final int FLYWHEEL_PERCENT_MAX = 90;
+    public static final float FLYWHEEL_PERCENT_MAX = 90.f;
 
     /**
      * Constant that defines integer representation of clockwise rotation
@@ -137,6 +141,7 @@ public class BadgerMotorController extends NetworkDebuggable{
 
                 GPIO.provisionPwmOutputPin(PWMProvider, BadgerPWMProvider.CONVEYOR_A, "Conveyor A - CV1"),
                 GPIO.provisionPwmOutputPin(PWMProvider, BadgerPWMProvider.CONVEYOR_B, "Conveyor B - CV2"),
+
                 GPIO.provisionPwmOutputPin(PWMProvider, BadgerPWMProvider.VACUUM_ROLLER, "Vacuum Roller - VAC"),
                 GPIO.provisionPwmOutputPin(PWMProvider, BadgerPWMProvider.FLYWHEEL_A, "Flywheel A - BS1"),
                 GPIO.provisionPwmOutputPin(PWMProvider, BadgerPWMProvider.FLYWHEEL_B, "Flywheel B - BS2"),
@@ -155,7 +160,10 @@ public class BadgerMotorController extends NetworkDebuggable{
                 GPIO.provisionDigitalOutputPin(RPIProvider, RPI.DRIVE_FRONT_LEFT, "Front Left - FL-L"),
                 GPIO.provisionDigitalOutputPin(RPIProvider, RPI.DRIVE_FRONT_RIGHT, "Front Right - FR-L"),
                 GPIO.provisionDigitalOutputPin(RPIProvider, RPI.DRIVE_BACK_LEFT, "Back Left - BL-L"),
-                GPIO.provisionDigitalOutputPin(RPIProvider, RPI.DRIVE_BACK_RIGHT, "Back Right - BR-L")
+                GPIO.provisionDigitalOutputPin(RPIProvider, RPI.DRIVE_BACK_RIGHT, "Back Right - BR-L"),
+
+                GPIO.provisionDigitalOutputPin(RPIProvider, RPI.CONVEYOR_A, "Conveyor A"),
+                GPIO.provisionDigitalOutputPin(RPIProvider, RPI.CONVEYOR_B, "Conveyor B"),
                 //TODO: Provision the rest of the digital pins
         };
         this.DigitalOutputs = myOutputs;
@@ -171,13 +179,6 @@ public class BadgerMotorController extends NetworkDebuggable{
      */
     public void setDriveMotorSpeed(Pin pin, float speedPercent) {
         if(!IsReady){
-            return;
-        }
-
-        boolean shouldMovePin = (pin==BadgerPWMProvider.DRIVE_BACK_LEFT || pin==BadgerPWMProvider.DRIVE_BACK_RIGHT
-                || pin ==BadgerPWMProvider.DRIVE_FRONT_LEFT || pin==BadgerPWMProvider.DRIVE_FRONT_RIGHT);
-
-        if(!shouldMovePin){
             return;
         }
 

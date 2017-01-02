@@ -30,6 +30,12 @@ public class HoneybadgerV6 {
      */
     private BadgerNetworkServer networkServer;
 
+    private float FlywheelThrottleA;
+
+    private float FlywheelThrottleB;
+
+    private boolean IsMoving;
+
     /**
      * Makes a new Honeybadger (this is version 6). Guaranteed not to give a shit
      * @throws Exception But honey badger don't give a shit
@@ -37,6 +43,10 @@ public class HoneybadgerV6 {
     private HoneybadgerV6() throws Exception {
         motorController = new BadgerMotorController();
         networkServer = new BadgerNetworkServer(this);
+
+        FlywheelThrottleA = 0.f;
+        FlywheelThrottleB = 0.f;
+        IsMoving = false;
         Log("Made the BadgerV6");
     }
 
@@ -64,6 +74,126 @@ public class HoneybadgerV6 {
 
     private void shutdown() {
         this.motorController.shutdown();
+    }
+
+    /**
+     * TODO: @foxtrot94
+     * @param dir
+     * @param throttle
+     */
+    public void updateMovement(char dir, float throttle){
+        //Change to a map with lambdas or something...
+        switch (dir){
+            case 'N':{ //up
+                IsMoving = true;
+                moveForward(throttle);
+                break;
+            }
+            case 'W':{ //left
+                IsMoving = true;
+                strafeLeft(throttle);
+                break;
+            }
+            case 'E':{ //right
+                IsMoving = true;
+                strafeRight(throttle);
+                break;
+            }
+            case 'S':{ //down
+                IsMoving = true;
+                moveBackward(throttle);
+                break;
+            }
+            case 'Z':{ //no dir
+                moveForward(0);
+                IsMoving = false;
+                break;
+            }
+            default:{
+                sendDebugMessageToDesktop("Movement update not understood!");
+                IsMoving = false;
+                break;
+            }
+        }
+    }
+
+    /**
+     *
+     * @param leftDir
+     * @param dir
+     * @param throttle
+     */
+    public void updateRotation(char leftDir, char dir, int throttle){
+        if( IsMoving == false){
+            switch (dir){
+                case 'N':{
+                    break;
+                }
+                case 'W':{
+                    spinLeft(throttle);
+                    break;
+                }
+                case 'E':{
+                    spinRight(throttle);
+                    break;
+                }
+                case 'S':{
+                    break;
+                }
+                case 'Z':{
+                    break;
+                }
+                default:{
+                    sendDebugMessageToDesktop("Rotation update not understood");
+                }
+            }
+        }
+    }
+
+    public void handleButton(boolean pressed){
+        //TODO:
+    }
+
+    public void moveConveyor(float throttle){
+        if(throttle>75){
+            throttle = 75.f;
+        }
+        motorController.setDriveMotorSpeed(BadgerPWMProvider.CONVEYOR_A,throttle);
+        motorController.setDriveMotorSpeed(BadgerPWMProvider.CONVEYOR_B,throttle);
+    }
+
+    public void increaseFlywheelSpeed(float step){
+        final float minFlywheelPower = 10.f;
+        //TODO: verify
+        final float maxFlywheelPowerA = 25.f;
+        final float maxFlywheelPowerB = 20.f;
+
+        boolean shouldIncrease = step > 0.001f;
+        if(shouldIncrease){
+            FlywheelThrottleB += step;
+            FlywheelThrottleA += step;
+        }
+        else{
+            FlywheelThrottleB -= step;
+            FlywheelThrottleA -= step;
+        }
+
+        //Verify and clamp
+//        FlywheelThrottleA =
+
+
+        motorController.setPWM(BadgerPWMProvider.FLYWHEEL_A,FlywheelThrottleA);
+        motorController.setPWM(BadgerPWMProvider.FLYWHEEL_B,FlywheelThrottleB);
+    }
+
+    public void armFlywheel(){
+        motorController.setPWM(BadgerPWMProvider.FLYWHEEL_A,BadgerMotorController.FLYWHEEL_PERCENT_MIN);
+        motorController.setPWM(BadgerPWMProvider.FLYWHEEL_B,BadgerMotorController.FLYWHEEL_PERCENT_MIN);
+    }
+
+    public void disarmFlywheel(){
+        motorController.setPWM(BadgerPWMProvider.FLYWHEEL_A,0);
+        motorController.setPWM(BadgerPWMProvider.FLYWHEEL_A,0);
     }
 
     /**
@@ -169,13 +299,20 @@ public class HoneybadgerV6 {
         //Stop the flywheels
         motorController.setPWM(BadgerPWMProvider.FLYWHEEL_A, BadgerMotorController.FLYWHEEL_PERCENT_MIN);
         motorController.setPWM(BadgerPWMProvider.FLYWHEEL_B, BadgerMotorController.FLYWHEEL_PERCENT_MIN);
-
-        //TODO: Stop conveyors, vacuum roller
     }
 
-    public void SetMotor(Pin DirPin, Pin PWMPin, int direction, float throttle){
+    public void setDriveMotor(Pin DirPin, Pin PWMPin, int direction, float throttle){
         motorController.setDriveMotorDirection(DirPin, direction);
         motorController.setDriveMotorSpeed(PWMPin, throttle);
+    }
+
+    public void setConveyor(int direction, float throttle){
+        int opposingDir = direction==0? 1 : 0;
+        motorController.setDriveMotorDirection(RPI.CONVEYOR_A,direction);
+        motorController.setDriveMotorDirection(RPI.CONVEYOR_B,opposingDir);
+
+        motorController.setDriveMotorSpeed(BadgerPWMProvider.CONVEYOR_A,throttle);
+        motorController.setDriveMotorSpeed(BadgerPWMProvider.CONVEYOR_B,throttle);
     }
 
     public void setFlywheelSpeed(float speed){

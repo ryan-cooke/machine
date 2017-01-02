@@ -1,23 +1,19 @@
 package Machine.desktop;
 
 import Machine.Common.Constants;
-import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
-import sun.swing.SwingLazyValue;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
-import javax.swing.plaf.FontUIResource;
 import javax.swing.text.Document;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.DataBufferByte;
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Map;
 
 import static Machine.Common.Utils.ErrorLog;
 import static Machine.Common.Utils.Log;
@@ -51,7 +47,6 @@ public class MainWindow {
     private int inputOffset;
     private double fontSize;
 
-    private Map<String, Font> originals;
 
     private MainWindow() {
 
@@ -111,8 +106,6 @@ public class MainWindow {
                 String input = Prompt.getText().substring(2);
                 if (input.length() > 0) {
                     Prompt.setText(promptChar);
-                    messageFeed.append(input);
-                    messageFeed.append("\n");
 
                     inputHistory.add(input);
                     boolean messageSuccess = singleton.networkBus.HandleMessage(input);
@@ -391,6 +384,7 @@ public class MainWindow {
         //TODO: maybe put this in a separate thread?
         singleton.networkBus = new NetworkConnector(ConnectionIP, 2017);
         singleton.messageReader = new NetworkConnector.MessageReader(singleton.networkBus);
+        Controller Xbox = new Controller(singleton.networkBus);
         Thread readMessages = new Thread(singleton.messageReader);
         readMessages.start();
 
