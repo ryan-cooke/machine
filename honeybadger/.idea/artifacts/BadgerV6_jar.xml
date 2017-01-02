@@ -6,6 +6,7 @@
       <element id="extracted-dir" path="$PROJECT_DIR$/deps/jaw.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$PROJECT_DIR$/deps/opencv-310.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$PROJECT_DIR$/deps/XboxController.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/deps/jsch-0.1.54.jar" path-in-jar="/" />
     </root>
   </artifact>
 </component>

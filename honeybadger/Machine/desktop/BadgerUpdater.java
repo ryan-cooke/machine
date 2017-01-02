@@ -34,7 +34,7 @@ public class BadgerUpdater {
         Session session = null;
         Channel channel = null;
         ChannelSftp channelSftp = null;
-        Log("preparing the host information for sftp.");
+        Log("Preparing the host information for transfer");
 
         try {
             JSch jsch = new JSch();
@@ -45,6 +45,7 @@ public class BadgerUpdater {
             config.put("StrictHostKeyChecking", "no");
             session.setConfig(config);
 
+            Log("Connecting....");
             session.connect();
             Log("Connection successful. Switching to Secure File Transfer Protocol");
             channel = session.openChannel("sftp");

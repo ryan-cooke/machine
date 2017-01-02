@@ -278,17 +278,18 @@ public class Controller extends XboxControllerAdapter{
     {
         connector = messageConnector;
 
+        String baseDir=System.getProperty("user.dir");
+        if(baseDir.endsWith("honeybadger")){
+            baseDir+="executable";
+        }
+        baseDir+="\\bin";
         String arch = System.getProperty("os.arch");
         System.out.println(arch);
-        String path="";
-        if(arch.contains("x86")){
-            path="xboxcontroller.dll";
-        }
-        else{
-            path="xboxcontroller64.dll";
-        }
+        String dllPath = String.format("%s\\%s",baseDir,
+                arch.contains("x86")? "xboxcontroller.dll" : "xboxcontroller64.dll");
+
         connectedController = new XboxController(
-                System.getProperty("user.dir") +"\\"+path ,
+                dllPath,
                 1,
                 50,
                 50);
