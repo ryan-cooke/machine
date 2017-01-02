@@ -3,30 +3,18 @@ package Machine.desktop;
 
 import java.awt.Color;
 import java.awt.Graphics;
-import java.awt.Image;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
 import java.awt.image.WritableRaster;
-import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
-import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.imageio.ImageIO;
-import javax.swing.JFrame;
 import javax.swing.JPanel;
-
-import Machine.desktop.Disp;
 import org.opencv.core.*;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.video.BackgroundSubtractorMOG2;
-import org.opencv.video.Video;
 import org.opencv.videoio.VideoCapture;
 import org.opencv.videoio.VideoWriter;
 
@@ -159,25 +147,6 @@ public class JPanelOpenCV extends JPanel {
     public void paint(Graphics g) {
         g.drawImage(image, 0, 0, this);
     }
-
-    public JPanelOpenCV() {
-    }
-
-    public JPanelOpenCV(BufferedImage img) {
-        image = img;
-    }
-
-    //Show image on window
-    public void window(BufferedImage img, String text, int x, int y) {
-        JFrame frame0 = new JFrame();
-        frame0.getContentPane().add(new JPanelOpenCV(img));
-        frame0.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame0.setTitle(text);
-        frame0.setSize(img.getWidth(), img.getHeight() + 30);
-        frame0.setLocation(x, y);
-        frame0.setVisible(true);
-    }
-
     //Load an image
     public BufferedImage loadImage(String file) {
         BufferedImage img;
