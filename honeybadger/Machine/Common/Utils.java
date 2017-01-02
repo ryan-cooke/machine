@@ -58,7 +58,7 @@ public class Utils {
         return Math.min(Math.max(value,min),max);
     }
 
-    protected static SimpleDateFormat formatter = new SimpleDateFormat("HH:mm:ss");
+    protected static SimpleDateFormat formatter = new SimpleDateFormat("HH:mm:ss.SSS");
 
     public static void Log(String log){
         //Make a timestamp to go with message
