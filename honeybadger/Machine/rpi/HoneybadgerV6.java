@@ -36,6 +36,10 @@ public class HoneybadgerV6 {
      */
     private BadgerNetworkServer NetworkServer;
 
+    public boolean isListeningToController() {
+        return IsListeningToController;
+    }
+
     private boolean IsListeningToController;
 
     private boolean IsMoving;
@@ -55,7 +59,7 @@ public class HoneybadgerV6 {
         NetworkServer = new BadgerNetworkServer(this);
 
         IsMoving = false;
-        IsListeningToController = false;
+        IsListeningToController = true;
 
         FlywheelThrottleA = 0.f;
         FlywheelThrottleB = 0.f;
@@ -111,28 +115,28 @@ public class HoneybadgerV6 {
         //Change to a map with lambdas or something...
         switch (dir){
             case 'N':{ //up
-                isMoving = true;
+                IsMoving = true;
                 moveForward(throttle);
                 break;
             }
             case 'W':{ //left
-                isMoving = true;
+                IsMoving = true;
                 strafeLeft(throttle);
                 break;
             }
             case 'E':{ //right
-                isMoving = true;
+                IsMoving = true;
                 strafeRight(throttle);
                 break;
             }
             case 'S':{ //down
-                isMoving = true;
+                IsMoving = true;
                 moveBackward(throttle);
                 break;
             }
             case 'Z':{ //no dir
                 moveForward(0);
-                isMoving = false;
+                IsMoving = false;
                 break;
             }
             default:{
@@ -149,7 +153,7 @@ public class HoneybadgerV6 {
      * @param throttle a float between 0.0 and 1.0, as given by controller input (for example)
      */
     public void updateRotation(char dir, int throttle){
-        if( !isMoving){
+        if( !IsMoving){
             switch (dir){
                 case 'N':{
                     break;
@@ -238,11 +242,11 @@ public class HoneybadgerV6 {
     }
 
     public void handleBack(){
-        disallowController();
+        listenToController(false);
     }
 
     public void handleStart(){
-        allowController();
+        listenToController(true);
     }
 
     public void handleRBumper(){
@@ -273,13 +277,14 @@ public class HoneybadgerV6 {
 
     }
 
-    public void handleSDPad(){
+    public void handleSDPad() {
+    }
 
     /**
      * Move the conveyor in one direction
      * @param throttle a float between 0.0 and 1.0, as given by controller input (for example)
      */
-    public void updateConveyor(float throttle){
+    public void updateConveyor (float throttle){
         throttle = Utils.Clamp(throttle*100.f,0.f,100.f);
         MotorController.setDriveMotorSpeed(BadgerPWMProvider.CONVEYOR_A,throttle);
         MotorController.setDriveMotorSpeed(BadgerPWMProvider.CONVEYOR_B,throttle);
