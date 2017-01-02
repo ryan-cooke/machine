@@ -34,49 +34,63 @@ import static Machine.Common.Utils.ErrorLog;
 import static Machine.Common.Utils.Log;
 
 
-public class JPanelOpenCV extends JPanel{
-    public static JPanelOpenCV instance;
-    public static BufferedImage image;
-    Scalar lowerBlack = new Scalar(0,0,0);
-    Scalar upperBlack = new Scalar(180,255,90);
+public class JPanelOpenCV extends JPanel {
+    static JPanelOpenCV instance;
+    static BufferedImage image;
+    private Scalar lowerBlack = new Scalar(0, 0, 0);
+    private Scalar upperBlack = new Scalar(180, 255, 90);
 
-    Scalar lowerBlue = new Scalar(5,140,100);
-    Scalar upperBlue = new Scalar(20,255,255);
+    private Scalar lowerBlue = new Scalar(5, 140, 100);
+    private Scalar upperBlue = new Scalar(20, 255, 255);
 
-    Scalar lowerb = new Scalar(35,140,60);
-    Scalar upperb = new Scalar(70,255,255);
+    private Scalar lowerb = new Scalar(35, 140, 60);
+    private Scalar upperb = new Scalar(70, 255, 255);
 
     private static String ConnectURL;
     private static boolean ShouldDraw;
 
-    public static void main (String args[]) throws InterruptedException{
+    public static void main(String args[]) throws InterruptedException {
         JPanelOpenCV j1 = new JPanelOpenCV();
         j1.startLoop();
     }
 
-    public static void SetConnectionHost(String host){
-        ConnectURL = String.format("http://%s:8090/?action=stream",host);
+    public static void SetConnectionHost(String host) {
+        ConnectURL = String.format("http://%s:8090/?action=stream", host);
         ShouldDraw = true;
     }
 
-    synchronized public static void renderActive(boolean shouldDraw){
+    public void setGreen(Scalar upper, Scalar lower) {
+        lowerb = lower;
+        upperb = upper;
+    }
+
+    synchronized public static void renderActive(boolean shouldDraw) {
         ShouldDraw = shouldDraw;
     }
 
+    public void setBlue(Scalar upper, Scalar lower) {
+        upperBlue = upper;
+        lowerBlue = lower;
+    }
 
-    public void startLoop()
-    {
+    public void setBlack(Scalar upper, Scalar lower) {
+        upperBlack = upper;
+        lowerBlack = lower;
+    }
+
+
+    public void startLoop() {
         String arch = System.getProperty("os.arch");
         System.out.println(arch);
-        String openCVLib = arch.contains("x86")? "opencv_java310" : "opencv_java310_64";
-        String ffmpegLib = arch.contains("x86")? "opencv_ffmpeg310" : "opencv_ffmpeg310_64";
+        String openCVLib = arch.contains("x86") ? "opencv_java310" : "opencv_java310_64";
+        String ffmpegLib = arch.contains("x86") ? "opencv_ffmpeg310" : "opencv_ffmpeg310_64";
         System.loadLibrary(openCVLib);
         System.loadLibrary(ffmpegLib);
 
         //******VideoCapture camera = new VideoCapture("http://192.168.1.117:8090/?action=stream.mjpg");
         //TODO: For Joey: you might want to change the IP
         VideoCapture camera = new VideoCapture(ConnectURL);
-        if(!camera.isOpened()){
+        if (!camera.isOpened()) {
             ErrorLog("Error opening stream");
             return;
         }
@@ -86,30 +100,32 @@ public class JPanelOpenCV extends JPanel{
         Mat diffFrame = null;
         camera.read(frame);
 
-
-        int fourcc = VideoWriter.fourcc('I','Y','U','V');
+        int fourcc = VideoWriter.fourcc('I', 'Y', 'U', 'V');
         double fps = 10;
 
-        Size s = new Size(640,480);
-        System.out.println("the fourcc code it "+fourcc);
+        Size s = new Size(640, 480);
+        System.out.println("the fourcc code it " + fourcc);
 
-
-        if(!camera.isOpened()){
+        if (!camera.isOpened()) {
             Log("Error 1 again");
         }
 
-        int count =0;
+        int count = 0;
         double rstTime = System.currentTimeMillis();
-        int secondsRec=300;
+        int secondsRec = 300;
+
 
         Mat resized = new Mat();
-        Size outputSize = new Size(640,480);
-        while(ShouldDraw)
-        {
+        Size outputSize = new Size(640, 480);
+        while (ShouldDraw) {
             camera.read(frame);
-            color(lowerb,upperb,upperBlue,lowerBlue,frame);
+            color(frame);
 
-            //if(System.currentTimeMillis()-rstTime>1000){System.out.println(count);rstTime=System.currentTimeMillis();count=0;secondsRec--;}
+            //if (System.currentTimeMillis() - rstTime > 1000) {
+            System.out.println(count);
+            rstTime = System.currentTimeMillis();
+            count = 0;
+            secondsRec--;
 
             image = instance.MatToBufferedImage(frame);
             try {
@@ -118,10 +134,12 @@ public class JPanelOpenCV extends JPanel{
                 e.printStackTrace();
             }
             count++;
-            if(secondsRec<0){break;}
+            if (secondsRec < 0) {
+                break;
+            }
 
             //@foxtrot94: resize whatever stream to 640x480
-            Imgproc.resize(frame,resized,outputSize);
+            Imgproc.resize(frame, resized, outputSize);
             image = MatToBufferedImage(resized);
             instance.invalidate();
             instance.repaint();
@@ -131,15 +149,14 @@ public class JPanelOpenCV extends JPanel{
         camera.release();
     }
 
-    public void color(Scalar greenMin, Scalar greenMax,Scalar blueMin,Scalar blueMax,Mat frame) {
+    public void color(Mat frame) {
         Mat original = frame.clone();
         Mat hsv = original.clone();
         Mat hsv2 = original.clone();
         Mat hsv3 = original.clone();
         Mat hough = original.clone();
 
-        Imgproc.cvtColor(original,hsv,Imgproc.COLOR_RGB2HSV);
-
+        Imgproc.cvtColor(original, hsv, Imgproc.COLOR_RGB2HSV);
 
         hsv2 = hsv.clone();
         hsv3 = hsv.clone();
@@ -148,20 +165,16 @@ public class JPanelOpenCV extends JPanel{
         Core.inRange(hsv2, lowerBlue, upperBlue, hsv2);
         Core.inRange(hsv3, lowerBlack, upperBlack, hsv3);
 
-        hsv=erodeDilate(hsv,10,3);
-        hsv2=erodeDilate(hsv2,10,3);
-        hsv3=erodeDilate(hsv3,10,3);
+        hsv = erodeDilate(hsv, 10, 3);
+        hsv2 = erodeDilate(hsv2, 10, 3);
+        hsv3 = erodeDilate(hsv3, 10, 3);
 
+        frame = searchForMovement(hsv, frame, "green");
+        frame = searchForMovement(hsv2, frame, "blue");
 
-        frame=searchForMovement(hsv,frame,"green");
-        frame=searchForMovement(hsv2,frame,"blue");
-
-        frame=searchLine(hough,frame);
-        frame=drawCrosshair(frame, 30, 250, 250,new Scalar(0,0,255));
+        frame = searchLine(hough, frame);
+        frame = drawCrosshair(frame, 30, 250, 250, new Scalar(0, 0, 255));
     }
-
-
-
 
     @Override
     public void paint(Graphics g) {
@@ -231,7 +244,6 @@ public class JPanelOpenCV extends JPanel{
                 img.setRGB(j, i, newColor.getRGB());
             }
         }
-
         return img;
     }
 
@@ -253,18 +265,17 @@ public class JPanelOpenCV extends JPanel{
         return image;
     }
 
-    public static void processFrame(VideoCapture capture, Mat mRgba, Mat mFGMask,BackgroundSubtractorMOG2 mBGSub)
-    {
-        mBGSub.apply(mRgba, mFGMask,0.005);
-        Imgproc.cvtColor(mFGMask, mRgba, Imgproc.COLOR_GRAY2BGRA,0);
+    public static void processFrame(VideoCapture capture, Mat mRgba, Mat mFGMask, BackgroundSubtractorMOG2 mBGSub) {
+        mBGSub.apply(mRgba, mFGMask, 0.005);
+        Imgproc.cvtColor(mFGMask, mRgba, Imgproc.COLOR_GRAY2BGRA, 0);
 
-        Mat erode = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(2,2));
+        Mat erode = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(2, 2));
 
-        Mat dilate = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(2,2));
+        Mat dilate = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(2, 2));
 
-        Mat openElem = Imgproc.getStructuringElement(Imgproc.MORPH_RECT,new Size(3,3), new Point(1,1));
+        Mat openElem = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(3, 3), new Point(1, 1));
 
-        Mat closeElem = Imgproc.getStructuringElement(Imgproc.MORPH_RECT,new Size(7, 7), new Point(3, 3));
+        Mat closeElem = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(7, 7), new Point(3, 3));
 
         Imgproc.threshold(mFGMask, mFGMask, 30, 259, Imgproc.THRESH_BINARY);
         Imgproc.morphologyEx(mFGMask, mFGMask, Imgproc.MORPH_OPEN, erode);
@@ -273,8 +284,7 @@ public class JPanelOpenCV extends JPanel{
         Imgproc.morphologyEx(mFGMask, mFGMask, Imgproc.MORPH_CLOSE, closeElem);
     }
 
-    public static Mat searchForMovement(Mat thresholdImage, Mat frame,String color)
-    {
+    public static Mat searchForMovement(Mat thresholdImage, Mat frame, String color) {
 
         List<MatOfPoint> contours = new ArrayList<MatOfPoint>();
         Mat hierarchy = new Mat();
@@ -282,51 +292,50 @@ public class JPanelOpenCV extends JPanel{
                 Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
 
         Rect objectBoundingRectangle = new Rect(0, 0, 0, 0);
-        for (int i = 0; i < contours.size(); i++)
-        {
+        for (int i = 0; i < contours.size(); i++) {
             objectBoundingRectangle = Imgproc.boundingRect(contours.get(i));
-            objectBoundingRectangle.width-=13;
-            objectBoundingRectangle.x+=3;
-            boolean skinnyRect=false;
-            if(objectBoundingRectangle.width==0){}else
-            if (objectBoundingRectangle.height/objectBoundingRectangle.width>3){skinnyRect=true;}
+            objectBoundingRectangle.width -= 13;
+            objectBoundingRectangle.x += 3;
+            boolean skinnyRect = false;
+            if (objectBoundingRectangle.width == 0) {
+            } else if (objectBoundingRectangle.height / objectBoundingRectangle.width > 3) {
+                skinnyRect = true;
+            }
 
 
-            if(skinnyRect){
-                Imgproc.rectangle(frame, objectBoundingRectangle.tl(), objectBoundingRectangle.br(), new Scalar(0,255,0));
-                System.out.println("width of rect is "+objectBoundingRectangle.width+"it is "+color);
+            if (skinnyRect) {
+                Imgproc.rectangle(frame, objectBoundingRectangle.tl(), objectBoundingRectangle.br(), new Scalar(0, 255, 0));
+                System.out.println("width of rect is " + objectBoundingRectangle.width + "it is " + color);
             }
         }
         return frame;
         //drawnWindow.showImage(frame);
     }
 
-    public static Mat searchCircle(Mat rawMat, Mat out)
-    {
+    public static Mat searchCircle(Mat rawMat, Mat out) {
         Mat raw = rawMat;
         Mat greyscale = new Mat();
         Imgproc.cvtColor(raw, greyscale, Imgproc.COLOR_BGR2GRAY);
-        Imgproc.GaussianBlur(greyscale, greyscale, new Size(9, 9), 2, 2 );
+        Imgproc.GaussianBlur(greyscale, greyscale, new Size(9, 9), 2, 2);
         Mat circles = new Mat();
 
-        Imgproc.HoughCircles(greyscale, circles, Imgproc.CV_HOUGH_GRADIENT, 1, (double)greyscale.rows()/8, 50, 80,0,0);
+        Imgproc.HoughCircles(greyscale, circles, Imgproc.CV_HOUGH_GRADIENT, 1, (double) greyscale.rows() / 8, 50, 80, 0, 0);
         System.out.println("got here");
         System.out.println(circles);
-        for (int i = 0; i < circles.cols(); i++){
+        for (int i = 0; i < circles.cols(); i++) {
             double[] vecCircle = circles.get(0, i);
 
             int x = (int) vecCircle[0];
             int y = (int) vecCircle[1];
             int r = (int) vecCircle[2];
-            Imgproc.circle(out, new Point(x,y), r, new Scalar(0,0,255),10);
-            System.out.println("x detected as "+ x);
+            Imgproc.circle(out, new Point(x, y), r, new Scalar(0, 0, 255), 10);
+            System.out.println("x detected as " + x);
         }
 
         return out;
     }
 
-    public static Mat searchLine(Mat rawMat, Mat out)
-    {
+    public static Mat searchLine(Mat rawMat, Mat out) {
         Mat raw = rawMat;
         Mat edges = new Mat();
         Mat greyscale = new Mat();
@@ -343,11 +352,10 @@ public class JPanelOpenCV extends JPanel{
         int minLineSize = 100;
         int lineGap = 5;
 
-        Imgproc.HoughLinesP(edges, lines, 1, Math.PI/180, threshold, minLineSize, lineGap);
-
+        Imgproc.HoughLinesP(edges, lines, 1, Math.PI / 180, threshold, minLineSize, lineGap);
 
     	  /*  for (int i = 0; i < lines.rows(); i++)
-    	    {
+            {
     	    	double linesAr[] = lines.get(i,0);
     	    	 double rho = linesAr[0], theta = linesAr[1];
 
@@ -365,12 +373,13 @@ public class JPanelOpenCV extends JPanel{
     	          Imgproc.line(out, pt1, pt2, new Scalar(255,0,0));
 
     	    }*/
-        for(int i = 0; i < lines.cols(); i++) {
+        for (int i = 0; i < lines.cols(); i++) {
             double[] val = lines.get(0, i);
 
-            double rise= Math.abs(val[3]-val[1]);
-            double run= Math.abs(val[2]-val[0]);
-            if ((rise/run)>0.8){}else{
+            double rise = Math.abs(val[3] - val[1]);
+            double run = Math.abs(val[2] - val[0]);
+            if ((rise / run) > 0.8) {
+            } else {
 
                 Imgproc.line(out, new Point(val[0], val[1]), new Point(val[2], val[3]), new Scalar(0, 0, 255), 2);
             }
@@ -381,9 +390,8 @@ public class JPanelOpenCV extends JPanel{
 
     }
 
-    public static Mat erodeDilate(Mat inMat,int dilate, int erode)
-    {
-        Mat out=inMat;
+    public static Mat erodeDilate(Mat inMat, int dilate, int erode) {
+        Mat out = inMat;
         Mat dilateElement = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(dilate, dilate));
         Mat erodeElement = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(erode, erode));
 
@@ -393,19 +401,17 @@ public class JPanelOpenCV extends JPanel{
         Imgproc.dilate(inMat, out, dilateElement);
         Imgproc.dilate(inMat, out, dilateElement);
 
-
         return out;
 
     }
 
-    public static Mat drawCrosshair(Mat inMat, int radius, int centerX, int centerY,Scalar color)
-    {
+    public static Mat drawCrosshair(Mat inMat, int radius, int centerX, int centerY, Scalar color) {
         Mat cross = inMat;
-        Point center = new Point(centerX,centerY);
-        Point top = new Point(centerX,centerY+30);
-        Point bot = new Point(centerX,centerY-30);
-        Point left = new Point(centerX-30,centerY);
-        Point right = new Point(centerX+30,centerY);
+        Point center = new Point(centerX, centerY);
+        Point top = new Point(centerX, centerY + 30);
+        Point bot = new Point(centerX, centerY - 30);
+        Point left = new Point(centerX - 30, centerY);
+        Point right = new Point(centerX + 30, centerY);
         Imgproc.circle(cross, center, radius, color);
         Imgproc.line(cross, center, top, color);
         Imgproc.line(cross, center, bot, color);

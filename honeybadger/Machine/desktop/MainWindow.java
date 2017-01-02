@@ -2,6 +2,7 @@ package Machine.desktop;
 
 import Machine.Common.Constants;
 import org.opencv.core.Core;
+import Machine.Common.Shell;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.Size;
@@ -49,6 +50,7 @@ public class MainWindow {
     private ArrayList<String> inputHistory;
     private int inputOffset;
     private double fontSize;
+    private JMenuItem openCVConfigMenuItem;
 
     private static String ConnectionIP;
 
@@ -189,6 +191,14 @@ public class MainWindow {
             }
         });
 
+        openCVConfigMenuItem = new JMenuItem("OpenCV Config");
+        openCVConfigMenuItem.setMnemonic(KeyEvent.VK_C);
+        openCVConfigMenuItem.setToolTipText("Open the OpenCV Configuration panel");
+        openCVConfigMenuItem.addActionListener((ActionEvent event) -> {
+            OpenCVConfig.main(new String[0]);
+        });
+
+
         fontSizeIncrease = new JMenuItem("Increase Font Size");
         fontSizeIncrease.setMnemonic(KeyEvent.VK_PLUS);
         fontSizeIncrease.setToolTipText("Increases the font size");
@@ -204,6 +214,7 @@ public class MainWindow {
         });
 
         file.add(exit);
+        file.add(openCVConfigMenuItem);
         view.add(fontSizeIncrease);
         view.add(fontSizeDecrease);
 
@@ -230,6 +241,7 @@ public class MainWindow {
         setFontSize(size, exit);
         setFontSize(size, fontSizeIncrease);
         setFontSize(size, fontSizeDecrease);
+        setFontSize(size, openCVConfigMenuItem);
         setFontSize(size, file);
         setFontSize(size, view);
         contentPane.updateUI();
@@ -248,6 +260,7 @@ public class MainWindow {
         setFontSize(size, exit);
         setFontSize(size, fontSizeIncrease);
         setFontSize(size, fontSizeDecrease);
+        setFontSize(size, openCVConfigMenuItem);
         setFontSize(size, file);
         setFontSize(size, view);
         contentPane.updateUI();
@@ -396,7 +409,7 @@ public class MainWindow {
     public static String promptForIP() {
         String ConnectionIP = JOptionPane.showInputDialog(
                 "Honeybadger IP: ",
-                "192.168.0.1");
+                "192.168.137.69");
 
         if (ConnectionIP == null) {
             JOptionPane.showMessageDialog(null,
@@ -411,17 +424,27 @@ public class MainWindow {
     public static void main(String[] args) {
         Constants.setActivePlatform(Constants.PLATFORM.DESKTOP_GUI);
 
-        if (Toolkit.getDefaultToolkit().getScreenSize().getWidth() > 1920) {
-            UIManager.put("OptionPane.messageFont", new Font(null, Font.PLAIN, 24) );
-            UIManager.put("OptionPane.buttonFont", new Font(null, Font.PLAIN, 24) );
-            UIManager.put("TextField.font", new Font(null, Font.PLAIN, 24) );
-        }
-
         //Try changing the theme
         try {
             UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
         } catch (Exception e) {
             ErrorLog("Unable to change theme");
+        }
+
+        if (Toolkit.getDefaultToolkit().getScreenSize().getWidth() > 1920) {
+            Font highDPI = new Font(null, Font.PLAIN, 24);
+            UIManager.put("MenuBar.font", highDPI);
+            UIManager.put("Menu.font", highDPI);
+            UIManager.put("MenuItem.font", highDPI);
+            UIManager.put("Slider.thumbHeight", 34);
+            UIManager.put("Slider.thumbWidth", 34);
+            UIManager.put("OptionPane.messageFont", highDPI);
+            UIManager.put("OptionPane.buttonFont", highDPI);
+            UIManager.put("TextField.font", highDPI);
+            UIManager.put("TextArea.font", highDPI);
+            UIManager.put("Label.font", highDPI);
+            UIManager.put("Button.font", highDPI);
+            UIManager.put("ToolTip.font", highDPI);
         }
 
         //Get the IP first.
