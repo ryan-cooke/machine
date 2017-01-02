@@ -179,59 +179,59 @@ public class HoneybadgerV6 {
     }
 
     public void handleButtonPress(HashMap<Button, Boolean> buttons){
-        if (buttons.get(Button.A) && buttonsPressed.get(Button.A)){
+        if (buttons.get(Button.A) && !buttonsPressed.get(Button.A)){
             buttonsPressed.replace(Button.A, true);
             handleA();
         }
-        if (buttons.get(Button.B) && buttonsPressed.get(Button.B)){
+        if (buttons.get(Button.B) && !buttonsPressed.get(Button.B)){
             buttonsPressed.replace(Button.B, true);
             handleB();
         }
-        if (buttons.get(Button.X) && buttonsPressed.get(Button.X)){
+        if (buttons.get(Button.X) && !buttonsPressed.get(Button.X)){
             buttonsPressed.replace(Button.X, true);
             handleX();
         }
-        if (buttons.get(Button.Y) && buttonsPressed.get(Button.Y)){
+        if (buttons.get(Button.Y) && !buttonsPressed.get(Button.Y)){
             buttonsPressed.replace(Button.A, true);
             handleY();
         }
-        if (buttons.get(Button.BACK) && buttonsPressed.get(Button.BACK)){
+        if (buttons.get(Button.BACK) && !buttonsPressed.get(Button.BACK)){
             buttonsPressed.replace(Button.BACK, true);
             handleBack();
         }
-        if (buttons.get(Button.START) && buttonsPressed.get(Button.START)){
+        if (buttons.get(Button.START) && !buttonsPressed.get(Button.START)){
             buttonsPressed.replace(Button.START, true);
             handleStart();
         }
-        if (buttons.get(Button.RBUMPER) && buttonsPressed.get(Button.RBUMPER)){
+        if (buttons.get(Button.RBUMPER) && !buttonsPressed.get(Button.RBUMPER)){
             buttonsPressed.replace(Button.RBUMPER, true);
             handleRBumper();
         }
-        if (buttons.get(Button.LBUMPER) && buttonsPressed.get(Button.LBUMPER)){
+        if (buttons.get(Button.LBUMPER) && !buttonsPressed.get(Button.LBUMPER)){
             buttonsPressed.replace(Button.LBUMPER, true);
             handleLBumper();
         }
-        if (buttons.get(Button.RTHUMB) && buttonsPressed.get(Button.RTHUMB)){
+        if (buttons.get(Button.RTHUMB) && !buttonsPressed.get(Button.RTHUMB)){
             buttonsPressed.replace(Button.RTHUMB, true);
             handleRThumb();
         }
-        if (buttons.get(Button.LTHUMB) && buttonsPressed.get(Button.LTHUMB)){
+        if (buttons.get(Button.LTHUMB) && !buttonsPressed.get(Button.LTHUMB)){
             buttonsPressed.replace(Button.LTHUMB, true);
             handleLThumb();
         }
-        if (buttons.get(Button.NDPAD) && buttonsPressed.get(Button.NDPAD)){
+        if (buttons.get(Button.NDPAD) && !buttonsPressed.get(Button.NDPAD)){
             buttonsPressed.replace(Button.NDPAD, true);
             handleNDPad();
         }
-        if (buttons.get(Button.EDPAD) && buttonsPressed.get(Button.EDPAD)){
+        if (buttons.get(Button.EDPAD) && !buttonsPressed.get(Button.EDPAD)){
             buttonsPressed.replace(Button.EDPAD, true);
             handleEDPad();
         }
-        if (buttons.get(Button.WDPAD) && buttonsPressed.get(Button.WDPAD)){
+        if (buttons.get(Button.WDPAD) && !buttonsPressed.get(Button.WDPAD)){
             buttonsPressed.replace(Button.WDPAD, true);
             handleWDPad();
         }
-        if (buttons.get(Button.SDPAD) && buttonsPressed.get(Button.SDPAD)){
+        if (buttons.get(Button.SDPAD) && !buttonsPressed.get(Button.SDPAD)){
             buttonsPressed.replace(Button.SDPAD, true);
             handleSDPad();
         }
