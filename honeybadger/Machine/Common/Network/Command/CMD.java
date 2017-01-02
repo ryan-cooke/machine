@@ -14,7 +14,7 @@ import static Machine.Common.Utils.Log;
  * Namespace class for classes implementing the IBadgerFunction interface
  */
 public class CMD {
-    public static abstract class MotorFunction implements IBadgerFunction{
+    public static abstract class CheckedFunction implements IBadgerFunction{
         protected BadgerMotorController BMC;
 
         protected boolean areParametersValid(String[] params){
@@ -35,7 +35,7 @@ public class CMD {
         }
     }
 
-    public static class setGPIO extends MotorFunction{
+    public static class setGPIO extends CheckedFunction {
         public setGPIO(){}
 
         @Override
@@ -61,7 +61,7 @@ public class CMD {
         }
     }
 
-    public static class setPWM extends MotorFunction{
+    public static class setPWM extends CheckedFunction {
         public setPWM(){}
 
         @Override
@@ -90,7 +90,7 @@ public class CMD {
         }
     }
 
-    public static class setAbsPWM extends MotorFunction{
+    public static class setAbsPWM extends CheckedFunction {
         public setAbsPWM(){}
 
         @Override
@@ -118,7 +118,7 @@ public class CMD {
         }
     }
 
-    public static class sweepPWM extends MotorFunction{
+    public static class sweepPWM extends CheckedFunction {
         public sweepPWM(){}
 
         @Override
@@ -163,7 +163,7 @@ public class CMD {
         }
     }
 
-    public static class setMotor extends MotorFunction{
+    public static class setMotor extends CheckedFunction {
         public setMotor(){}
 
         @Override
@@ -193,7 +193,7 @@ public class CMD {
         }
     }
 
-    public static class servo extends MotorFunction{
+    public static class servo extends CheckedFunction {
         @Override
         public boolean Invoke(HoneybadgerV6 badger, String[] params) {
             if(!super.Invoke(badger,params)){
@@ -218,30 +218,7 @@ public class CMD {
         }
     }
 
-    public static class flywheel extends MotorFunction{
-        @Override
-        public boolean Invoke(HoneybadgerV6 badger, String[] params) {
-            if(!super.Invoke(badger,params)){
-                return false;
-            }
-
-            float percent = Float.parseFloat(params[0]);
-            badger.setFlywheelSpeed(percent);
-            return true;
-        }
-
-        @Override
-        public String Explain() {
-            return "\"flywheel <Percent throttle of flywheel range>\"";
-        }
-
-        @Override
-        public int MinimumParameterNum() {
-            return 1;
-        }
-    }
-
-    public static class setConveyor extends MotorFunction{
+    public static class setConveyor extends CheckedFunction {
         @Override
         public boolean Invoke(HoneybadgerV6 badger, String[] params) {
             if(!super.Invoke(badger,params)){
@@ -257,7 +234,7 @@ public class CMD {
 
         @Override
         public String Explain() {
-            return "\"setConveyor <Direction (0,1)> <Throttle percent>\"";
+            return "\"CMD setConveyor <Direction (0,1)> <Throttle percent>\"";
         }
 
         @Override
@@ -266,7 +243,7 @@ public class CMD {
         }
     }
 
-    public static class setAllDriveMotors extends MotorFunction{
+    public static class setAllDriveMotors extends CheckedFunction {
         @Override
         public boolean Invoke(HoneybadgerV6 badger, String[] params) {
             if(!super.Invoke(badger,params)){
@@ -283,7 +260,7 @@ public class CMD {
 
         @Override
         public String Explain() {
-            return "\"setAllDriveMotors <Throttle percent>\"";
+            return "\"CMD setAllDriveMotors <Throttle percent>\"";
         }
 
         @Override
@@ -319,7 +296,155 @@ public class CMD {
 
         @Override
         public String Explain() {
-            return "\'ack <anything>\'";
+            return "\'CMD ack <anything>\'";
+        }
+
+        @Override
+        public int MinimumParameterNum() {
+            return 1;
+        }
+    }
+
+    //Implements basic movement
+    public static class move extends CheckedFunction{
+        @Override
+        public boolean Invoke(HoneybadgerV6 badger, String[] params) {
+            if(!super.Invoke(badger,params)){
+                return false;
+            }
+            char direction = params[0].toLowerCase().charAt(0);
+            float throttle = Float.parseFloat(params[1]);
+
+            switch (direction){
+                case 'f':{
+                    badger.moveForward(throttle);
+                    break;
+                }
+                case 'b':{
+                    badger.moveBackward(throttle);
+                    break;
+                }
+                case 'l':{
+                    badger.strafeLeft(throttle);
+                    break;
+                }
+                case 'r':{
+                    badger.strafeRight(throttle);
+                    break;
+                }
+                default:{
+                    badger.moveForward(0);
+                    break;
+                }
+            }
+
+            return true;
+        }
+
+        @Override
+        public String Explain() {
+            return "\'CMD move <F,B,L,R> <Throttle Percent>\'";
+        }
+
+        @Override
+        public int MinimumParameterNum() {
+            return 2;
+        }
+    }
+
+    public static class primeCannon extends CheckedFunction{
+        @Override
+        public boolean Invoke(HoneybadgerV6 badger, String[] params) {
+            if(!super.Invoke(badger,params)){
+                return false;
+            }
+            int input = Integer.parseInt(params[0]);
+            if(input!=0 && input!=1){
+                return false;
+            }
+
+            boolean useFlywheel = input==1;
+            if(useFlywheel){
+                badger.sendDebugMessageToDesktop("Arming flywheel");
+                badger.armFlywheel();
+            }
+            else{
+                badger.sendDebugMessageToDesktop("Disarming!");
+                badger.disarmFlywheel();
+            }
+
+            return true;
+        }
+
+        @Override
+        public String Explain() {
+            return "\'CMD primeCannon <1: arm and speed up | 0: disarm>\'";
+        }
+
+        @Override
+        public int MinimumParameterNum() {
+            return 1;
+        }
+    }
+
+    public static class rampFlywheel extends CheckedFunction{
+        @Override
+        public boolean Invoke(HoneybadgerV6 badger, String[] params) {
+            if(!super.Invoke(badger,params)){
+                return false;
+            }
+            int input = Integer.parseInt(params[0]);
+            if(input!=0 && input!=1){
+                return false;
+            }
+
+            float updateFactor = (float) input;
+
+            try {
+                badger.sendDebugMessageToDesktop(String.format("Ramping flywheel with update factor %f",updateFactor));
+                Thread.sleep(1000);
+                for (int i = 0; i < 200; i++) {
+                    badger.updateFlywheel(updateFactor);
+                    Thread.sleep(500);//200*.5 = 100 seconds to fully ramp up
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+                return false;
+            }
+
+            return true;
+        }
+
+        @Override
+        public String Explain() {
+            return "\'CMD rampFlywheel <1: ramp up | 0: ramp down>\'";
+        }
+
+        @Override
+        public int MinimumParameterNum() {
+            return 1;
+        }
+    }
+
+    public static class useController extends CheckedFunction{
+        @Override
+        public boolean Invoke(HoneybadgerV6 badger, String[] params) {
+            if(!super.Invoke(badger,params)){
+                return false;
+            }
+            int input = Integer.parseInt(params[0]);
+            if(input!=0 && input!=1){
+                return false;
+            }
+
+            badger.listenToController(input==1);
+
+            return true;
+        }
+
+        @Override
+        public String Explain() {
+            return "\'CMD useController <1: yes | 0: no>\'";
         }
 
         @Override

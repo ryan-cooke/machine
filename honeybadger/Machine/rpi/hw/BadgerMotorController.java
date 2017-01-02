@@ -1,17 +1,18 @@
 package Machine.rpi.hw;
 
 import Machine.rpi.HoneybadgerV6;
-import Machine.rpi.NetworkDebuggable;
+
 import com.pi4j.io.gpio.*;
 import com.pi4j.io.i2c.I2CBus;
 import com.pi4j.io.i2c.I2CFactory;
 
+import static Machine.Common.Utils.ErrorLog;
 import static Machine.Common.Utils.Log;
 
 /***
  * Simple class to manage the I2C communication with the PCA9685.
  */
-public class BadgerMotorController extends NetworkDebuggable{
+public class BadgerMotorController {
     /**
      * Boolean to check that the expected RPi hardware is present and ready
      */
@@ -47,7 +48,9 @@ public class BadgerMotorController extends NetworkDebuggable{
      */
     private GpioProvider RPIProvider;
 
-
+    /**
+     * Object that wraps the interface to Hardware GPIO pins.
+     */
     private GpioController GPIO;
 
     /**
@@ -66,13 +69,13 @@ public class BadgerMotorController extends NetworkDebuggable{
      * Calling setPWM on the flywheel motors with this value will arm them.
      * Subsequent calls to setPWM  with this value will stop the motors from spinning.
      */
-    public static final int FLYWHEEL_PERCENT_MIN = 10;
+    public static final float FLYWHEEL_PERCENT_MIN = 10.f;
 
     /**
      * Highest percent for Flywheel PWM to be set.
      * DANGER! NEVER SET AT THIS VALUE IMMEDIATELY IN ONE SHOT!
      */
-    public static final int FLYWHEEL_PERCENT_MAX = 90;
+    public static final float FLYWHEEL_PERCENT_MAX = 90.f;
 
     /**
      * Constant that defines integer representation of clockwise rotation
@@ -114,11 +117,9 @@ public class BadgerMotorController extends NetworkDebuggable{
             Log("Badger Motor Controller Ready");
         }
         catch (Exception e){
-            //TODO: Should be a harder warning
             e.printStackTrace();
             String message = "ERROR: THE EXPECTED DEVICES WERE NOT AVAILABLE";
-            HoneybadgerV6.getInstance().sendCriticalMessageToDesktop(message,e);
-            Log(message);
+            ErrorLog(message);
         }
     }
 
@@ -145,9 +146,8 @@ public class BadgerMotorController extends NetworkDebuggable{
                 GPIO.provisionPwmOutputPin(PWMProvider, BadgerPWMProvider.VACUUM_ROLLER, "Vacuum Roller - VAC"),
                 GPIO.provisionPwmOutputPin(PWMProvider, BadgerPWMProvider.FLYWHEEL_A, "Flywheel A - BS1"),
                 GPIO.provisionPwmOutputPin(PWMProvider, BadgerPWMProvider.FLYWHEEL_B, "Flywheel B - BS2"),
-//                GPIO.provisionPwmOutputPin(PWMProvider, BadgerPWMProvider.CLIMBING_ARM, "Climbing Arm - RND1"),
-//                GPIO.provisionPwmOutputPin(PWMProvider, BadgerPWMProvider.CLIMBING_WRIST, "Climbing Wrist - RND2"),
-//                GPIO.provisionPwmOutputPin(PWMProvider, BadgerPWMProvider.SHOOTING_AIM_ADJUST, "Shooting aim adjust - RND3")
+
+                GPIO.provisionPwmOutputPin(PWMProvider, BadgerPWMProvider.CLIMBING_MOTOR,"Climbing Motor - CM"),
         };
     }
 
@@ -172,25 +172,24 @@ public class BadgerMotorController extends NetworkDebuggable{
     /**
      * Sets the speed percentage, value from 0 to 100, for a given TLE chip-controlled motor.
      *
-     * Actual speed of the motor is maxed out at at 80% at Ryan's request
+     * Actual speed of the motor is limited to only 80% of the maximum output to avoid passing an overvoltage
      * therefore, percentage parameter is used to scale motor speed based on the Max PWM value.
      * @param pin PCA9685Pin for the motor whose speed will be set
      * @param speedPercent Speed to set the motor too, int value from 0 to 100
      */
     public void setDriveMotorSpeed(Pin pin, float speedPercent) {
-        if(!IsReady){
+        if(!IsReady||pin==null){
             return;
         }
 
         if (speedPercent < 0 || speedPercent > 100){
-            Log("[BadgerMotorController.setDriveSpeed] Speed percentage out of range. Must be INT between 0 and " +
-                    "100");
+            Log("[BadgerMotorController.setDriveSpeed] Speed percentage out of range.");
             return;
         }
 
-        //TODO: REVIEW!!!
         float percent = speedPercent/100.f;
         int PWMtime = (int)(DRIVE_PWM_MAX - ((percent)* DRIVE_PWM_MAX));
+
         //Overdrive option
         if(DriveMotorLimiting){
             PWMtime += DRIVE_PWM_MIN;
@@ -199,6 +198,9 @@ public class BadgerMotorController extends NetworkDebuggable{
         this.PWMProvider.setPwm(pin, 0, PWMtime);
     }
 
+    /**
+     * Automatically stop all known Drive Motors hooked up to the TLE H-Bridge chip
+     */
     public void stopDriveMotors(){
         for(Pin motor : BadgerPWMProvider.DriveMotors) {
             this.PWMProvider.setAlwaysOn(motor);
@@ -210,9 +212,8 @@ public class BadgerMotorController extends NetworkDebuggable{
      * @param pin RaspberryPI pin that controlling direction of the desired motor. EX: RPI.DRIVE_FRONT_LEFT
      * @param direction Direction in which the motor will rotate. EX: BadgerMotorController.CLOCKWISE or BadgerMotorController.COUNTER_CLOCKWISE
      */
-    //TODO: TEST THIS METHOD WITH A MOTOR
     public void setDriveMotorDirection(Pin pin, int direction) {
-        if(!IsReady){
+        if(!IsReady || pin==null){
             return;
         }
 
@@ -221,11 +222,16 @@ public class BadgerMotorController extends NetworkDebuggable{
         else if (direction == COUNTER_CLOCKWISE)
             this.RPIProvider.setState(pin, PinState.HIGH);
         else
-            System.out.println("[BadgerMotorController.setMotorDirection] Invalid motor direction given");
+            Log("[BadgerMotorController.setMotorDirection] Invalid motor direction given");
     }
 
+    /**
+     * Set a percentage value on a PWM Provider pin instance. The percentage is a raw value
+     * @param pin The pin object, as seen by the PWM Provider
+     * @param value Percentage between 0.0% and 100% to which to set the value
+     */
     public void setPWM(Pin pin, float value){
-        if(!IsReady){
+        if(!IsReady || pin==null){
             return;
         }
 
@@ -233,10 +239,14 @@ public class BadgerMotorController extends NetworkDebuggable{
         int PWMOffTime = (int)scaledThrottle;
         PWMOffTime = PWMOffTime<1? 1 : PWMOffTime;
 
-        SendDebugMessage(String.format("PWM:%s - value: %f",pin.getName(),value));
         this.PWMProvider.setPwm(pin, 0, PWMOffTime);
     }
 
+    /**
+     * Send a position command to a known servo over serial UART
+     * @param servoID The Unique ID of the servo being referred to
+     * @param position A position, between 0 and 1023, to which to set the servo
+     */
     public void setServoPosition(int servoID, int position){
         if(!IsReady){
             return;
@@ -244,13 +254,23 @@ public class BadgerMotorController extends NetworkDebuggable{
         this.SerialServo.SetPosition((byte)(servoID&0xFF),250,position);
     }
 
+    /**
+     * Set an absolute time for a PWM signal to fire
+     * @param pin The pin object, as seen by the PWM Provider
+     * @param val Time in microseconds
+     */
     public void setAbsPWM(Pin pin, int val){
-        if(!IsReady){
+        if(!IsReady||pin==null){
             return;
         }
         this.PWMProvider.setPwm(pin,val);
     }
 
+    /**
+     * Sets the overdrive value on the motor driven by the TLE H-Bridge
+     * WARNING: By using overdrive for extended periods of time, there is a risk of irreversibly damaging the motors
+     * @param active Indicate whether overdrive should be active or not.
+     */
     public void setOverdrive(boolean active){
         DriveMotorLimiting = !active;
     }

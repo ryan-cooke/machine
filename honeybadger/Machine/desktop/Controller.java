@@ -1,137 +1,195 @@
 package Machine.desktop;
 
-import Machine.Common.Network.BaseMsg;
 import Machine.Common.Network.ControllerMessage;
-import Machine.Common.Utils;
-
-import Machine.rpi.hw.BadgerMotorController;
 import ch.aplu.xboxcontroller.*;
 
-import java.nio.file.SecureDirectoryStream;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
+
+import static Machine.Common.Utils.Log;
 
 
 public class Controller extends XboxControllerAdapter{
 
-    private String path = "xboxcontroller64.dll";
+    private final ScheduledExecutorService ScheduledManager;
+
     private NetworkConnector connector;
     private XboxController connectedController;
 
-    private Utils.Vector2D RightThumbstick;
-    private Utils.Vector2D LeftThumbstick;
+    private ControllerMessage controllerState;
 
-    private float FlywheelSpeed;
+    private ScheduledFuture<?> ControllerMessageSender;
 
-    private void SendMessage(String msg){
-        connector.SendMessage(msg);
+    private void press(ControllerMessage.Button button){
+        controllerState.setButtonsPressed(controllerState.getButtonsPressed()+1);
+        controllerState.buttons.replace(button, true);
     }
-
-    private void SendMessage(BaseMsg msg){
-        connector.SendMessage(msg);
+    
+    private void depress(ControllerMessage.Button button){
+        controllerState.setButtonsPressed(controllerState.getButtonsPressed()-1);
+        controllerState.buttons.replace(button, false);
     }
-
+    
     public void buttonA(boolean pressed)
     {
         if(pressed){
-            SendMessage(new ControllerMessage(new ControllerMessage.MoveBack(100)));
+            press(ControllerMessage.Button.A);
+        }
+        else{
+            depress(ControllerMessage.Button.A);
         }
     }
 
     public void buttonB(boolean pressed)
     {
         if(pressed){
-            SendMessage(new ControllerMessage(new ControllerMessage.MoveRight(100)));
+            press(ControllerMessage.Button.B);
+        }
+        else{
+            depress(ControllerMessage.Button.B);
         }
     }
 
     public void buttonX(boolean pressed)
     {
         if(pressed){
-            SendMessage(new ControllerMessage(new ControllerMessage.MoveLeft(100)));
+            press(ControllerMessage.Button.X);
+        }
+        else{
+            depress(ControllerMessage.Button.X);
         }
     }
 
     public void buttonY(boolean pressed)
     {
         if (pressed){
-            SendMessage(new ControllerMessage(new ControllerMessage.MoveForward(100)));
+            press(ControllerMessage.Button.Y);
+        }
+        else{
+            depress(ControllerMessage.Button.Y);
         }
     }
 
     public void back(boolean pressed)
     {
         if (pressed){
-            SendMessage(new ControllerMessage(new ControllerMessage.Stop()));
+            press(ControllerMessage.Button.BACK);
+        }
+        else{
+            depress(ControllerMessage.Button.START);
         }
     }
 
     public void start(boolean pressed)
     {
         if (pressed){
-            SendMessage("Pressed start button");
+            press(ControllerMessage.Button.RBUMPER);
+        }
+        else{
+            depress(ControllerMessage.Button.RBUMPER);
         }
     }
 
     public void leftShoulder(boolean pressed)
     {
         if (pressed){
-            ControllerMessage.DEBUG_MOTOR.throttle = ControllerMessage.DEBUG_MOTOR.throttle <100?
-                    ControllerMessage.DEBUG_MOTOR.throttle - 5.0f : ControllerMessage.DEBUG_MOTOR.throttle;
-            SendMessage("Pressed left bumper");
+            press(ControllerMessage.Button.LBUMPER);
+        }
+        else{
+            depress(ControllerMessage.Button.LBUMPER);
         }
     }
 
     public void rightShoulder(boolean pressed)
     {
         if (pressed){
-            ControllerMessage.DEBUG_MOTOR.throttle = ControllerMessage.DEBUG_MOTOR.throttle <100?
-                    ControllerMessage.DEBUG_MOTOR.throttle + 5.0f : ControllerMessage.DEBUG_MOTOR.throttle;
-
-            SendMessage("Pressed right bumper");
+            press(ControllerMessage.Button.RBUMPER);
+        }
+        else{
+            depress(ControllerMessage.Button.RBUMPER);
         }
     }
 
     public void leftThumb(boolean pressed)
     {
         if (pressed){
-            SendMessage("Pressed left thumbstick");
+            press(ControllerMessage.Button.LTHUMB);
+        }
+        else{
+            depress(ControllerMessage.Button.LTHUMB);
         }
     }
 
     public void rightThumb(boolean pressed)
     {
         if (pressed){
-            SendMessage("Pressed right thumbstick");
+            press(ControllerMessage.Button.RTHUMB);
+        }
+        else{
+            depress(ControllerMessage.Button.RTHUMB);
         }
     }
 
     public void dpad(int direction, boolean pressed) {
         if (pressed) {
-            SendMessage("Pressed dpad direction "+direction);
             switch (direction) {
                 case 0:
                     // N
-                    SendMessage(new ControllerMessage(new ControllerMessage.DEBUG_MOTOR_FR(BadgerMotorController.CLOCKWISE)));
+                    press(ControllerMessage.Button.NDPAD);
                     break;
                 case 1:
                     // NE
                     break;
                 case 2:
                     // E
-                    SendMessage(new ControllerMessage(new ControllerMessage.DEBUG_MOTOR_BR(BadgerMotorController.CLOCKWISE)));
+                    press(ControllerMessage.Button.EDPAD);
                     break;
                 case 3:
                     // SE
                     break;
                 case 4:
                     // S
-                    SendMessage(new ControllerMessage(new ControllerMessage.DEBUG_MOTOR_FR(BadgerMotorController.COUNTER_CLOCKWISE)));
+                    press(ControllerMessage.Button.SDPAD);
                     break;
                 case 5:
                     // SW
                     break;
                 case 6:
                     // W
-                    SendMessage(new ControllerMessage(new ControllerMessage.DEBUG_MOTOR_BR(BadgerMotorController.COUNTER_CLOCKWISE)));
+                    press(ControllerMessage.Button.WDPAD);
+                    break;
+                case 7:
+                    // NW
+                    break;
+            }
+        } else{
+            switch (direction) {
+                case 0:
+                    // N
+                    depress(ControllerMessage.Button.NDPAD);
+                    break;
+                case 1:
+                    // NE
+                    break;
+                case 2:
+                    // E
+                    depress(ControllerMessage.Button.EDPAD);
+                    break;
+                case 3:
+                    // SE
+                    break;
+                case 4:
+                    // S
+                    depress(ControllerMessage.Button.SDPAD);
+                    break;
+                case 5:
+                    // SW
+                    break;
+                case 6:
+                    // W
+                    depress(ControllerMessage.Button.WDPAD);
                     break;
                 case 7:
                     // NW
@@ -143,71 +201,129 @@ public class Controller extends XboxControllerAdapter{
     public void leftTrigger(double value)
     {
         //value is how hard you press. Between 0-1.0
-        FlywheelSpeed += value;
-        if(FlywheelSpeed>100){
-            FlywheelSpeed=100;
-        }
-        SendMessage(new ControllerMessage(new ControllerMessage.Shoot((float)value)));
+        controllerState.leftTriggerMagnitude = value;
     }
 
     public void rightTrigger(double value)
     {
         //value is how hard you press. Between 0-1.0
-        SendMessage(new ControllerMessage(new ControllerMessage.Shoot((float)value)));
+        controllerState.rightTriggerMagnitude = value;
     }
 
     public void leftThumbMagnitude(double magnitude)
     {
         //magnitude is how hard you press. Between 0-1.0
-        LeftThumbstick.UpdateMagnitude(magnitude);
-        SendMessage(LeftThumbstick.toString());
+        controllerState.leftThumbstickMagnitude = magnitude;
+        if( magnitude < 0.2){
+            controllerState.leftThumbstickDirection = 'Z';
+            controllerState.leftThumbstickRotation = 0.0;
+        }
     }
 
     public void leftThumbDirection(double direction)
     {
         //direction is angle. Between 0-360.0, at top
-        LeftThumbstick.UpdateAngleDegrees(direction);
-        SendMessage(LeftThumbstick.toString());
+        controllerState.leftThumbstickRotation = (direction);
+        if (direction < 45 || direction > 315){
+            controllerState.setLeftThumbDir('N');
+        } else if (direction < 135){
+            controllerState.setLeftThumbDir('E');
+        } else if (direction < 225){
+            controllerState.setLeftThumbDir('S');
+        } else if (direction < 315){
+            controllerState.setLeftThumbDir('W');
+        } else {
+            controllerState.setLeftThumbDir('Z');
+        }
     }
 
     public void rightThumbMagnitude(double magnitude)
     {
         //magnitude is how hard you press. Between 0-1.0
-        RightThumbstick.UpdateMagnitude(magnitude);
-        SendMessage(RightThumbstick.toString());
+        controllerState.rightThumbstickMagnitude = magnitude;
+        if( magnitude < 0.2){
+            controllerState.rightThumbstickDirection = 'Z';
+            controllerState.rightThumbstickRotation = 0.0;
+        }
     }
 
     public void rightThumbDirection(double direction)
     {
         //direction is angle. Between 0-360.0, at top
-        RightThumbstick.UpdateAngleDegrees(direction);
-        SendMessage(RightThumbstick.toString());
+        controllerState.rightThumbstickRotation = (direction);
+        if (direction < 45 || direction > 315){
+            controllerState.setRightThumbstickDirection('N');
+        } else if (direction < 135){
+            controllerState.setRightThumbstickDirection('E');
+        } else if (direction < 225){
+            controllerState.setRightThumbstickDirection('S');
+        } else if (direction < 315){
+            controllerState.setRightThumbstickDirection('W');
+        } else {
+            controllerState.setRightThumbstickDirection('Z');
+        }
     }
 
     public void isConnected()
     {
         if (connectedController.isConnected()) {
-            Utils.Log(" - Controller connected");
-            SendMessage(" - Controller connected");
+            Log(" - Controller connected");
         }
         else {
-            Utils.Log(" - Controller disconnected");
-            SendMessage(" - Controller connected");
+            Log(" - Controller disconnected");
         }
     }
 
     public Controller(NetworkConnector messageConnector)
     {
         connector = messageConnector;
-        connectedController = new XboxController(System.getProperty("user.dir") +"\\"+path ,1,50,50);
+
+        String baseDir=System.getProperty("user.dir");
+        if(baseDir.endsWith("honeybadger")){
+            baseDir+="\\executable";
+        }
+        baseDir+="\\bin";
+        String arch = System.getProperty("os.arch");
+        System.out.println(arch);
+        String dllPath = String.format("%s\\%s",baseDir,
+                arch.contains("x86")? "xboxcontroller.dll" : "xboxcontroller64.dll");
+
+        connectedController = new XboxController(
+                dllPath,
+                1,
+                50,
+                50);
+
         isConnected();
+        ScheduledManager = Executors.newScheduledThreadPool(1);
+
+        controllerState = new ControllerMessage();
+        controllerState.Initialize();
 
         connectedController.addXboxControllerListener(this);
         connectedController.setLeftThumbDeadZone(0.2);
         connectedController.setRightThumbDeadZone(0.2);
 
-        RightThumbstick = new Utils.Vector2D();
-        LeftThumbstick = new Utils.Vector2D();
+        makePeriodicSender();
+    }
 
+    public void makePeriodicSender(){
+        if (connector==null || ControllerMessageSender!=null || connector.IsBroken()){
+            Log("Unable to make periodic controller message sender.");
+            return;
+        }
+
+        ControllerMessageSender = ScheduledManager.scheduleAtFixedRate(
+                () -> {
+                    if(connector.HasActiveConnection() && !connector.IsBroken()) {
+                        if(connectedController.isConnected())
+                            connector.SendMessage(new ControllerMessage(controllerState));
+                    }else{
+                        ControllerMessageSender.cancel(false); //Don't interrupt yourself.
+                        ControllerMessageSender = null;
+                    }
+                },
+                1,1, TimeUnit.SECONDS
+        );
     }
 }

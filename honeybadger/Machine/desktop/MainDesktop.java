@@ -63,7 +63,7 @@ public class MainDesktop {
             NetworkConnector nc = new NetworkConnector(IP, 2017);
             MessageReader readerHandle = new MessageReader(nc);
             Thread readMessages = new Thread(readerHandle);
-            //Controller Xbox = new Controller(nc);
+            Controller Xbox = new Controller(nc);
             input = "";
             keepAlive = true;
             isActive = true;

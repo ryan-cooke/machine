@@ -2,6 +2,7 @@ package Machine.desktop;
 
 import Machine.Common.Constants;
 import org.opencv.core.Core;
+import Machine.Common.Shell;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.Size;
@@ -17,21 +18,30 @@ import java.io.File;
 import java.util.ArrayList;
 
 import static Machine.Common.Utils.ErrorLog;
+import static Machine.Common.Utils.Log;
 
-public class MainWindow extends JDialog {
+public class MainWindow {
     private static MainWindow singleton;
+    private static JFrame mainFrame;
 
     private NetworkConnector networkBus;
     private NetworkConnector.MessageReader messageReader;
 
     private Thread networkThread;
-
     private Thread videoThread;
+    private Thread updaterThread;
 
     private JPanel contentPane;
     private JButton buttonReboot;
     private JButton buttonExit;
     private JFormattedTextField Prompt;
+    private JMenuBar menuBar;
+    private JMenu file;
+    private JMenu view;
+    private JMenuItem update;
+    private JMenuItem exit;
+    private JMenuItem fontSizeIncrease;
+    private JMenuItem fontSizeDecrease;
 
     private JTextArea messageFeed;
     private JPanelOpenCV videoPanel;
@@ -39,11 +49,29 @@ public class MainWindow extends JDialog {
     private final String promptChar = "> ";
     private ArrayList<String> inputHistory;
     private int inputOffset;
+    private double fontSize;
+    private JMenuItem openCVConfigMenuItem;
+
+    private static String ConnectionIP;
 
     private MainWindow() {
-        setContentPane(contentPane);
-        setModal(true);
-        getRootPane().setDefaultButton(buttonReboot);
+
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        double width = 0.75 * screenSize.getWidth();
+        double height = 0.75 * screenSize.getHeight();
+
+        mainFrame = new JFrame("Badger Controller");
+        mainFrame.setSize((int) width, (int) height);
+        mainFrame.setLayout(new GridLayout(1, 1));
+        mainFrame.addWindowListener(new WindowAdapter() {
+            public void windowClosing(WindowEvent windowEvent) {
+                onPressExit();
+            }
+        });
+
+        mainFrame.add(contentPane);
+        initilializeMenu();
+        mainFrame.setVisible(true);
 
         inputHistory = new ArrayList<>(40);
         inputOffset = 0;
@@ -53,24 +81,28 @@ public class MainWindow extends JDialog {
             //Choose and load the dlls for the correct arch
             String arch = System.getProperty("os.arch");
             System.out.println(arch);
-            if(arch.contains("x86")){
+            if (arch.contains("x86")) {
                 System.loadLibrary("opencv_java310");
                 System.loadLibrary("opencv_ffmpeg310");
-            }
-            else{
+            } else {
                 System.loadLibrary("opencv_java310_64");
                 System.loadLibrary("opencv_ffmpeg310_64");
             }
 
             videoPanel.image = ImageIO.read(new File("maxresdefault.jpg"));
             Mat original = new Mat(videoPanel.image.getHeight(), videoPanel.image.getWidth(), CvType.CV_8UC3);
-            original.put(0,0,((DataBufferByte) JPanelOpenCV.image.getRaster().getDataBuffer()).getData());
+            original.put(0, 0, ((DataBufferByte) JPanelOpenCV.image.getRaster().getDataBuffer()).getData());
             Mat reduced = new Mat();
-            Size newSize = new Size(640,480);
-            Imgproc.resize(original,reduced,newSize);
+            Size newSize = new Size(640, 480);
+            Imgproc.resize(original, reduced, newSize);
 
             JPanelOpenCV.image = JPanelOpenCV.MatToBufferedImage(reduced);
-        }catch (Exception e){e.printStackTrace();}
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        mainFrame.invalidate();
+        mainFrame.repaint();
 
         registerCallbacks();
         //Below are listeners being tested
@@ -78,18 +110,20 @@ public class MainWindow extends JDialog {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
                 String input = Prompt.getText().substring(2);
-                if(input.length()>0) {
+                if (input.length() > 0) {
                     Prompt.setText(promptChar);
 
                     inputHistory.add(input);
-                    boolean messageSuccess = singleton.networkBus.HandleMessage(input);
-                    if(!messageSuccess){
-                        resetConnection();
+                    if(singleton.networkBus!=null) {
+                        boolean messageSuccess = singleton.networkBus.HandleMessage(input);
+                        if (!messageSuccess) {
+                            resetConnection();
+                        }
                     }
                 }
-                inputOffset=0;
+                inputOffset = 0;
             }
-        },KeyStroke.getKeyStroke(KeyEvent.VK_ENTER,0),JComponent.WHEN_FOCUSED);
+        }, KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), JComponent.WHEN_FOCUSED);
 
         Prompt.registerKeyboardAction(new ActionListener() {
             @Override
@@ -97,55 +131,144 @@ public class MainWindow extends JDialog {
                 Document rawIn = Prompt.getDocument();
                 Cursor cursor = Prompt.getCursor();
                 int pos = Prompt.getCaretPosition();
-                if(rawIn.getLength()>promptChar.length() && pos>promptChar.length()) {
+                if (rawIn.getLength() > promptChar.length() && pos > promptChar.length()) {
                     try {
-                        rawIn.remove(Prompt.getCaretPosition()-1, 1);
+                        rawIn.remove(Prompt.getCaretPosition() - 1, 1);
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
-                    catch (Exception e){e.printStackTrace();}
                 }
             }
-        },KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE,0),JComponent.WHEN_FOCUSED);
+        }, KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0), JComponent.WHEN_FOCUSED);
 
         Prompt.registerKeyboardAction(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
                 //Try getting previous commands
-                inputOffset +=1;
+                inputOffset += 1;
                 previousInputLookup();
             }
-        },KeyStroke.getKeyStroke(KeyEvent.VK_UP,0),JComponent.WHEN_FOCUSED);
+        }, KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0), JComponent.WHEN_FOCUSED);
 
         Prompt.registerKeyboardAction(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
-                inputOffset -=1;
+                inputOffset -= 1;
                 previousInputLookup();
             }
-        },KeyStroke.getKeyStroke(KeyEvent.VK_DOWN,0),JComponent.WHEN_FOCUSED);
+        }, KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0), JComponent.WHEN_FOCUSED);
 
         videoPanel.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 super.mouseClicked(e);
-                if(videoThread==null) {
-//                    JPanelOpenCV.instance = videoPanel;
-                    videoThread = new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            try {
-                                videoPanel.main(null);
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    });
-                    videoThread.start();
-                }
+                startVideoStream();
             }
         });
+
+
     }
 
-    private void registerCallbacks(){
+    private void initilializeMenu() {
+        menuBar = new JMenuBar();
+
+        file = new JMenu("File");
+        file.setMnemonic(KeyEvent.VK_F);
+
+        view = new JMenu("View");
+        view.setMnemonic(KeyEvent.VK_V);
+
+        exit = new JMenuItem("Exit");
+        exit.setMnemonic(KeyEvent.VK_E);
+        exit.setToolTipText("If you really need a tool tip for this button, you shouldn't be in engineering");
+
+        update = new JMenuItem("Update badger");
+        update.setToolTipText("Update the Honeybadger V6 remotely");
+        update.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                runRemoteUpdate();
+            }
+        });
+
+        openCVConfigMenuItem = new JMenuItem("OpenCV Config");
+        openCVConfigMenuItem.setMnemonic(KeyEvent.VK_C);
+        openCVConfigMenuItem.setToolTipText("Open the OpenCV Configuration panel");
+        openCVConfigMenuItem.addActionListener((ActionEvent event) -> {
+            OpenCVConfig.main(new String[0]);
+        });
+
+
+        fontSizeIncrease = new JMenuItem("Increase Font Size");
+        fontSizeIncrease.setMnemonic(KeyEvent.VK_PLUS);
+        fontSizeIncrease.setToolTipText("Increases the font size");
+        fontSizeIncrease.addActionListener((ActionEvent event) -> {
+            increaseFontSize();
+        });
+
+        fontSizeDecrease = new JMenuItem("Decrease Font Size");
+        fontSizeDecrease.setMnemonic(KeyEvent.VK_MINUS);
+        fontSizeDecrease.setToolTipText("Decrease the font size");
+        fontSizeDecrease.addActionListener((ActionEvent e) -> {
+            decreaseFontSize();
+        });
+
+        file.add(exit);
+        file.add(openCVConfigMenuItem);
+        view.add(fontSizeIncrease);
+        view.add(fontSizeDecrease);
+
+        menuBar.add(file);
+        menuBar.add(view);
+        menuBar.add(update);
+        mainFrame.setJMenuBar(menuBar);
+    }
+
+    private void setFontSize(double size, Component c) {
+
+        Font font = c.getFont().deriveFont((float) size);
+        c.setFont(font);
+    }
+
+    private void increaseFontSize() {
+        double size = messageFeed.getFont().getSize();
+        size *= 1.4;
+        fontSize = size;
+        setFontSize(size, messageFeed);
+        setFontSize(size, buttonExit);
+        setFontSize(size, buttonReboot);
+        setFontSize(size, Prompt);
+        setFontSize(size, exit);
+        setFontSize(size, fontSizeIncrease);
+        setFontSize(size, fontSizeDecrease);
+        setFontSize(size, openCVConfigMenuItem);
+        setFontSize(size, file);
+        setFontSize(size, view);
+        contentPane.updateUI();
+        mainFrame.revalidate();
+        mainFrame.repaint();
+    }
+
+    private void decreaseFontSize() {
+        double size = messageFeed.getFont().getSize();
+        size *= 0.4;
+        fontSize = size;
+        setFontSize(size, messageFeed);
+        setFontSize(size, buttonExit);
+        setFontSize(size, buttonReboot);
+        setFontSize(size, Prompt);
+        setFontSize(size, exit);
+        setFontSize(size, fontSizeIncrease);
+        setFontSize(size, fontSizeDecrease);
+        setFontSize(size, openCVConfigMenuItem);
+        setFontSize(size, file);
+        setFontSize(size, view);
+        contentPane.updateUI();
+        mainFrame.revalidate();
+        mainFrame.repaint();
+    }
+
+    private void registerCallbacks() {
         buttonReboot.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 onPressReboot();
@@ -158,14 +281,6 @@ public class MainWindow extends JDialog {
             }
         });
 
-        // call onPressExit() when cross is clicked
-        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-        addWindowListener(new WindowAdapter() {
-            public void windowClosing(WindowEvent e) {
-                onPressExit();
-            }
-        });
-
         // call onPressExit() on ESCAPE
         contentPane.registerKeyboardAction(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -174,17 +289,69 @@ public class MainWindow extends JDialog {
         }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
     }
 
-    private void previousInputLookup(){
-        int historyIndex = inputHistory.size()-inputOffset;
-        if(historyIndex>=0 && historyIndex<inputHistory.size()){
-            Prompt.setText(String.format("%s%s",promptChar,inputHistory.get(historyIndex)));
+    private void previousInputLookup() {
+        int historyIndex = inputHistory.size() - inputOffset;
+        if (historyIndex >= 0 && historyIndex < inputHistory.size()) {
+            Prompt.setText(String.format("%s%s", promptChar, inputHistory.get(historyIndex)));
         }
         //Clamp it otherwise
-        else if(historyIndex<0){
-            inputOffset=inputHistory.size();
+        else if (historyIndex < 0) {
+            inputOffset = inputHistory.size();
+        } else if (historyIndex >= inputHistory.size()) {
+            inputOffset = 0;
         }
-        else if(historyIndex>=inputHistory.size()){
-            inputOffset=0;
+    }
+
+    private void runRemoteUpdate(){
+        if(updaterThread!=null){
+            JOptionPane.showMessageDialog(null,
+                    "An update is in progress. Please wait",
+                    "Update Transmission Error",
+                    JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        //TODO: obfuscate password input!
+        //Will likely need a JOptionPane.showOptionDialog with custom components.
+        String password = JOptionPane.showInputDialog(
+                "Remote host password",
+                "");
+        if (password == null){
+            Log("Cancelling update");
+            return;
+        }
+
+        updaterThread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                boolean success = BadgerUpdater.sendUpdate(ConnectionIP,password);
+                //resetConnection();
+                updaterThread = null;
+            }
+        });
+        updaterThread.start();
+    }
+
+    private void startVideoStream(){
+        if (videoThread == null) {
+            MainWindow.writeToMessageFeed("Opening video stream...");
+            JPanelOpenCV.instance = videoPanel;
+            videoThread = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        videoPanel.SetConnectionHost(ConnectionIP);
+                        videoPanel.startLoop();
+                    } catch (Exception e) {
+                        MainWindow.writeToMessageFeed("Failed to open video stream");
+                        e.printStackTrace();
+                    }
+                    finally {
+                        videoThread = null;
+                    }
+                }
+            });
+            videoThread.start();
         }
     }
 
@@ -195,53 +362,58 @@ public class MainWindow extends JDialog {
 
     private void onPressExit() {
         // add your code here if necessary
-        int dialogResult = JOptionPane.showConfirmDialog (null,
-                "Are you sure you want to quit?","Exit Warning",
+        int dialogResult = JOptionPane.showConfirmDialog(null,
+                "Are you sure you want to quit?", "Exit Warning",
                 JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
 
-        if(dialogResult == JOptionPane.YES_OPTION){
-            //TODO: close all network connections
-            dispose();
+        if (dialogResult == JOptionPane.YES_OPTION) {
+            try {
+                networkBus.SendMessage("close");
+                networkBus.End();
+            } catch (Exception e){e.printStackTrace();}
+            finally {
+                System.exit(0);
+            }
         }
     }
 
     private void resetConnection() {
-        MainWindow.writeToMessageFeed("Connection died. Attempting to reset...");
+        Log("Connection died. Attempting to reset...");
         String ConnectionIP = singleton.networkBus.host;
         singleton.networkBus.End();
         singleton.messageReader.end();
 
-        singleton.networkBus = new NetworkConnector(ConnectionIP,2017);
+        singleton.networkBus = new NetworkConnector(ConnectionIP, 2017);
         singleton.messageReader = new NetworkConnector.MessageReader(singleton.networkBus);
         Thread readMessages = new Thread(singleton.messageReader);
         readMessages.start();
     }
 
-    synchronized public static void writeToMessageFeed(String input){
-        if(singleton==null){
+    synchronized public static void writeToMessageFeed(String input) {
+        if (singleton == null) {
             return;
         }
         singleton.messageFeed.append(input);
-        if(!input.endsWith("\n")){
+        if (!input.endsWith("\n")) {
             singleton.messageFeed.append("\n");
             singleton.messageFeed.setCaretPosition(singleton.messageFeed.getDocument().getLength());
         }
     }
 
     synchronized public static void dieWithError(String errorMessage) {
-        JOptionPane.showMessageDialog (null, errorMessage,"A death has occured",
+        JOptionPane.showMessageDialog(null, errorMessage, "A death has occured",
                 JOptionPane.ERROR_MESSAGE);
         System.exit(1);
     }
 
-    public static String promptForIP(){
+    public static String promptForIP() {
         String ConnectionIP = JOptionPane.showInputDialog(
                 "Honeybadger IP: ",
-                "192.168.0.1");
+                "192.168.137.69");
 
-        if(ConnectionIP==null){
-            JOptionPane.showMessageDialog (null,
-                    "Honeybadger Command requires a network IP to run","IP Needed",
+        if (ConnectionIP == null) {
+            JOptionPane.showMessageDialog(null,
+                    "Honeybadger Command requires a network IP to run", "IP Needed",
                     JOptionPane.ERROR_MESSAGE);
             System.exit(0);
         }
@@ -255,21 +427,37 @@ public class MainWindow extends JDialog {
         //Try changing the theme
         try {
             UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
-        }catch (Exception e){ErrorLog("Unable to change theme");}
+        } catch (Exception e) {
+            ErrorLog("Unable to change theme");
+        }
+
+        if (Toolkit.getDefaultToolkit().getScreenSize().getWidth() > 1920) {
+            Font highDPI = new Font(null, Font.PLAIN, 24);
+            UIManager.put("MenuBar.font", highDPI);
+            UIManager.put("Menu.font", highDPI);
+            UIManager.put("MenuItem.font", highDPI);
+            UIManager.put("Slider.thumbHeight", 34);
+            UIManager.put("Slider.thumbWidth", 34);
+            UIManager.put("OptionPane.messageFont", highDPI);
+            UIManager.put("OptionPane.buttonFont", highDPI);
+            UIManager.put("TextField.font", highDPI);
+            UIManager.put("TextArea.font", highDPI);
+            UIManager.put("Label.font", highDPI);
+            UIManager.put("Button.font", highDPI);
+            UIManager.put("ToolTip.font", highDPI);
+        }
 
         //Get the IP first.
-        String ConnectionIP = promptForIP();
+        ConnectionIP = promptForIP();
 
         singleton = new MainWindow();
-
-        //TODO: maybe put this in a separate thread?
-        singleton.networkBus = new NetworkConnector(ConnectionIP,2017);
+        singleton.networkBus = new NetworkConnector(ConnectionIP, 2017);
         singleton.messageReader = new NetworkConnector.MessageReader(singleton.networkBus);
-        Thread readMessages = new Thread(singleton.messageReader);
-        readMessages.start();
+        singleton.startVideoStream();
 
-        singleton.pack();
-        singleton.setVisible(true);
-        System.exit(0);
+        Controller Xbox = new Controller(singleton.networkBus);
+        Thread readMessages = new Thread(singleton.messageReader);
+
+        readMessages.start();
     }
 }
