@@ -15,7 +15,6 @@ public class Controller extends XboxControllerAdapter{
 
     private final ScheduledExecutorService ScheduledManager;
 
-    private String path = "xboxcontroller64.dll"; //Change to choose between 32 and 64 bit.
     private NetworkConnector connector;
     private XboxController connectedController;
 
@@ -135,7 +134,6 @@ public class Controller extends XboxControllerAdapter{
 
     public void dpad(int direction, boolean pressed) {
         if (pressed) {
-//            SendMessage("Pressed dpad direction "+direction);
             switch (direction) {
                 case 0:
                     // N
@@ -167,7 +165,6 @@ public class Controller extends XboxControllerAdapter{
                     break;
             }
         } else{
-            //Log("Unpressed dpad direction "+direction);
             switch (direction) {
                 case 0:
                     // N
@@ -226,7 +223,6 @@ public class Controller extends XboxControllerAdapter{
     public void leftThumbDirection(double direction)
     {
         //direction is angle. Between 0-360.0, at top
-        //@foxtrot94: Would rather this be kept in a vector to avoid code duplication
         controllerState.leftThumbstickRotation = (direction);
         if (direction < 45 || direction > 315){
             controllerState.setLeftThumbDir('N');
@@ -244,7 +240,6 @@ public class Controller extends XboxControllerAdapter{
     public void rightThumbMagnitude(double magnitude)
     {
         //magnitude is how hard you press. Between 0-1.0
-//        RightThumbstick.UpdateMagnitude(magnitude);
         controllerState.rightThumbstickMagnitude = magnitude;
         if( magnitude < 0.2){
             controllerState.rightThumbstickDirection = 'Z';
@@ -255,9 +250,7 @@ public class Controller extends XboxControllerAdapter{
     public void rightThumbDirection(double direction)
     {
         //direction is angle. Between 0-360.0, at top
-//        RightThumbstick.UpdateAngleDegrees(direction);
         controllerState.rightThumbstickRotation = (direction);
-        //@foxtrot94: Would rather this be kept in a vector to avoid code duplication
         if (direction < 45 || direction > 315){
             controllerState.setRightThumbstickDirection('N');
         } else if (direction < 135){
@@ -287,6 +280,7 @@ public class Controller extends XboxControllerAdapter{
 
         String arch = System.getProperty("os.arch");
         System.out.println(arch);
+        String path="";
         if(arch.contains("x86")){
             path="xboxcontroller.dll";
         }
@@ -321,8 +315,8 @@ public class Controller extends XboxControllerAdapter{
         ControllerMessageSender = ScheduledManager.scheduleAtFixedRate(
                 () -> {
                     if(connector.HasActiveConnection() && !connector.IsBroken()) {
-                        //Log(controllerState.toString());
-                        connector.SendMessage(new ControllerMessage(controllerState));
+                        if(connectedController.isConnected())
+                            connector.SendMessage(new ControllerMessage(controllerState));
                     }else{
                         ControllerMessageSender.cancel(false); //Don't interrupt yourself.
                         ControllerMessageSender = null;

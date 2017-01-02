@@ -235,6 +235,7 @@ public class HoneybadgerV6 {
 
         MotorController.setPWM(BadgerPWMProvider.FLYWHEEL_A,BadgerMotorController.FLYWHEEL_PERCENT_MIN);
         MotorController.setPWM(BadgerPWMProvider.FLYWHEEL_B,BadgerMotorController.FLYWHEEL_PERCENT_MIN);
+        FlywheelIsReady = true;
     }
 
     public void disarmFlywheel(){
@@ -245,6 +246,7 @@ public class HoneybadgerV6 {
 
         MotorController.setPWM(BadgerPWMProvider.FLYWHEEL_A,0);
         MotorController.setPWM(BadgerPWMProvider.FLYWHEEL_A,0);
+        FlywheelIsReady = false;
     }
 
     /**

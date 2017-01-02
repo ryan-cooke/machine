@@ -14,7 +14,7 @@ import static Machine.Common.Utils.Log;
  * Namespace class for classes implementing the IBadgerFunction interface
  */
 public class CMD {
-    public static abstract class MotorFunction implements IBadgerFunction{
+    public static abstract class CheckedFunction implements IBadgerFunction{
         protected BadgerMotorController BMC;
 
         protected boolean areParametersValid(String[] params){
@@ -35,7 +35,7 @@ public class CMD {
         }
     }
 
-    public static class setGPIO extends MotorFunction{
+    public static class setGPIO extends CheckedFunction {
         public setGPIO(){}
 
         @Override
@@ -61,7 +61,7 @@ public class CMD {
         }
     }
 
-    public static class setPWM extends MotorFunction{
+    public static class setPWM extends CheckedFunction {
         public setPWM(){}
 
         @Override
@@ -90,7 +90,7 @@ public class CMD {
         }
     }
 
-    public static class setAbsPWM extends MotorFunction{
+    public static class setAbsPWM extends CheckedFunction {
         public setAbsPWM(){}
 
         @Override
@@ -118,7 +118,7 @@ public class CMD {
         }
     }
 
-    public static class sweepPWM extends MotorFunction{
+    public static class sweepPWM extends CheckedFunction {
         public sweepPWM(){}
 
         @Override
@@ -163,7 +163,7 @@ public class CMD {
         }
     }
 
-    public static class setMotor extends MotorFunction{
+    public static class setMotor extends CheckedFunction {
         public setMotor(){}
 
         @Override
@@ -193,7 +193,7 @@ public class CMD {
         }
     }
 
-    public static class servo extends MotorFunction{
+    public static class servo extends CheckedFunction {
         @Override
         public boolean Invoke(HoneybadgerV6 badger, String[] params) {
             if(!super.Invoke(badger,params)){
@@ -218,7 +218,7 @@ public class CMD {
         }
     }
 
-    public static class setConveyor extends MotorFunction{
+    public static class setConveyor extends CheckedFunction {
         @Override
         public boolean Invoke(HoneybadgerV6 badger, String[] params) {
             if(!super.Invoke(badger,params)){
@@ -243,7 +243,7 @@ public class CMD {
         }
     }
 
-    public static class setAllDriveMotors extends MotorFunction{
+    public static class setAllDriveMotors extends CheckedFunction {
         @Override
         public boolean Invoke(HoneybadgerV6 badger, String[] params) {
             if(!super.Invoke(badger,params)){
@@ -297,6 +297,97 @@ public class CMD {
         @Override
         public String Explain() {
             return "\'ack <anything>\'";
+        }
+
+        @Override
+        public int MinimumParameterNum() {
+            return 1;
+        }
+    }
+
+    //Implements basic movement
+    public static class move extends CheckedFunction{
+        @Override
+        public boolean Invoke(HoneybadgerV6 badger, String[] params) {
+            if(!super.Invoke(badger,params)){
+                return false;
+            }
+            char direction = params[0].toLowerCase().charAt(0);
+            float throttle = Float.parseFloat(params[1]);
+
+            switch (direction){
+                case 'f':{
+                    badger.moveForward(throttle);
+                    break;
+                }
+                case 'b':{
+                    badger.moveBackward(throttle);
+                    break;
+                }
+                case 'l':{
+                    badger.strafeLeft(throttle);
+                    break;
+                }
+                case 'r':{
+                    badger.strafeRight(throttle);
+                    break;
+                }
+                default:{
+                    badger.moveForward(0);
+                    break;
+                }
+            }
+
+            return true;
+        }
+
+        @Override
+        public String Explain() {
+            return "\'move <F,B,L,R> <Throttle Percent>\'";
+        }
+
+        @Override
+        public int MinimumParameterNum() {
+            return 2;
+        }
+    }
+
+    public static class primeCannon extends CheckedFunction{
+        @Override
+        public boolean Invoke(HoneybadgerV6 badger, String[] params) {
+            if(!super.Invoke(badger,params)){
+                return false;
+            }
+            int input = Integer.parseInt(params[0]);
+            if(input!=0 && input!=1){
+                return false;
+            }
+
+            boolean useFlywheel = input==1;
+            if(useFlywheel){
+                try {
+                    badger.sendDebugMessageToDesktop("Activating flywheel and speeding up to safe max");
+                    badger.armFlywheel();
+                    Thread.sleep(1000);
+                    for (int i = 0; i < 70; i++) {
+                        badger.updateFlywheel(1.f);
+                        Thread.sleep(500);
+                    }
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                    return false;
+                }
+            }
+            else{
+                badger.disarmFlywheel();
+            }
+
+            return true;
+        }
+
+        @Override
+        public String Explain() {
+            return "\'primeCannon <1: arm and speed up | 0: disarm>\'";
         }
 
         @Override
