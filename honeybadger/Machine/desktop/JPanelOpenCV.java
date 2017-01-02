@@ -30,6 +30,9 @@ import org.opencv.video.Video;
 import org.opencv.videoio.VideoCapture;
 import org.opencv.videoio.VideoWriter;
 
+import static Machine.Common.Utils.ErrorLog;
+import static Machine.Common.Utils.Log;
+
 
 public class JPanelOpenCV extends JPanel{
     public static JPanelOpenCV instance;
@@ -43,30 +46,40 @@ public class JPanelOpenCV extends JPanel{
     Scalar lowerb = new Scalar(35,140,60);
     Scalar upperb = new Scalar(70,255,255);
 
-    public static void main (String args[]) throws InterruptedException{
+    private static String ConnectURL;
+    private static boolean ShouldDraw;
 
+    public static void main (String args[]) throws InterruptedException{
         JPanelOpenCV j1 = new JPanelOpenCV();
         j1.startLoop();
+    }
 
+    public static void SetConnectionHost(String host){
+        ConnectURL = String.format("http://%s:8090/?action=stream",host);
+        ShouldDraw = true;
+    }
 
-
-
-
+    synchronized public static void renderActive(boolean shouldDraw){
+        ShouldDraw = shouldDraw;
     }
 
 
     public void startLoop()
     {
-        System.loadLibrary("opencv_java310");
-        System.loadLibrary("opencv_ffmpeg310_64");
-        JPanelOpenCV t = new JPanelOpenCV();
-
+        String arch = System.getProperty("os.arch");
+        System.out.println(arch);
+        String openCVLib = arch.contains("x86")? "opencv_java310" : "opencv_java310_64";
+        String ffmpegLib = arch.contains("x86")? "opencv_ffmpeg310" : "opencv_ffmpeg310_64";
+        System.loadLibrary(openCVLib);
+        System.loadLibrary(ffmpegLib);
 
         //******VideoCapture camera = new VideoCapture("http://192.168.1.117:8090/?action=stream.mjpg");
-
-        VideoCapture camera = new VideoCapture(1);
-
-        Disp j = new Disp(image);
+        //TODO: For Joey: you might want to change the IP
+        VideoCapture camera = new VideoCapture(ConnectURL);
+        if(!camera.isOpened()){
+            ErrorLog("Error opening stream");
+            return;
+        }
 
         Mat original = new Mat();
         Mat frame = new Mat();
@@ -82,20 +95,23 @@ public class JPanelOpenCV extends JPanel{
 
 
         if(!camera.isOpened()){
-            System.out.println("Error 1 again");
+            Log("Error 1 again");
         }
-        else {
-        }
+
         int count =0;
         double rstTime = System.currentTimeMillis();
         int secondsRec=300;
-        while(true)
-        {
 
+        Mat resized = new Mat();
+        Size outputSize = new Size(640,480);
+        while(ShouldDraw)
+        {
             camera.read(frame);
             color(lowerb,upperb,upperBlue,lowerBlue,frame);
-            if(System.currentTimeMillis()-rstTime>1000){System.out.println(count);rstTime=System.currentTimeMillis();count=0;secondsRec--;}
-            image = t.MatToBufferedImage(frame);
+
+            //if(System.currentTimeMillis()-rstTime>1000){System.out.println(count);rstTime=System.currentTimeMillis();count=0;secondsRec--;}
+
+            image = instance.MatToBufferedImage(frame);
             try {
                 Thread.sleep(10);
             } catch (InterruptedException e) {
@@ -105,19 +121,14 @@ public class JPanelOpenCV extends JPanel{
             if(secondsRec<0){break;}
 
             //@foxtrot94: resize whatever stream to 640x480
-            Mat reduced = new Mat();
-            Size newSize = new Size(640,480);
-            Imgproc.resize(frame,reduced,newSize);
-            image = MatToBufferedImage(reduced);
+            Imgproc.resize(frame,resized,outputSize);
+            image = MatToBufferedImage(resized);
             instance.invalidate();
             instance.repaint();
             //@foxtrot94: END
-
         }
 
-
         camera.release();
-        System.exit(0);
     }
 
     public void color(Scalar greenMin, Scalar greenMax,Scalar blueMin,Scalar blueMax,Mat frame) {

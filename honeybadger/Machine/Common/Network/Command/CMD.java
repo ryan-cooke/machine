@@ -405,7 +405,7 @@ public class CMD {
                 Thread.sleep(1000);
                 for (int i = 0; i < 200; i++) {
                     badger.updateFlywheel(updateFactor);
-                    Thread.sleep(250);
+                    Thread.sleep(500);//200*.5 = 100 seconds to fully ramp up
                 }
             } catch (InterruptedException e) {
                 e.printStackTrace();

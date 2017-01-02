@@ -160,23 +160,7 @@ public class MainWindow {
             @Override
             public void mouseClicked(MouseEvent e) {
                 super.mouseClicked(e);
-                if (videoThread == null) {
-                    MainWindow.writeToMessageFeed("Opening video stream...");
-                    JPanelOpenCV.instance = videoPanel;
-                    videoThread = new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            try {
-                                videoPanel.main(null);
-                            } catch (Exception e) {
-                                MainWindow.writeToMessageFeed("Failed to open video stream");
-                                e.printStackTrace();
-                                videoThread = null;
-                            }
-                        }
-                    });
-                    videoThread.start();
-                }
+                startVideoStream();
             }
         });
 
@@ -335,6 +319,29 @@ public class MainWindow {
         updaterThread.start();
     }
 
+    private void startVideoStream(){
+        if (videoThread == null) {
+            MainWindow.writeToMessageFeed("Opening video stream...");
+            JPanelOpenCV.instance = videoPanel;
+            videoThread = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        videoPanel.SetConnectionHost(ConnectionIP);
+                        videoPanel.startLoop();
+                    } catch (Exception e) {
+                        MainWindow.writeToMessageFeed("Failed to open video stream");
+                        e.printStackTrace();
+                    }
+                    finally {
+                        videoThread = null;
+                    }
+                }
+            });
+            videoThread.start();
+        }
+    }
+
     private void onPressReboot() {
         //TODO: Send a network command to quit.
 
@@ -421,13 +428,13 @@ public class MainWindow {
         ConnectionIP = promptForIP();
 
         singleton = new MainWindow();
-
-        //TODO: maybe put this in a separate thread?
         singleton.networkBus = new NetworkConnector(ConnectionIP, 2017);
         singleton.messageReader = new NetworkConnector.MessageReader(singleton.networkBus);
+        singleton.startVideoStream();
+
         Controller Xbox = new Controller(singleton.networkBus);
         Thread readMessages = new Thread(singleton.messageReader);
-        readMessages.start();
 
+        readMessages.start();
     }
 }
