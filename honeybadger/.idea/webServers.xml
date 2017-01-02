@@ -2,8 +2,8 @@
 <project version="4">
   <component name="WebServers">
     <option name="servers">
-      <webServer id="91f5f644-245d-4f24-9ee9-cf8dc98d4df2" name="Badger" url="http://192.168.0.1">
-        <fileTransfer host="192.168.0.1" port="22" rootFolder="/home/pi" accessType="SFTP">
+      <webServer id="91f5f644-245d-4f24-9ee9-cf8dc98d4df2" name="Badger" url="http://192.168.137.69">
+        <fileTransfer host="192.168.137.69" port="22" rootFolder="/home/pi" accessType="SFTP">
           <advancedOptions>
             <advancedOptions dataProtectionLevel="Private" />
           </advancedOptions>

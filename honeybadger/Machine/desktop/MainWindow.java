@@ -272,7 +272,6 @@ public class MainWindow {
     }
 
     private void runRemoteUpdate() {
-        String password = null;
         if (updaterThread != null) {
             JOptionPane.showMessageDialog(null,
                     "An update is in progress. Please wait",
@@ -281,32 +280,44 @@ public class MainWindow {
             return;
         }
 
+        final int[] option = {1};
+        JDialog dialog = new JDialog();
         JPanel panel = new JPanel();
         JLabel label = new JLabel("Remote host password:");
         JPasswordField pass = new JPasswordField(20);
+        JButton ok = new JButton("OK");
+        JButton cancel = new JButton("Cancel");
+        ok.addActionListener(e -> {
+
+            char[] passwordC = pass.getPassword();
+            if (passwordC.length > 0) {
+                String password = new String(passwordC);
+                String finalPassword = password;
+                updaterThread = new Thread(() -> {
+                    boolean success = BadgerUpdater.sendUpdate(ConnectionIP, finalPassword);
+                    //resetConnection();
+                    updaterThread = null;
+                });
+                updaterThread.start();
+            } else {
+                Log("No password was entered");
+            }
+            dialog.dispose();
+        });
+        cancel.addActionListener(e -> {
+            dialog.dispose();
+            Log("Update canceled");
+        });
+
         panel.add(label);
         panel.add(pass);
-        String[] options = new String[]{"OK", "Cancel"};
-        int option = JOptionPane.showOptionDialog(null, panel, "RasPI Update authentication",
-                JOptionPane.NO_OPTION, JOptionPane.PLAIN_MESSAGE,
-                null, options, options[1]);
-        if(option == 0) // pressing OK button
-        {
-            char[] passwordC = pass.getPassword();
-            password = new String(passwordC);
-        }
-        if (password == null) {
-            Log("Cancelling update");
-            return;
-        }
-
-        String finalPassword = password;
-        updaterThread = new Thread(() -> {
-            boolean success = BadgerUpdater.sendUpdate(ConnectionIP, finalPassword);
-            //resetConnection();
-            updaterThread = null;
-        });
-        updaterThread.start();
+        panel.add(ok);
+        panel.add(cancel);
+        dialog.add(panel);
+        dialog.pack();
+        pass.requestFocusInWindow();
+        dialog.setModal(true);
+        dialog.setVisible(true);
     }
 
     private void startVideoStream() {
@@ -413,7 +424,7 @@ public class MainWindow {
             UIManager.put("Label.font", highDPI);
             UIManager.put("Button.font", highDPI);
             UIManager.put("ToolTip.font", highDPI);
-            UIManager.put("FormattedTextField.font" , highDPI);
+            UIManager.put("FormattedTextField.font", highDPI);
             UIManager.put("PasswordField.font", highDPI);
         }
 
