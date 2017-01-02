@@ -1,8 +1,6 @@
 package Machine.desktop;
 
 import Machine.Common.Constants;
-import org.opencv.core.Core;
-import Machine.Common.Shell;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.Size;
@@ -61,6 +59,8 @@ public class MainWindow {
 
     private static String ConnectionIP;
 
+    private static Controller Xbox;
+
     private MainWindow() {
 
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
@@ -96,14 +96,14 @@ public class MainWindow {
                 System.loadLibrary("opencv_ffmpeg310_64");
             }
 
-            JPanelOpenCV.image = ImageIO.read(new File("maxresdefault.jpg"));
-            Mat original = new Mat(JPanelOpenCV.image.getHeight(), JPanelOpenCV.image.getWidth(), CvType.CV_8UC3);
-            original.put(0, 0, ((DataBufferByte) JPanelOpenCV.image.getRaster().getDataBuffer()).getData());
+            JPanelOpenCV.processedImage = ImageIO.read(new File("maxresdefault.jpg"));
+            Mat original = new Mat(JPanelOpenCV.processedImage.getHeight(), JPanelOpenCV.processedImage.getWidth(), CvType.CV_8UC3);
+            original.put(0, 0, ((DataBufferByte) JPanelOpenCV.processedImage.getRaster().getDataBuffer()).getData());
             Mat reduced = new Mat();
             Size newSize = new Size(640, 480);
             Imgproc.resize(original, reduced, newSize);
 
-            JPanelOpenCV.image = JPanelOpenCV.MatToBufferedImage(reduced);
+            JPanelOpenCV.processedImage = JPanelOpenCV.MatToBufferedImage(reduced);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -474,7 +474,21 @@ public class MainWindow {
         singleton.messageReader = new NetworkConnector.MessageReader(singleton.networkBus);
         singleton.startVideoStream();
 
-        Controller Xbox = new Controller(singleton.networkBus);
+        Thread controllerThread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                Xbox = new Controller(singleton.networkBus);
+                while(true){
+                    try {
+                        Thread.sleep(500);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        });
+        controllerThread.start();
+
         Thread readMessages = new Thread(singleton.messageReader);
 
         readMessages.start();
