@@ -324,7 +324,7 @@ public class MainWindow {
             @Override
             public void run() {
                 boolean success = BadgerUpdater.sendUpdate(networkBus.getHost(),password);
-                networkBus.SendMessage("reconnect");
+                resetConnection();
                 updaterThread = null;
             }
         });
@@ -350,7 +350,7 @@ public class MainWindow {
     }
 
     private void resetConnection() {
-        MainWindow.writeToMessageFeed("Connection died. Attempting to reset...");
+        Log("Connection died. Attempting to reset...");
         String ConnectionIP = singleton.networkBus.host;
         singleton.networkBus.End();
         singleton.messageReader.end();

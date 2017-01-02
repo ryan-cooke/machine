@@ -12,12 +12,39 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Set;
 
+import static Machine.Common.Utils.ErrorLog;
 import static Machine.Common.Utils.Log;
 
 /**
  * Creates a connection and sends messages down the wire
  */
 public class NetworkConnector {
+
+    public static class MessageReader implements Runnable {
+        private NetworkConnector Net;
+
+        MessageReader(NetworkConnector nc) {
+            Net = nc;
+        }
+
+        @Override
+        public void run() {
+            //Four conditions can make this stop reading messages
+            while (!Thread.currentThread().isInterrupted() && !Net.IsBroken() && Net.HasActiveConnection()) {
+                try {
+                    Net.ReceiveMessage();
+                } catch (Exception e) {
+                    ErrorLog("Exception in Message Reader",e);
+                }
+            }
+        }
+
+        public void end() {
+            Thread.currentThread().interrupt();
+        }
+    }
+
+
     String host;
     int port;
 
@@ -38,8 +65,18 @@ public class NetworkConnector {
         port = connectPort;
         exceptionOccurred = false;
 
-        MainWindow.writeToMessageFeed("Connecting to "+host+":"+port);
+        Log("Connecting to "+host+":"+port);
+        OpenConnection();
 
+        if (connection == null) {
+            MainWindow.dieWithError("Connection to "+host+":"+port+" failed.");
+        }
+
+        Log(String.format("Connection to %s:%s established successfully", Host, connectPort));
+        LastSentMessage = null;
+    }
+
+    private void OpenConnection(){
         int retries = 3;
         while (connection == null && retries > 0) {
             try {
@@ -50,7 +87,7 @@ public class NetworkConnector {
                 e.printStackTrace();
                 System.out.flush();
                 System.err.flush();
-                MainWindow.writeToMessageFeed("waiting 10 seconds to retry");
+                Log("waiting 10 seconds to retry");
             }
 
             if (connection == null) {
@@ -63,13 +100,6 @@ public class NetworkConnector {
                 retries -= 1;
             }
         }
-
-        if (connection == null) {
-            MainWindow.dieWithError("Connection to "+host+":"+port+" failed.");
-        }
-
-        MainWindow.writeToMessageFeed(String.format("Connection to %s:%s established successfully", Host, connectPort));
-        LastSentMessage = null;
     }
 
     void SendMessage(String msg) {
@@ -87,7 +117,7 @@ public class NetworkConnector {
             } catch (Exception e) {
                 exceptionOccurred = true;
                 e.printStackTrace();
-                MainWindow.writeToMessageFeed("Message Not Sent: " + LastSentMessage.getPayload());
+                Log("Message Not Sent: " + LastSentMessage.getPayload());
             }
         }
     }
@@ -114,12 +144,17 @@ public class NetworkConnector {
     }
 
     public void End() {
-        if (!connection.isConnected()) {
+        if (!connection.isConnected() || connection==null) {
             return;
         }
 
         try {
+            //Clean up everything
+            inStream.close();
+            outStream.close();
             connection.close();
+
+            connection = null;
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -132,31 +167,6 @@ public class NetworkConnector {
     public boolean HasActiveConnection() {
         return connection != null && connection.isConnected() &&
                 !connection.isClosed() && !connection.isInputShutdown() && !connection.isOutputShutdown();
-    }
-
-    public static class MessageReader implements Runnable {
-        private NetworkConnector Net;
-
-        MessageReader(NetworkConnector nc) {
-            Net = nc;
-        }
-
-        @Override
-        public void run() {
-            //Four conditions can make this stop reading messages
-            while (!Thread.currentThread().isInterrupted() && !Net.IsBroken() && Net.HasActiveConnection()) {
-                try {
-                    Net.ReceiveMessage();
-//                    MainWindow.writeToMessageFeed(String.format("Received \'%s\'", Net.ReceiveMessage()));
-                } catch (Exception e) {
-                    MainWindow.writeToMessageFeed("Exception in Message Reader");
-                }
-            }
-        }
-
-        public void end() {
-            Thread.currentThread().interrupt();
-        }
     }
 
     public boolean HandleMessage(String input) {
@@ -189,12 +199,19 @@ public class NetworkConnector {
             this.SendMessage(input);
         }
         if (this.IsBroken()) {
-            MainWindow.writeToMessageFeed("Lost Connection... Reconnecting");
+            Log("Lost Connection... Reconnecting");
             return false;
         } else {
             return true;
         }
     }
+
+    public void Refresh(){
+        //Close and reopen basically...
+        this.End();
+        this.OpenConnection();
+    }
+
     public String getHost() {
         return host;
     }
