@@ -38,11 +38,11 @@ public class JPanelOpenCV extends JPanel {
     private static Scalar lowerGreen = new Scalar(35, 140, 60);
     private static Scalar upperGreen = new Scalar(70, 255, 255);
 
-    private Scalar lowerYellow = new Scalar(90,100,60);
-    private Scalar upperYellow = new Scalar(110,255,255);
+    private static Scalar lowerYellow = new Scalar(90,100,60);
+    private static Scalar upperYellow = new Scalar(110,255,255);
 
-    private Scalar lowerRed = new Scalar(110,100,60);
-    private Scalar upperRed = new Scalar(140,255,255);
+    private static Scalar lowerRed = new Scalar(110,100,60);
+    private static Scalar upperRed = new Scalar(140,255,255);
 
 
     private int erode = 3;
@@ -69,7 +69,7 @@ public class JPanelOpenCV extends JPanel {
         erode = e;
     }
 
-    public void setGreen(Scalar upper, Scalar lower) {
+    public static void setGreen(Scalar upper, Scalar lower) {
         lowerGreen = lower;
         upperGreen = upper;
     }
@@ -82,6 +82,10 @@ public class JPanelOpenCV extends JPanel {
         ar[3] = upperBlue;
         ar[4] = lowerBlack;
         ar[5] = upperBlack;
+        ar[6] = lowerRed;
+        ar[7] = upperRed;
+        ar[8] = lowerYellow;
+        ar[9] = upperYellow;
         return ar;
     }
 
@@ -97,12 +101,12 @@ public class JPanelOpenCV extends JPanel {
         return blueTarget;
     }
 
-    public void setBlue(Scalar upper, Scalar lower) {
+    public static void setBlue(Scalar upper, Scalar lower) {
         upperBlue = upper;
         lowerBlue = lower;
     }
 
-    public void setBlack(Scalar upper, Scalar lower) {
+    public static void setBlack(Scalar upper, Scalar lower) {
         upperBlack = upper;
         lowerBlack = lower;
     }
