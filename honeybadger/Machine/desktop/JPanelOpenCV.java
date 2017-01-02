@@ -87,7 +87,6 @@ public class JPanelOpenCV extends JPanel {
         System.loadLibrary(openCVLib);
         System.loadLibrary(ffmpegLib);
 
-        //******VideoCapture camera = new VideoCapture("http://192.168.1.117:8090/?action=stream.mjpg");
         //TODO: For Joey: you might want to change the IP
         VideoCapture camera = new VideoCapture(ConnectURL);
         if (!camera.isOpened()) {
@@ -100,19 +99,9 @@ public class JPanelOpenCV extends JPanel {
         Mat diffFrame = null;
         camera.read(frame);
 
-        int fourcc = VideoWriter.fourcc('I', 'Y', 'U', 'V');
-        double fps = 10;
-
-        Size s = new Size(640, 480);
-        System.out.println("the fourcc code it " + fourcc);
-
         if (!camera.isOpened()) {
             Log("Error 1 again");
         }
-
-        int count = 0;
-        double rstTime = System.currentTimeMillis();
-        int secondsRec = 300;
 
 
         Mat resized = new Mat();
@@ -121,21 +110,11 @@ public class JPanelOpenCV extends JPanel {
             camera.read(frame);
             color(frame);
 
-            //if (System.currentTimeMillis() - rstTime > 1000) {
-            System.out.println(count);
-            rstTime = System.currentTimeMillis();
-            count = 0;
-            secondsRec--;
-
             image = instance.MatToBufferedImage(frame);
             try {
                 Thread.sleep(10);
             } catch (InterruptedException e) {
                 e.printStackTrace();
-            }
-            count++;
-            if (secondsRec < 0) {
-                break;
             }
 
             //@foxtrot94: resize whatever stream to 640x480
