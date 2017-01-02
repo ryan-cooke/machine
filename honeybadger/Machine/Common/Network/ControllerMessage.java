@@ -141,10 +141,6 @@ public class ControllerMessage extends BaseMsg implements Serializable {
         if (buttons.get(Button.START) && !badger.isListeningToController()){
             badger.listenToController(true);
         }
-
-
-        badger.updateRotation(rightThumbstickDirection, (int) leftThumbstickMagnitude*100);
-        //TODO: handle more buttons
     }
 
     @Override
