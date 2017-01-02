@@ -182,7 +182,6 @@ public class MainWindow {
             OpenCVConfig.main(new String[0]);
         });
 
-
         fontSizeIncrease = new JMenuItem("Increase Font Size");
         fontSizeIncrease.setMnemonic(KeyEvent.VK_PLUS);
         fontSizeIncrease.setToolTipText("Increases the font size");
@@ -193,19 +192,19 @@ public class MainWindow {
         fontSizeDecrease.setToolTipText("Decrease the font size");
         fontSizeDecrease.addActionListener(e -> decreaseFontSize());
 
-        file.add(exit);
+        file.add(update);
         file.add(openCVConfigMenuItem);
+        file.add(exit);
+
         view.add(fontSizeIncrease);
         view.add(fontSizeDecrease);
 
         menuBar.add(file);
         menuBar.add(view);
-        menuBar.add(update);
         mainFrame.setJMenuBar(menuBar);
     }
 
     private void setFontSize(double size, Component c) {
-
         Font font = c.getFont().deriveFont((float) size);
         c.setFont(font);
     }
@@ -232,7 +231,7 @@ public class MainWindow {
 
     private void decreaseFontSize() {
         double size = messageFeed.getFont().getSize();
-        size *= 0.4;
+        size *= 0.3;
         fontSize = size;
         setFontSize(size, messageFeed);
         setFontSize(size, buttonExit);
@@ -273,6 +272,7 @@ public class MainWindow {
     }
 
     private void runRemoteUpdate() {
+        String password = null;
         if (updaterThread != null) {
             JOptionPane.showMessageDialog(null,
                     "An update is in progress. Please wait",
@@ -281,18 +281,28 @@ public class MainWindow {
             return;
         }
 
-        //TODO: obfuscate password input!
-        //Will likely need a JOptionPane.showOptionDialog with custom components.
-        String password = JOptionPane.showInputDialog(
-                "Remote host password",
-                "");
+        JPanel panel = new JPanel();
+        JLabel label = new JLabel("Remote host password:");
+        JPasswordField pass = new JPasswordField(20);
+        panel.add(label);
+        panel.add(pass);
+        String[] options = new String[]{"OK", "Cancel"};
+        int option = JOptionPane.showOptionDialog(null, panel, "RasPI Update authentication",
+                JOptionPane.NO_OPTION, JOptionPane.PLAIN_MESSAGE,
+                null, options, options[1]);
+        if(option == 0) // pressing OK button
+        {
+            char[] passwordC = pass.getPassword();
+            password = new String(passwordC);
+        }
         if (password == null) {
             Log("Cancelling update");
             return;
         }
 
+        String finalPassword = password;
         updaterThread = new Thread(() -> {
-            boolean success = BadgerUpdater.sendUpdate(ConnectionIP, password);
+            boolean success = BadgerUpdater.sendUpdate(ConnectionIP, finalPassword);
             //resetConnection();
             updaterThread = null;
         });
@@ -404,6 +414,7 @@ public class MainWindow {
             UIManager.put("Button.font", highDPI);
             UIManager.put("ToolTip.font", highDPI);
             UIManager.put("FormattedTextField.font" , highDPI);
+            UIManager.put("PasswordField.font", highDPI);
         }
 
         //Get the IP first.
