@@ -2,7 +2,9 @@ package Machine.Common;
 
 import Machine.desktop.MainWindow;
 
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.Scanner;
 
 /**
@@ -54,10 +56,13 @@ public class Utils {
         return Math.min(Math.max(value,min),max);
     }
 
+    protected static SimpleDateFormat formatter = new SimpleDateFormat("HH:mm:ss");
+
     public static void Log(String log){
-        //Very lazy, just needed a quick timestamp
-        java.sql.Timestamp ts = new java.sql.Timestamp(Calendar.getInstance().getTime().getTime());
-        String formatted = String.format("%s: %s\n", ts, log);
+        //Make a timestamp to go with message
+        Date date = new Date(Calendar.getInstance().getTime().getTime());
+        String formatted = String.format("%s: %s\n", formatter.format(date), log);
+
         System.out.format(formatted);
         if(Constants.getActivePlatform()== Constants.PLATFORM.DESKTOP_GUI){
             MainWindow.writeToMessageFeed(formatted);
@@ -65,9 +70,10 @@ public class Utils {
     }
 
     public static void ErrorLog(String message){
-        //Very lazy, just needed a quick timestamp
-        java.sql.Timestamp ts = new java.sql.Timestamp(Calendar.getInstance().getTime().getTime());
-        String formatted = String.format("%s: %s\n", ts, message);
+        //Make a timestamp to go with message
+        Date date = new Date(Calendar.getInstance().getTime().getTime());
+        String formatted = String.format("%s: %s\n", formatter.format(date), message);
+
         System.out.format(formatted);
         System.err.format(formatted);
         if(Constants.getActivePlatform() == Constants.PLATFORM.DESKTOP_GUI){

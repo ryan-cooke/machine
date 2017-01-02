@@ -171,7 +171,7 @@ public class NetworkConnector {
                     MainWindow.writeToMessageFeed("Explaining Commands");
                     Collection<IBadgerFunction> functors = TextCommandMessage.getCommandHandlers();
                     for (IBadgerFunction functor : functors) {
-                        MainWindow.writeToMessageFeed(String.format("\t%s | call: %s", functor.getClass().getSimpleName(), functor.Explain()));
+                        MainWindow.writeToMessageFeed(String.format("   %s | call: %s", functor.getClass().getSimpleName(), functor.Explain()));
                     }
                 } else {
                     MainWindow.writeToMessageFeed(String.format("Sending TextCommandMessage \'%s\'", input.substring(4)));

@@ -395,4 +395,43 @@ public class CMD {
             return 1;
         }
     }
+
+    public static class rampFlywheel extends CheckedFunction{
+        @Override
+        public boolean Invoke(HoneybadgerV6 badger, String[] params) {
+            if(!super.Invoke(badger,params)){
+                return false;
+            }
+            int input = Integer.parseInt(params[0]);
+            if(input!=0 && input!=1){
+                return false;
+            }
+
+            float updateFactor = (float) input;
+
+            try {
+                badger.sendDebugMessageToDesktop("Ramping flywheel");
+                Thread.sleep(1000);
+                for (int i = 0; i < 70; i++) {
+                    badger.updateFlywheel(updateFactor);
+                    Thread.sleep(500);
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+                return false;
+            }
+
+            return true;
+        }
+
+        @Override
+        public String Explain() {
+            return "\'rampFlywheel <1: ramp up | 0: ramp down>\'";
+        }
+
+        @Override
+        public int MinimumParameterNum() {
+            return 1;
+        }
+    }
 }

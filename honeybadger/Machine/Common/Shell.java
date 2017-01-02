@@ -50,4 +50,8 @@ public class Shell {
             Log(String.format("Successfully executed \'%s\'",command));
         }catch (Exception e){e.printStackTrace();}
     }
+
+    public String getLatestStandardOut() {
+        return latestStandardOut;
+    }
 }
