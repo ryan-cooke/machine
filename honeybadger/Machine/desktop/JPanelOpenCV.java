@@ -61,6 +61,17 @@ public class JPanelOpenCV extends JPanel {
         lowerb = lower;
         upperb = upper;
     }
+    public Scalar[] getColorScalars()
+    {
+        Scalar[] ar = new Scalar[6];
+        ar[0]=lowerb;
+        ar[1]=upperb;
+        ar[2]=lowerBlue;
+        ar[3]=upperBlue;
+        ar[4]=lowerBlack;
+        ar[5]=upperBlack;
+        return ar;
+    }
 
     synchronized public static void renderActive(boolean shouldDraw) {
         ShouldDraw = shouldDraw;
