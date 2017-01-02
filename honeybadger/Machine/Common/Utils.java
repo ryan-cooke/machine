@@ -10,6 +10,9 @@ import java.util.Scanner;
  */
 public class Utils {
 
+    public enum Button {A, B, X, Y, BACK, START, RBUMPER, LBUMPER, RTHUMB,
+            LTHUMB, NDPAD, EDPAD, SDPAD, WDPAD}
+
     public static class Vector2D{
         public double x,y;
         private double Magnitude;

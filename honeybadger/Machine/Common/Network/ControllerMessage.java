@@ -1,20 +1,18 @@
 package Machine.Common.Network;
 
 import Machine.Common.Utils;
-import Machine.desktop.Controller;
 import Machine.rpi.HoneybadgerV6;
 
 import java.io.Serializable;
 import java.util.HashMap;
 
 import static Machine.Common.Utils.Log;
+import Machine.Common.Utils.Button;
 
 /**
  * Handles everything related to networking the controller
  */
 public class ControllerMessage extends BaseMsg implements Serializable {
-    public enum Button {A, B, X, Y, BACK, START, RBUMPER, LBUMPER, RTHUMB,
-        LTHUMB, NDPAD, EDPAD, SDPAD, WDPAD, LTRIGGER, RTRIGGER}
 
     public int buttonsPressed; // Number of buttons currently pressed
 
@@ -135,6 +133,7 @@ public class ControllerMessage extends BaseMsg implements Serializable {
         badger.updateMovement(leftThumbstickDirection, (float) leftThumbstickMagnitude * 100.f);
 
         if(buttons.get(Button.LBUMPER)){
+            badger.buttonsPressed.replace(Button.LBUMPER, false);
             badger.disarmFlywheel();
         }
         if(buttons.get(Button.RBUMPER)){
@@ -144,7 +143,7 @@ public class ControllerMessage extends BaseMsg implements Serializable {
         badger.setFlywheelSpeed((float)rightTriggerMagnitude);
         badger.moveConveyor((float)leftTriggerMagnitude);
 
-        badger.updateRotation(leftThumbstickDirection, rightThumbstickDirection, (int) leftThumbstickMagnitude*100);
+        badger.updateRotation(rightThumbstickDirection, (int) leftThumbstickMagnitude*100);
         //TODO: handle more buttons
     }
 

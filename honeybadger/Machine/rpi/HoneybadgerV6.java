@@ -6,8 +6,13 @@ import Machine.Common.Network.StatusMessage;
 import Machine.rpi.hw.BadgerMotorController;
 import Machine.rpi.hw.BadgerPWMProvider;
 import Machine.rpi.hw.RPI;
+import Machine.Common.Utils.Button;
+
 
 import com.pi4j.io.gpio.Pin;
+
+import java.util.HashMap;
+
 
 import static Machine.Common.Utils.Log;
 
@@ -34,7 +39,9 @@ public class HoneybadgerV6 {
 
     private float FlywheelThrottleB;
 
-    private boolean IsMoving;
+    private boolean isMoving;
+
+    public HashMap<Button, Boolean> buttonsPressed;
 
     /**
      * Makes a new Honeybadger (this is version 6). Guaranteed not to give a shit
@@ -46,7 +53,24 @@ public class HoneybadgerV6 {
 
         FlywheelThrottleA = 0.f;
         FlywheelThrottleB = 0.f;
-        IsMoving = false;
+        isMoving = false;
+
+        buttonsPressed = new HashMap<>();
+        buttonsPressed.put(Button.A, false);
+        buttonsPressed.put(Button.B, false);
+        buttonsPressed.put(Button.X, false);
+        buttonsPressed.put(Button.Y, false);
+        buttonsPressed.put(Button.BACK, false);
+        buttonsPressed.put(Button.START, false);
+        buttonsPressed.put(Button.RBUMPER, false);
+        buttonsPressed.put(Button.LBUMPER, false);
+        buttonsPressed.put(Button.RTHUMB, false);
+        buttonsPressed.put(Button.LTHUMB, false);
+        buttonsPressed.put(Button.NDPAD, false);
+        buttonsPressed.put(Button.EDPAD, false);
+        buttonsPressed.put(Button.SDPAD, false);
+        buttonsPressed.put(Button.WDPAD, false);
+
         Log("Made the BadgerV6");
     }
 
@@ -85,46 +109,44 @@ public class HoneybadgerV6 {
         //Change to a map with lambdas or something...
         switch (dir){
             case 'N':{ //up
-                IsMoving = true;
+                isMoving = true;
                 moveForward(throttle);
                 break;
             }
             case 'W':{ //left
-                IsMoving = true;
+                isMoving = true;
                 strafeLeft(throttle);
                 break;
             }
             case 'E':{ //right
-                IsMoving = true;
+                isMoving = true;
                 strafeRight(throttle);
                 break;
             }
             case 'S':{ //down
-                IsMoving = true;
+                isMoving = true;
                 moveBackward(throttle);
                 break;
             }
             case 'Z':{ //no dir
                 moveForward(0);
-                IsMoving = false;
+                isMoving = false;
                 break;
             }
             default:{
                 sendDebugMessageToDesktop("Movement update not understood!");
-                IsMoving = false;
+                isMoving = false;
                 break;
             }
         }
     }
 
     /**
-     *
-     * @param leftDir
-     * @param dir
+     *  @param dir
      * @param throttle
      */
-    public void updateRotation(char leftDir, char dir, int throttle){
-        if( IsMoving == false){
+    public void updateRotation(char dir, int throttle){
+        if( !isMoving){
             switch (dir){
                 case 'N':{
                     break;
