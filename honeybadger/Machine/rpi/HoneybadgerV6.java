@@ -42,8 +42,6 @@ public class HoneybadgerV6 {
 
     public boolean allowController;
 
-    public HashMap<Button, Boolean> buttonsDisabled;
-
     /**
      * Makes a new Honeybadger (this is version 6). Guaranteed not to give a shit
      * @throws Exception But honey badger don't give a shit
@@ -56,22 +54,6 @@ public class HoneybadgerV6 {
         FlywheelThrottleB = 0.f;
         isMoving = false;
         allowController = true;
-
-        buttonsDisabled = new HashMap<>();
-        buttonsDisabled.put(Button.A, false);
-        buttonsDisabled.put(Button.B, false);
-        buttonsDisabled.put(Button.X, false);
-        buttonsDisabled.put(Button.Y, false);
-        buttonsDisabled.put(Button.BACK, false);
-        buttonsDisabled.put(Button.START, false);
-        buttonsDisabled.put(Button.RBUMPER, false);
-        buttonsDisabled.put(Button.LBUMPER, true);
-        buttonsDisabled.put(Button.RTHUMB, false);
-        buttonsDisabled.put(Button.LTHUMB, false);
-        buttonsDisabled.put(Button.NDPAD, false);
-        buttonsDisabled.put(Button.EDPAD, false);
-        buttonsDisabled.put(Button.SDPAD, false);
-        buttonsDisabled.put(Button.WDPAD, false);
 
         Log("Made the BadgerV6");
     }
@@ -174,65 +156,48 @@ public class HoneybadgerV6 {
         }
     }
 
-    private boolean allowButtonPress(HashMap<Button, Boolean> buttons, Button button){
-        return buttons.get(button) && !buttonsDisabled.get(button);
-    }
 
     public void handleButtonPress(HashMap<Button, Boolean> buttons){
-        if (allowButtonPress(buttons, Button.A)){
-            buttonsDisabled.replace(Button.A, true);
+        if (buttons.get(Button.A)){
             handleA();
         }
-        if (allowButtonPress(buttons, Button.B)){
-            buttonsDisabled.replace(Button.B, true);
+        if (buttons.get(Button.B)){
             handleB();
         }
-        if (allowButtonPress(buttons, Button.X)){
-            buttonsDisabled.replace(Button.X, true);
+        if (buttons.get(Button.X)){
             handleX();
         }
-        if (allowButtonPress(buttons, Button.Y)){
-            buttonsDisabled.replace(Button.A, true);
+        if (buttons.get(Button.Y)){
             handleY();
         }
-        if (allowButtonPress(buttons, Button.BACK)){
-            buttonsDisabled.replace(Button.BACK, true);
+        if (buttons.get(Button.BACK)){
             handleBack();
         }
-        if (allowButtonPress(buttons, Button.START)){
-            buttonsDisabled.replace(Button.START, true);
+        if (buttons.get(Button.START)){
             handleStart();
         }
-        if (allowButtonPress(buttons, Button.RBUMPER)){
-            buttonsDisabled.replace(Button.RBUMPER, true);
+        if (buttons.get(Button.RBUMPER)){
             handleRBumper();
         }
-        if (allowButtonPress(buttons, Button.LBUMPER)){
-            buttonsDisabled.replace(Button.LBUMPER, true);
+        if (buttons.get(Button.LBUMPER)){
             handleLBumper();
         }
-        if (allowButtonPress(buttons, Button.RTHUMB)){
-            buttonsDisabled.replace(Button.RTHUMB, true);
+        if (buttons.get(Button.RTHUMB)){
             handleRThumb();
         }
-        if (allowButtonPress(buttons, Button.LTHUMB)){
-            buttonsDisabled.replace(Button.LTHUMB, true);
+        if (buttons.get(Button.LTHUMB)){
             handleLThumb();
         }
-        if (allowButtonPress(buttons, Button.NDPAD)){
-            buttonsDisabled.replace(Button.NDPAD, true);
+        if (buttons.get(Button.NDPAD)){
             handleNDPad();
         }
-        if (allowButtonPress(buttons, Button.EDPAD)){
-            buttonsDisabled.replace(Button.EDPAD, true);
+        if (buttons.get(Button.EDPAD)){
             handleEDPad();
         }
-        if (allowButtonPress(buttons, Button.WDPAD)){
-            buttonsDisabled.replace(Button.WDPAD, true);
+        if (buttons.get(Button.WDPAD)){
             handleWDPad();
         }
-        if (allowButtonPress(buttons, Button.SDPAD)){
-            buttonsDisabled.replace(Button.SDPAD, true);
+        if (buttons.get(Button.SDPAD)){
             handleSDPad();
         }
     }
@@ -254,23 +219,19 @@ public class HoneybadgerV6 {
     }
 
     public void handleBack(){
-        allowController = false;
-        buttonsDisabled.replace(Button.START, false);
+        disallowController();
     }
 
     public void handleStart(){
-        allowController = true;
-        buttonsDisabled.replace(Button.BACK, false);
+        allowController();
     }
 
     public void handleRBumper(){
         armFlywheel();
-        buttonsDisabled.replace(Button.LTHUMB, false);
     }
 
     public void handleLBumper(){
         disarmFlywheel();
-        buttonsDisabled.replace(Button.RTHUMB, false);
     }
 
     public void handleRThumb(){
@@ -339,6 +300,17 @@ public class HoneybadgerV6 {
         motorController.setPWM(BadgerPWMProvider.FLYWHEEL_A,0);
     }
 
+    public void allowController(){
+        if (!allowController) {
+            allowController = true;
+        }
+    }
+
+    public void disallowController(){
+        if(allowController) {
+            allowController = false;
+        }
+    }
     /**
      * Sets the direction of the badger's movement to forward at the given speed percentage
      * @param throttle Int value between 0 (no motion) and 100 (max speed)

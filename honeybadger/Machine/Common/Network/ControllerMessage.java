@@ -138,7 +138,7 @@ public class ControllerMessage extends BaseMsg implements Serializable {
             badger.handleButtonPress(buttons);
         }
         if (buttons.get(Button.START) && !badger.allowController){
-            badger.handleStart();
+            badger.allowController();
         }
 
 
