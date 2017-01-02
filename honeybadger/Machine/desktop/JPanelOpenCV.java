@@ -54,6 +54,12 @@ public class JPanelOpenCV extends JPanel{
 
     }
 
+    public void setGreen(Scalar upper,Scalar lower){lowerb=lower;upperb=upper;}
+
+    public void setBlue(Scalar upper,Scalar lower){upperBlue=upper;lowerBlue=lower;}
+
+    public void setBlack(Scalar upper,Scalar lower){upperBlack=upper;lowerBlack=lower;}
+
 
     public void startLoop()
     {
@@ -93,7 +99,7 @@ public class JPanelOpenCV extends JPanel{
         {
 
             camera.read(frame);
-            color(lowerb,upperb,upperBlue,lowerBlue,frame);
+            color(frame);
             if(System.currentTimeMillis()-rstTime>1000){System.out.println(count);rstTime=System.currentTimeMillis();count=0;secondsRec--;}
             image = t.MatToBufferedImage(frame);
             try {
@@ -112,7 +118,7 @@ public class JPanelOpenCV extends JPanel{
         System.exit(0);
     }
 
-    public void color(Scalar greenMin, Scalar greenMax,Scalar blueMin,Scalar blueMax,Mat frame) {
+    public void color(Mat frame) {
         Mat original = frame.clone();
         Mat hsv = original.clone();
         Mat hsv2 = original.clone();
