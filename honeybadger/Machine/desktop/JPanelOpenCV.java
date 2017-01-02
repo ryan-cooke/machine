@@ -25,6 +25,10 @@ import static Machine.Common.Utils.Log;
 public class JPanelOpenCV extends JPanel {
     static JPanelOpenCV instance;
     static BufferedImage image;
+    private static boolean target=false;
+    private static boolean blueTarget=false;
+    private static int center=320;
+
     private Scalar lowerBlack = new Scalar(0, 0, 0);
     private Scalar upperBlack = new Scalar(180, 255, 90);
 
@@ -55,6 +59,10 @@ public class JPanelOpenCV extends JPanel {
     synchronized public static void renderActive(boolean shouldDraw) {
         ShouldDraw = shouldDraw;
     }
+
+    public boolean isTarget(){return target;}
+
+    public boolean isBlueTarget(){return blueTarget;}
 
     public void setBlue(Scalar upper, Scalar lower) {
         upperBlue = upper;
@@ -240,6 +248,8 @@ public class JPanelOpenCV extends JPanel {
                 Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
 
         Rect objectBoundingRectangle = new Rect(0, 0, 0, 0);
+        target=false;
+        blueTarget=false;
         for (int i = 0; i < contours.size(); i++) {
             objectBoundingRectangle = Imgproc.boundingRect(contours.get(i));
             objectBoundingRectangle.width -= 13;
@@ -253,7 +263,14 @@ public class JPanelOpenCV extends JPanel {
 
             if (skinnyRect) {
                 Imgproc.rectangle(frame, objectBoundingRectangle.tl(), objectBoundingRectangle.br(), new Scalar(0, 255, 0));
-                System.out.println("width of rect is " + objectBoundingRectangle.width + "it is " + color);
+                int rectCenter=objectBoundingRectangle.x+objectBoundingRectangle.width/2;
+                if(Math.abs(rectCenter-center)<5){
+                    target=true;
+                    if(color.equals("blue")){blueTarget=true;}
+
+                }
+
+
             }
         }
         return frame;
