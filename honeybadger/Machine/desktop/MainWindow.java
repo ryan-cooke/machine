@@ -157,7 +157,7 @@ public class MainWindow {
                 super.mouseClicked(e);
                 if (videoThread == null) {
                     MainWindow.writeToMessageFeed("Opening video stream...");
-                    JPanelOpenCV.instance = videoPanel;
+//                    JPanelOpenCV.instance = videoPanel;
                     videoThread = new Thread(new Runnable() {
                         @Override
                         public void run() {
