@@ -210,7 +210,7 @@ public class HoneybadgerV6 {
 
         //The step is used to determine whether the flywheel speed should decrease, increase or stay the same.
         float delta = 0.f;
-        if(updateFactor>0.001f && updateFactor<0.3f){ //decrease
+        if(updateFactor<0.3f){ //decrease
             delta -= step;
         }
         else if(updateFactor > 0.56f && updateFactor<1.1f){

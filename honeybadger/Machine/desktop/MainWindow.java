@@ -50,6 +50,8 @@ public class MainWindow {
     private int inputOffset;
     private double fontSize;
 
+    private static String ConnectionIP;
+
     private MainWindow() {
 
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
@@ -110,9 +112,11 @@ public class MainWindow {
                     Prompt.setText(promptChar);
 
                     inputHistory.add(input);
-                    boolean messageSuccess = singleton.networkBus.HandleMessage(input);
-                    if (!messageSuccess) {
-                        resetConnection();
+                    if(singleton.networkBus!=null) {
+                        boolean messageSuccess = singleton.networkBus.HandleMessage(input);
+                        if (!messageSuccess) {
+                            resetConnection();
+                        }
                     }
                 }
                 inputOffset = 0;
@@ -323,8 +327,8 @@ public class MainWindow {
         updaterThread = new Thread(new Runnable() {
             @Override
             public void run() {
-                boolean success = BadgerUpdater.sendUpdate(networkBus.getHost(),password);
-                resetConnection();
+                boolean success = BadgerUpdater.sendUpdate(ConnectionIP,password);
+                //resetConnection();
                 updaterThread = null;
             }
         });
@@ -343,9 +347,13 @@ public class MainWindow {
                 JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
 
         if (dialogResult == JOptionPane.YES_OPTION) {
-            networkBus.SendMessage("close");
-            networkBus.End();
-            System.exit(0);
+            try {
+                networkBus.SendMessage("close");
+                networkBus.End();
+            } catch (Exception e){e.printStackTrace();}
+            finally {
+                System.exit(0);
+            }
         }
     }
 
@@ -410,7 +418,7 @@ public class MainWindow {
         }
 
         //Get the IP first.
-        String ConnectionIP = promptForIP();
+        ConnectionIP = promptForIP();
 
         singleton = new MainWindow();
 

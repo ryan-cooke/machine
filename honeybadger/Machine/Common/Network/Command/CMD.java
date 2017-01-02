@@ -234,7 +234,7 @@ public class CMD {
 
         @Override
         public String Explain() {
-            return "\"setConveyor <Direction (0,1)> <Throttle percent>\"";
+            return "\"CMD setConveyor <Direction (0,1)> <Throttle percent>\"";
         }
 
         @Override
@@ -260,7 +260,7 @@ public class CMD {
 
         @Override
         public String Explain() {
-            return "\"setAllDriveMotors <Throttle percent>\"";
+            return "\"CMD setAllDriveMotors <Throttle percent>\"";
         }
 
         @Override
@@ -296,7 +296,7 @@ public class CMD {
 
         @Override
         public String Explain() {
-            return "\'ack <anything>\'";
+            return "\'CMD ack <anything>\'";
         }
 
         @Override
@@ -343,7 +343,7 @@ public class CMD {
 
         @Override
         public String Explain() {
-            return "\'move <F,B,L,R> <Throttle Percent>\'";
+            return "\'CMD move <F,B,L,R> <Throttle Percent>\'";
         }
 
         @Override
@@ -365,20 +365,11 @@ public class CMD {
 
             boolean useFlywheel = input==1;
             if(useFlywheel){
-                try {
-                    badger.sendDebugMessageToDesktop("Activating flywheel and speeding up to safe max");
-                    badger.armFlywheel();
-                    Thread.sleep(1000);
-                    for (int i = 0; i < 70; i++) {
-                        badger.updateFlywheel(1.f);
-                        Thread.sleep(500);
-                    }
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                    return false;
-                }
+                badger.sendDebugMessageToDesktop("Arming flywheel");
+                badger.armFlywheel();
             }
             else{
+                badger.sendDebugMessageToDesktop("Disarming!");
                 badger.disarmFlywheel();
             }
 
@@ -387,7 +378,7 @@ public class CMD {
 
         @Override
         public String Explain() {
-            return "\'primeCannon <1: arm and speed up | 0: disarm>\'";
+            return "\'CMD primeCannon <1: arm and speed up | 0: disarm>\'";
         }
 
         @Override
@@ -410,11 +401,11 @@ public class CMD {
             float updateFactor = (float) input;
 
             try {
-                badger.sendDebugMessageToDesktop("Ramping flywheel");
+                badger.sendDebugMessageToDesktop(String.format("Ramping flywheel with update factor %f",updateFactor));
                 Thread.sleep(1000);
-                for (int i = 0; i < 70; i++) {
+                for (int i = 0; i < 200; i++) {
                     badger.updateFlywheel(updateFactor);
-                    Thread.sleep(500);
+                    Thread.sleep(250);
                 }
             } catch (InterruptedException e) {
                 e.printStackTrace();
@@ -426,7 +417,34 @@ public class CMD {
 
         @Override
         public String Explain() {
-            return "\'rampFlywheel <1: ramp up | 0: ramp down>\'";
+            return "\'CMD rampFlywheel <1: ramp up | 0: ramp down>\'";
+        }
+
+        @Override
+        public int MinimumParameterNum() {
+            return 1;
+        }
+    }
+
+    public static class useController extends CheckedFunction{
+        @Override
+        public boolean Invoke(HoneybadgerV6 badger, String[] params) {
+            if(!super.Invoke(badger,params)){
+                return false;
+            }
+            int input = Integer.parseInt(params[0]);
+            if(input!=0 && input!=1){
+                return false;
+            }
+
+            badger.listenToController(input==1);
+
+            return true;
+        }
+
+        @Override
+        public String Explain() {
+            return "\'CMD useController <1: yes | 0: no>\'";
         }
 
         @Override
