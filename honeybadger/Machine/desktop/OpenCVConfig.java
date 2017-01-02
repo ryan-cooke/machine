@@ -13,6 +13,7 @@ public class OpenCVConfig extends JDialog {
     private JPanel contentPane;
     private JButton buttonSave;
     private JButton buttonCancel;
+    private JPanel sliderPanels;
 
     private JSlider hSlider1;
     private JSlider sSlider1;
@@ -31,7 +32,12 @@ public class OpenCVConfig extends JDialog {
     private JSlider vSlider3;
     private JSlider dilateSlider3;
     private JSlider blurSlider3;
-    private JPanel sliderPanels;
+
+    private JSlider canny1;
+    private JSlider canny2;
+    private JSlider houghline1;
+    private JSlider houghline2;
+    private JSlider houghline3;
 
     public OpenCVConfig() {
 
@@ -90,10 +96,8 @@ public class OpenCVConfig extends JDialog {
             if (c instanceof JPanel)
                 for (Component d : ((JPanel) c).getComponents()) {
                     if (d instanceof JSlider) {
-                        ((JSlider) d).addChangeListener((ChangeEvent event) -> {
-                            int value = ((JSlider) d).getValue();
-                            ((JSlider) d).setToolTipText(Integer.toString(value));
-                        });
+                        int value = ((JSlider) d).getValue();
+                        ((JSlider) d).setToolTipText(Integer.toString(value));
                     }
                 }
         }
