@@ -7,8 +7,12 @@ import Machine.Common.Utils;
 import Machine.rpi.hw.BadgerMotorController;
 import Machine.rpi.hw.BadgerPWMProvider;
 import Machine.rpi.hw.RPI;
+import Machine.Common.Utils.Button;
+
 
 import com.pi4j.io.gpio.Pin;
+
+import java.util.HashMap;
 
 import static Machine.Common.Utils.ErrorLog;
 import static Machine.Common.Utils.Log;
@@ -32,6 +36,10 @@ public class HoneybadgerV6 {
      */
     private BadgerNetworkServer NetworkServer;
 
+    public boolean isListeningToController() {
+        return IsListeningToController;
+    }
+
     private boolean IsListeningToController;
 
     private boolean IsMoving;
@@ -51,7 +59,7 @@ public class HoneybadgerV6 {
         NetworkServer = new BadgerNetworkServer(this);
 
         IsMoving = false;
-        IsListeningToController = false;
+        IsListeningToController = true;
 
         FlywheelThrottleA = 0.f;
         FlywheelThrottleB = 0.f;
@@ -104,14 +112,7 @@ public class HoneybadgerV6 {
      * @param throttle a float between 0.0 and 1.0, as given by controller input (for example)
      */
     public void updateMovement(char dir, float throttle){
-        //Ignore method call if we're not explicitly listening for a controller
-        if(!IsListeningToController){
-            return;
-        }
-
-        //Normalize the throttle to 0 to 100%
-        throttle = Utils.Clamp(throttle*100.f,0.f,100.f);
-
+        //Change to a map with lambdas or something...
         switch (dir){
             case 'N':{ //up
                 IsMoving = true;
@@ -151,25 +152,18 @@ public class HoneybadgerV6 {
      * @param dir Single character representing the direction (N,S,E,W or Z)
      * @param throttle a float between 0.0 and 1.0, as given by controller input (for example)
      */
-    public void updateRotation(char dir, float throttle){
-        if(!IsListeningToController){
-            return;
-        }
-
-        //Normalize the throttle to 0 to 100%
-        throttle = Utils.Clamp(throttle*100.f,0.f,100.f);
-
-        if( IsMoving == false){
+    public void updateRotation(char dir, int throttle){
+        if( !IsMoving){
             switch (dir){
                 case 'N':{
                     break;
                 }
                 case 'W':{
-                    //spinLeft(throttle);
+                    spinLeft(throttle);
                     break;
                 }
                 case 'E':{
-                    //spinRight(throttle);
+                    spinRight(throttle);
                     break;
                 }
                 case 'S':{
@@ -185,11 +179,112 @@ public class HoneybadgerV6 {
         }
     }
 
+
+    public void handleButtonPress(HashMap<Button, Boolean> buttons){
+        if (buttons.get(Button.A)){
+            handleA();
+        }
+        if (buttons.get(Button.B)){
+            handleB();
+        }
+        if (buttons.get(Button.X)){
+            handleX();
+        }
+        if (buttons.get(Button.Y)){
+            handleY();
+        }
+        if (buttons.get(Button.BACK)){
+            handleBack();
+        }
+        if (buttons.get(Button.START)){
+            handleStart();
+        }
+        if (buttons.get(Button.RBUMPER)){
+            handleRBumper();
+        }
+        if (buttons.get(Button.LBUMPER)){
+            handleLBumper();
+        }
+        if (buttons.get(Button.RTHUMB)){
+            handleRThumb();
+        }
+        if (buttons.get(Button.LTHUMB)){
+            handleLThumb();
+        }
+        if (buttons.get(Button.NDPAD)){
+            handleNDPad();
+        }
+        if (buttons.get(Button.EDPAD)){
+            handleEDPad();
+        }
+        if (buttons.get(Button.WDPAD)){
+            handleWDPad();
+        }
+        if (buttons.get(Button.SDPAD)){
+            handleSDPad();
+        }
+    }
+
+    public void handleA(){
+
+    }
+
+    public void handleB(){
+
+    }
+
+    public void handleX(){
+
+    }
+
+    public void handleY(){
+
+    }
+
+    public void handleBack(){
+        listenToController(false);
+    }
+
+    public void handleStart(){
+        listenToController(true);
+    }
+
+    public void handleRBumper(){
+        armFlywheel();
+    }
+
+    public void handleLBumper(){
+        disarmFlywheel();
+    }
+
+    public void handleRThumb(){
+
+    }
+
+    public void handleLThumb(){
+
+    }
+
+    public void handleNDPad(){
+
+    }
+
+    public void handleEDPad(){
+
+    }
+
+    public void handleWDPad(){
+
+    }
+
+    public void handleSDPad() {
+    }
+
     /**
      * Move the conveyor in one direction
      * @param throttle a float between 0.0 and 1.0, as given by controller input (for example)
      */
-    public void updateConveyor(float throttle){
+    public void updateConveyor (float throttle){
         throttle = Utils.Clamp(throttle*100.f,0.f,100.f);
         MotorController.setDriveMotorSpeed(BadgerPWMProvider.CONVEYOR_A,throttle);
         MotorController.setDriveMotorSpeed(BadgerPWMProvider.CONVEYOR_B,throttle);
