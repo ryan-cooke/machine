@@ -28,6 +28,7 @@ public class MainWindow {
 
     private Thread networkThread;
     private Thread videoThread;
+    private Thread updaterThread;
 
     private JPanel contentPane;
     private JButton buttonReboot;
@@ -36,6 +37,7 @@ public class MainWindow {
     private JMenuBar menuBar;
     private JMenu file;
     private JMenu view;
+    private JMenuItem update;
     private JMenuItem exit;
     private JMenuItem fontSizeIncrease;
     private JMenuItem fontSizeDecrease;
@@ -59,7 +61,7 @@ public class MainWindow {
         mainFrame.setLayout(new GridLayout(1, 1));
         mainFrame.addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent windowEvent) {
-                System.exit(0);
+                onPressExit();
             }
         });
 
@@ -106,26 +108,6 @@ public class MainWindow {
                 String input = Prompt.getText().substring(2);
                 if (input.length() > 0) {
                     Prompt.setText(promptChar);
-                    if(input.contains("update")){
-                        //TODO: obfuscate password input!
-                        //Will likely need a JOptionPane.showOptionDialog with custom components.
-                        String password = JOptionPane.showInputDialog(
-                                "Remote host password",
-                                "");
-                        if (password == null) {
-                            return;
-                        }
-
-                        //TODO: keep track of thread...
-                        Thread updater=new Thread(new Runnable() {
-                            @Override
-                            public void run() {
-                                BadgerUpdater.sendUpdate(networkBus.getHost(),password);
-                                networkBus.SendMessage("reconnect");
-                            }
-                        });
-                        updater.start();
-                    }
 
                     inputHistory.add(input);
                     boolean messageSuccess = singleton.networkBus.HandleMessage(input);
@@ -210,6 +192,15 @@ public class MainWindow {
         exit.setMnemonic(KeyEvent.VK_E);
         exit.setToolTipText("If you really need a tool tip for this button, you shouldn't be in engineering");
 
+        update = new JMenuItem("Update badger");
+        update.setToolTipText("Update the Honeybadger V6 remotely");
+        update.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                runRemoteUpdate();
+            }
+        });
+
         fontSizeIncrease = new JMenuItem("Increase Font Size");
         fontSizeIncrease.setMnemonic(KeyEvent.VK_PLUS);
         fontSizeIncrease.setToolTipText("Increases the font size");
@@ -230,7 +221,7 @@ public class MainWindow {
 
         menuBar.add(file);
         menuBar.add(view);
-
+        menuBar.add(update);
         mainFrame.setJMenuBar(menuBar);
     }
 
@@ -289,14 +280,6 @@ public class MainWindow {
             }
         });
 
-        /*// call onPressExit() when cross is clicked
-        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-        addWindowListener(new WindowAdapter() {
-            public void windowClosing(WindowEvent e) {
-                onPressExit();
-            }
-        });*/
-
         // call onPressExit() on ESCAPE
         contentPane.registerKeyboardAction(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -316,6 +299,36 @@ public class MainWindow {
         } else if (historyIndex >= inputHistory.size()) {
             inputOffset = 0;
         }
+    }
+
+    private void runRemoteUpdate(){
+        if(updaterThread!=null){
+            JOptionPane.showMessageDialog(null,
+                    "An update is in progress. Please wait",
+                    "Update Transmission Error",
+                    JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        //TODO: obfuscate password input!
+        //Will likely need a JOptionPane.showOptionDialog with custom components.
+        String password = JOptionPane.showInputDialog(
+                "Remote host password",
+                "");
+        if (password == null){
+            Log("Cancelling update");
+            return;
+        }
+
+        updaterThread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                boolean success = BadgerUpdater.sendUpdate(networkBus.getHost(),password);
+                networkBus.SendMessage("reconnect");
+                updaterThread = null;
+            }
+        });
+        updaterThread.start();
     }
 
     private void onPressReboot() {

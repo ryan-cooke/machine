@@ -2,6 +2,8 @@ package Machine.Common;
 
 import Machine.desktop.MainWindow;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -82,6 +84,14 @@ public class Utils {
 
         //Print immediately
         System.err.flush();
+    }
+
+    public static void ErrorLog(String message, Exception except){
+        StringWriter errors = new StringWriter();
+        if(except!=null) {
+            except.printStackTrace(new PrintWriter(errors));
+        }
+        ErrorLog(String.format("%s\n%s",errors.toString(),message));
     }
 
     public static String Prompt(char symbol, Scanner kb){

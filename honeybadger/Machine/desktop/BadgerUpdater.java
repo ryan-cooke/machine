@@ -12,6 +12,7 @@ import java.util.jar.JarFile;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
+import static Machine.Common.Utils.ErrorLog;
 import static Machine.Common.Utils.Log;
 
 /**
@@ -26,7 +27,7 @@ public class BadgerUpdater {
      * @param host
      * @param password
      */
-    public static void sendUpdate (String host, String password) {
+    public static boolean sendUpdate (String host, String password) {
         final int SFTP_PORT = 22;
         final String targetDirectory = "/home/pi/intellij/out/production/Forge";
         final String user = "pi";
@@ -36,6 +37,7 @@ public class BadgerUpdater {
         ChannelSftp channelSftp = null;
         Log("Preparing the host information for transfer");
 
+        boolean operationSuccessful=false;
         try {
             JSch jsch = new JSch();
             session = jsch.getSession(user, host, SFTP_PORT);
@@ -45,13 +47,13 @@ public class BadgerUpdater {
             config.put("StrictHostKeyChecking", "no");
             session.setConfig(config);
 
-            Log("Connecting....");
+            Log("Establishing secure connection.");
             session.connect();
-            Log("Connection successful. Switching to Secure File Transfer Protocol");
+            Log("Connection successful. Switching to Secure File Transfer Protocol.");
             channel = session.openChannel("sftp");
             channel.connect();
 
-            Log("Channel Open. Transferring update...");
+            Log("SFTP Channel Open. Transferring update...");
             channelSftp = (ChannelSftp) channel;
             channelSftp.cd(targetDirectory);
 
@@ -72,15 +74,24 @@ public class BadgerUpdater {
             }
 
             Log("Update sent successfully to Honeybadger");
-        } catch (Exception ex) {
-            Log("Exception occurred while updating the Honeybadger");
+            operationSuccessful = true;
+        } catch (Exception e) {
+            ErrorLog("Exception occurred while updating the Honeybadger",e);
+            e.printStackTrace();
         }
         finally{
-            channelSftp.exit();
-            Log("SFTP channel closed.");
-            channel.disconnect();
-            session.disconnect();
-            Log("Host Session disconnected.");
+            if(channelSftp!=null) {
+                channelSftp.exit();
+                Log("SFTP channel closed.");
+            }
+
+            if(channel!=null)
+                channel.disconnect();
+            if(session!=null)
+                session.disconnect();
+            Log("Update Session disconnected.");
         }
+
+        return operationSuccessful;
     }
 }

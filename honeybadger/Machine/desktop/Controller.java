@@ -280,7 +280,7 @@ public class Controller extends XboxControllerAdapter{
 
         String baseDir=System.getProperty("user.dir");
         if(baseDir.endsWith("honeybadger")){
-            baseDir+="executable";
+            baseDir+="\\executable";
         }
         baseDir+="\\bin";
         String arch = System.getProperty("os.arch");
