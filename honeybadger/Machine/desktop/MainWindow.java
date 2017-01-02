@@ -1,7 +1,7 @@
 package Machine.desktop;
 
 import Machine.Common.Constants;
-import Machine.Common.Shell;
+import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.Size;

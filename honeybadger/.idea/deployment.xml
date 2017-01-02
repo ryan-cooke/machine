@@ -1,8 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="PublishConfigData" serverName="Badger">
+  <component name="PublishConfigData" serverName="Badger (project level)">
     <serverData>
       <paths name="Badger">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/intellij" local="$PROJECT_DIR$" web="/" />
+          </mappings>
+        </serverdata>
+      </paths>
+      <paths name="Badger (project level)">
         <serverdata>
           <mappings>
             <mapping deploy="/intellij" local="$PROJECT_DIR$" web="/" />
