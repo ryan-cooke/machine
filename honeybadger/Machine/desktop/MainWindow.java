@@ -15,6 +15,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.DataBufferByte;
 import java.io.File;
+import java.security.Key;
 import java.util.ArrayList;
 
 import static Machine.Common.Utils.ErrorLog;
@@ -39,11 +40,16 @@ public class MainWindow {
     private JMenuBar menuBar;
     private JMenu file;
     private JMenu view;
+    private JMenu opencv;
+    private JMenu opencvBuffers;
     private JMenuItem update;
     private JMenuItem exit;
     private JMenuItem fontSizeIncrease;
     private JMenuItem fontSizeDecrease;
     private JMenuItem openCVConfigMenuItem;
+    private JMenuItem regularBuffer;
+    private JMenuItem cannyBuffer;
+    private JMenuItem hougheBuffer;
 
     private JTextArea messageFeed;
     private JPanelOpenCV videoPanel;
@@ -167,6 +173,9 @@ public class MainWindow {
         view = new JMenu("View");
         view.setMnemonic(KeyEvent.VK_V);
 
+        opencv = new JMenu("OpenCV");
+        opencv.setMnemonic(KeyEvent.VK_O);
+
         exit = new JMenuItem("Exit");
         exit.setMnemonic(KeyEvent.VK_E);
         exit.setToolTipText("If you really need a tool tip for this button, you shouldn't be in engineering");
@@ -182,6 +191,28 @@ public class MainWindow {
             OpenCVConfig.main(new String[0]);
         });
 
+        //reg canny houghe
+        opencvBuffers = new JMenu("Change OpenCV Buffer");
+        opencvBuffers.setMnemonic(KeyEvent.VK_B);
+
+        regularBuffer = new JMenuItem("Regular");
+        regularBuffer.setMnemonic(KeyEvent.VK_R);
+        regularBuffer.addActionListener(e -> {
+
+        });
+
+        cannyBuffer = new JMenuItem("Canny");
+        cannyBuffer.setMnemonic(KeyEvent.VK_C);
+        cannyBuffer.addActionListener(e -> {
+
+        });
+
+        hougheBuffer = new JMenuItem("Houghe");
+        hougheBuffer.setMnemonic(KeyEvent.VK_H);
+        hougheBuffer.addActionListener(e -> {
+
+        });
+
         fontSizeIncrease = new JMenuItem("Increase Font Size");
         fontSizeIncrease.setMnemonic(KeyEvent.VK_PLUS);
         fontSizeIncrease.setToolTipText("Increases the font size");
@@ -193,14 +224,21 @@ public class MainWindow {
         fontSizeDecrease.addActionListener(e -> decreaseFontSize());
 
         file.add(update);
-        file.add(openCVConfigMenuItem);
         file.add(exit);
 
         view.add(fontSizeIncrease);
         view.add(fontSizeDecrease);
 
+        opencvBuffers.add(regularBuffer);
+        opencvBuffers.add(cannyBuffer);
+        opencvBuffers.add(hougheBuffer);
+
+        opencv.add(openCVConfigMenuItem);
+        opencv.add(opencvBuffers);
+
         menuBar.add(file);
         menuBar.add(view);
+        menuBar.add(opencv);
         mainFrame.setJMenuBar(menuBar);
     }
 
