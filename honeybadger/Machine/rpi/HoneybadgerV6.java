@@ -12,10 +12,6 @@ import Machine.Common.Utils.Button;
 import com.pi4j.io.gpio.Pin;
 
 import java.util.HashMap;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-
 
 import static Machine.Common.Utils.Log;
 
@@ -44,38 +40,38 @@ public class HoneybadgerV6 {
 
     private boolean isMoving;
 
-    public HashMap<Button, Boolean> buttonsPressed;
+    public boolean allowController;
 
-    private ScheduledExecutorService executor;
+    public HashMap<Button, Boolean> buttonsDisabled;
 
     /**
      * Makes a new Honeybadger (this is version 6). Guaranteed not to give a shit
      * @throws Exception But honey badger don't give a shit
      */
     private HoneybadgerV6() throws Exception {
-        executor = (ScheduledExecutorService) Executors.newFixedThreadPool(12);
         motorController = new BadgerMotorController();
         networkServer = new BadgerNetworkServer(this);
 
         FlywheelThrottleA = 0.f;
         FlywheelThrottleB = 0.f;
         isMoving = false;
+        allowController = true;
 
-        buttonsPressed = new HashMap<>();
-        buttonsPressed.put(Button.A, false);
-        buttonsPressed.put(Button.B, false);
-        buttonsPressed.put(Button.X, false);
-        buttonsPressed.put(Button.Y, false);
-        buttonsPressed.put(Button.BACK, false);
-        buttonsPressed.put(Button.START, false);
-        buttonsPressed.put(Button.RBUMPER, false);
-        buttonsPressed.put(Button.LBUMPER, true);
-        buttonsPressed.put(Button.RTHUMB, false);
-        buttonsPressed.put(Button.LTHUMB, false);
-        buttonsPressed.put(Button.NDPAD, false);
-        buttonsPressed.put(Button.EDPAD, false);
-        buttonsPressed.put(Button.SDPAD, false);
-        buttonsPressed.put(Button.WDPAD, false);
+        buttonsDisabled = new HashMap<>();
+        buttonsDisabled.put(Button.A, false);
+        buttonsDisabled.put(Button.B, false);
+        buttonsDisabled.put(Button.X, false);
+        buttonsDisabled.put(Button.Y, false);
+        buttonsDisabled.put(Button.BACK, false);
+        buttonsDisabled.put(Button.START, false);
+        buttonsDisabled.put(Button.RBUMPER, false);
+        buttonsDisabled.put(Button.LBUMPER, true);
+        buttonsDisabled.put(Button.RTHUMB, false);
+        buttonsDisabled.put(Button.LTHUMB, false);
+        buttonsDisabled.put(Button.NDPAD, false);
+        buttonsDisabled.put(Button.EDPAD, false);
+        buttonsDisabled.put(Button.SDPAD, false);
+        buttonsDisabled.put(Button.WDPAD, false);
 
         Log("Made the BadgerV6");
     }
@@ -178,71 +174,71 @@ public class HoneybadgerV6 {
         }
     }
 
+    private boolean allowButtonPress(HashMap<Button, Boolean> buttons, Button button){
+        return buttons.get(button) && !buttonsDisabled.get(button);
+    }
+
     public void handleButtonPress(HashMap<Button, Boolean> buttons){
-        if (buttons.get(Button.A) && !buttonsPressed.get(Button.A)){
-            buttonsPressed.replace(Button.A, true);
+        if (allowButtonPress(buttons, Button.A)){
+            buttonsDisabled.replace(Button.A, true);
             handleA();
         }
-        if (buttons.get(Button.B) && !buttonsPressed.get(Button.B)){
-            buttonsPressed.replace(Button.B, true);
+        if (allowButtonPress(buttons, Button.B)){
+            buttonsDisabled.replace(Button.B, true);
             handleB();
         }
-        if (buttons.get(Button.X) && !buttonsPressed.get(Button.X)){
-            buttonsPressed.replace(Button.X, true);
+        if (allowButtonPress(buttons, Button.X)){
+            buttonsDisabled.replace(Button.X, true);
             handleX();
         }
-        if (buttons.get(Button.Y) && !buttonsPressed.get(Button.Y)){
-            buttonsPressed.replace(Button.A, true);
+        if (allowButtonPress(buttons, Button.Y)){
+            buttonsDisabled.replace(Button.A, true);
             handleY();
         }
-        if (buttons.get(Button.BACK) && !buttonsPressed.get(Button.BACK)){
-            buttonsPressed.replace(Button.BACK, true);
+        if (allowButtonPress(buttons, Button.BACK)){
+            buttonsDisabled.replace(Button.BACK, true);
             handleBack();
         }
-        if (buttons.get(Button.START) && !buttonsPressed.get(Button.START)){
-            buttonsPressed.replace(Button.START, true);
+        if (allowButtonPress(buttons, Button.START)){
+            buttonsDisabled.replace(Button.START, true);
             handleStart();
         }
-        if (buttons.get(Button.RBUMPER) && !buttonsPressed.get(Button.RBUMPER)){
-            buttonsPressed.replace(Button.RBUMPER, true);
+        if (allowButtonPress(buttons, Button.RBUMPER)){
+            buttonsDisabled.replace(Button.RBUMPER, true);
             handleRBumper();
         }
-        if (buttons.get(Button.LBUMPER) && !buttonsPressed.get(Button.LBUMPER)){
-            buttonsPressed.replace(Button.LBUMPER, true);
+        if (allowButtonPress(buttons, Button.LBUMPER)){
+            buttonsDisabled.replace(Button.LBUMPER, true);
             handleLBumper();
         }
-        if (buttons.get(Button.RTHUMB) && !buttonsPressed.get(Button.RTHUMB)){
-            buttonsPressed.replace(Button.RTHUMB, true);
+        if (allowButtonPress(buttons, Button.RTHUMB)){
+            buttonsDisabled.replace(Button.RTHUMB, true);
             handleRThumb();
         }
-        if (buttons.get(Button.LTHUMB) && !buttonsPressed.get(Button.LTHUMB)){
-            buttonsPressed.replace(Button.LTHUMB, true);
+        if (allowButtonPress(buttons, Button.LTHUMB)){
+            buttonsDisabled.replace(Button.LTHUMB, true);
             handleLThumb();
         }
-        if (buttons.get(Button.NDPAD) && !buttonsPressed.get(Button.NDPAD)){
-            buttonsPressed.replace(Button.NDPAD, true);
+        if (allowButtonPress(buttons, Button.NDPAD)){
+            buttonsDisabled.replace(Button.NDPAD, true);
             handleNDPad();
         }
-        if (buttons.get(Button.EDPAD) && !buttonsPressed.get(Button.EDPAD)){
-            buttonsPressed.replace(Button.EDPAD, true);
+        if (allowButtonPress(buttons, Button.EDPAD)){
+            buttonsDisabled.replace(Button.EDPAD, true);
             handleEDPad();
         }
-        if (buttons.get(Button.WDPAD) && !buttonsPressed.get(Button.WDPAD)){
-            buttonsPressed.replace(Button.WDPAD, true);
+        if (allowButtonPress(buttons, Button.WDPAD)){
+            buttonsDisabled.replace(Button.WDPAD, true);
             handleWDPad();
         }
-        if (buttons.get(Button.SDPAD) && !buttonsPressed.get(Button.SDPAD)){
-            buttonsPressed.replace(Button.SDPAD, true);
+        if (allowButtonPress(buttons, Button.SDPAD)){
+            buttonsDisabled.replace(Button.SDPAD, true);
             handleSDPad();
         }
     }
 
-    private Runnable depressButton(Button button){
-        return () -> buttonsPressed.replace(button, false);
-    }
-
     public void handleA(){
-        executor.schedule(depressButton(Button.A), 2, TimeUnit.SECONDS);
+
     }
 
     public void handleB(){
@@ -258,25 +254,27 @@ public class HoneybadgerV6 {
     }
 
     public void handleBack(){
-
+        allowController = false;
+        buttonsDisabled.replace(Button.START, false);
     }
 
     public void handleStart(){
-
+        allowController = true;
+        buttonsDisabled.replace(Button.BACK, false);
     }
 
     public void handleRBumper(){
-
+        armFlywheel();
+        buttonsDisabled.replace(Button.LTHUMB, false);
     }
 
     public void handleLBumper(){
         disarmFlywheel();
-        buttonsPressed.replace(Button.RTHUMB, false);
+        buttonsDisabled.replace(Button.RTHUMB, false);
     }
 
     public void handleRThumb(){
-        armFlywheel();
-        buttonsPressed.replace(Button.LTHUMB, false);
+
     }
 
     public void handleLThumb(){
