@@ -15,32 +15,10 @@ public class Disp extends JPanel{
 	public Disp(BufferedImage img)
 	{
 		image = img;
-		
-		
-		
 	}
 	public void setImage(BufferedImage img){image = img;}
 	
 	public void paint(Graphics g) {
         g.drawImage(image, 0, 0, this);
     }
-	
-	public BufferedImage MatToBufferedImage(Mat frame) {
-        //Mat() to BufferedImage
-        int type = 0;
-        if (frame.channels() == 1) {
-            type = BufferedImage.TYPE_BYTE_GRAY;
-        } else if (frame.channels() == 3) {
-            type = BufferedImage.TYPE_3BYTE_BGR;
-        }
-        BufferedImage image = new BufferedImage(frame.width(), frame.height(), type);
-        WritableRaster raster = image.getRaster();
-        DataBufferByte dataBuffer = (DataBufferByte) raster.getDataBuffer();
-        byte[] data = dataBuffer.getData();
-        frame.get(0, 0, data);
-        return image;
-    }
-	
-	
-	
 }
