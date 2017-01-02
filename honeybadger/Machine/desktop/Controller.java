@@ -12,9 +12,9 @@ import static Machine.Common.Utils.Log;
 import Machine.Common.Utils.Button;
 
 
-public class Controller extends XboxControllerAdapter{
+public class Controller{
 
-    private final ScheduledExecutorService ScheduledManager;
+//    private final ScheduledExecutorService ScheduledManager;
 
     private NetworkConnector connector;
     private XboxController connectedController;
@@ -27,242 +27,10 @@ public class Controller extends XboxControllerAdapter{
         controllerState.setButtonsPressed(controllerState.getButtonsPressed()+1);
         controllerState.buttons.replace(button, true);
     }
-    
+
     private void depress(Button button){
         controllerState.setButtonsPressed(controllerState.getButtonsPressed()-1);
         controllerState.buttons.replace(button, false);
-    }
-    
-    public void buttonA(boolean pressed)
-    {
-        if(pressed){
-            press(Button.A);
-        }
-        else{
-            depress(Button.A);
-        }
-    }
-
-    public void buttonB(boolean pressed)
-    {
-        if(pressed){
-            press(Button.B);
-        }
-        else{
-            depress(Button.B);
-        }
-    }
-
-    public void buttonX(boolean pressed)
-    {
-        if(pressed){
-            press(Button.X);
-        }
-        else{
-            depress(Button.X);
-        }
-    }
-
-    public void buttonY(boolean pressed)
-    {
-        if (pressed){
-            press(Button.Y);
-        }
-        else{
-            depress(Button.Y);
-        }
-    }
-
-    public void back(boolean pressed)
-    {
-        if (pressed){
-            press(Button.BACK);
-        }
-        else{
-            depress(Button.START);
-        }
-    }
-
-    public void start(boolean pressed)
-    {
-        if (pressed){
-            press(Button.RBUMPER);
-        }
-        else{
-            depress(Button.RBUMPER);
-        }
-    }
-
-    public void leftShoulder(boolean pressed)
-    {
-        if (pressed){
-            press(Button.LBUMPER);
-        }
-        else{
-            depress(Button.LBUMPER);
-        }
-    }
-
-    public void rightShoulder(boolean pressed)
-    {
-        if (pressed){
-            press(Button.RBUMPER);
-        }
-        else{
-            depress(Button.RBUMPER);
-        }
-    }
-
-    public void leftThumb(boolean pressed)
-    {
-        if (pressed){
-            press(Button.LTHUMB);
-        }
-        else{
-            depress(Button.LTHUMB);
-        }
-    }
-
-    public void rightThumb(boolean pressed)
-    {
-        if (pressed){
-            press(Button.RTHUMB);
-        }
-        else{
-            depress(Button.RTHUMB);
-        }
-    }
-
-    public void dpad(int direction, boolean pressed) {
-        if (pressed) {
-            switch (direction) {
-                case 0:
-                    // N
-                    press(Button.NDPAD);
-                    break;
-                case 1:
-                    // NE
-                    break;
-                case 2:
-                    // E
-                    press(Button.EDPAD);
-                    break;
-                case 3:
-                    // SE
-                    break;
-                case 4:
-                    // S
-                    press(Button.SDPAD);
-                    break;
-                case 5:
-                    // SW
-                    break;
-                case 6:
-                    // W
-                    press(Button.WDPAD);
-                    break;
-                case 7:
-                    // NW
-                    break;
-            }
-        } else{
-            switch (direction) {
-                case 0:
-                    // N
-                    depress(Button.NDPAD);
-                    break;
-                case 1:
-                    // NE
-                    break;
-                case 2:
-                    // E
-                    depress(Button.EDPAD);
-                    break;
-                case 3:
-                    // SE
-                    break;
-                case 4:
-                    // S
-                    depress(Button.SDPAD);
-                    break;
-                case 5:
-                    // SW
-                    break;
-                case 6:
-                    // W
-                    depress(Button.WDPAD);
-                    break;
-                case 7:
-                    // NW
-                    break;
-            }
-        }
-    }
-
-    public void leftTrigger(double value)
-    {
-        //value is how hard you press. Between 0-1.0
-        controllerState.leftTriggerMagnitude = value;
-    }
-
-    public void rightTrigger(double value)
-    {
-        //value is how hard you press. Between 0-1.0
-        controllerState.rightTriggerMagnitude = value;
-    }
-
-    public void leftThumbMagnitude(double magnitude)
-    {
-        //magnitude is how hard you press. Between 0-1.0
-        controllerState.leftThumbstickMagnitude = magnitude;
-        if( magnitude < 0.2){
-            controllerState.leftThumbstickDirection = 'Z';
-            controllerState.leftThumbstickRotation = 0.0;
-        }
-    }
-
-    public void leftThumbDirection(double direction)
-    {
-        //direction is angle. Between 0-360.0, at top
-        controllerState.leftThumbstickRotation = (direction);
-        if (direction < 45 || direction > 315){
-            controllerState.setLeftThumbDir('N');
-        } else if (direction < 135){
-            controllerState.setLeftThumbDir('E');
-        } else if (direction < 225){
-            controllerState.setLeftThumbDir('S');
-        } else if (direction < 315){
-            controllerState.setLeftThumbDir('W');
-        } else {
-            controllerState.setLeftThumbDir('Z');
-        }
-    }
-
-    public void rightThumbMagnitude(double magnitude)
-    {
-        //magnitude is how hard you press. Between 0-1.0
-        controllerState.rightThumbstickMagnitude = magnitude;
-        if( magnitude < 0.2){
-            controllerState.rightThumbstickDirection = 'Z';
-            controllerState.rightThumbstickRotation = 0.0;
-        }
-    }
-
-    public void rightThumbDirection(double direction)
-    {
-        //direction is angle. Between 0-360.0, at top
-        controllerState.rightThumbstickRotation = (direction);
-        if (direction < 45 || direction > 315){
-            controllerState.setRightThumbstickDirection('N');
-        } else if (direction < 135){
-            controllerState.setRightThumbstickDirection('E');
-        } else if (direction < 225){
-            controllerState.setRightThumbstickDirection('S');
-        } else if (direction < 315){
-            controllerState.setRightThumbstickDirection('W');
-        } else {
-            controllerState.setRightThumbstickDirection('Z');
-        }
     }
 
     public void isConnected()
@@ -296,16 +64,270 @@ public class Controller extends XboxControllerAdapter{
                 50);
 
         isConnected();
-        ScheduledManager = Executors.newScheduledThreadPool(1);
+//        ScheduledManager = Executors.newScheduledThreadPool(1);
 
         controllerState = new ControllerMessage();
         controllerState.Initialize();
 
-        connectedController.addXboxControllerListener(this);
+        connectedController.addXboxControllerListener(new XboxControllerAdapter() {
+            @Override
+            public void buttonA(boolean pressed)
+            {
+                if(pressed){
+                    press(Button.A);
+                }
+                else{
+                    depress(Button.A);
+                }
+            }
+
+            @Override
+            public void buttonB(boolean pressed)
+            {
+                if(pressed){
+                    press(Button.B);
+                }
+                else{
+                    depress(Button.B);
+                }
+            }
+
+            @Override
+            public void buttonX(boolean pressed)
+            {
+                if(pressed){
+                    press(Button.X);
+                }
+                else{
+                    depress(Button.X);
+                }
+            }
+
+            @Override
+            public void buttonY(boolean pressed)
+            {
+                if (pressed){
+                    press(Button.Y);
+                }
+                else{
+                    depress(Button.Y);
+                }
+            }
+
+            @Override
+            public void back(boolean pressed)
+            {
+                if (pressed){
+                    press(Button.BACK);
+                }
+                else{
+                    depress(Button.START);
+                }
+            }
+
+            @Override
+            public void start(boolean pressed)
+            {
+                if (pressed){
+                    press(Button.RBUMPER);
+                }
+                else{
+                    depress(Button.RBUMPER);
+                }
+            }
+
+            @Override
+            public void leftShoulder(boolean pressed)
+            {
+                if (pressed){
+                    press(Button.LBUMPER);
+                }
+                else{
+                    depress(Button.LBUMPER);
+                }
+            }
+
+            @Override
+            public void rightShoulder(boolean pressed)
+            {
+                if (pressed){
+                    press(Button.RBUMPER);
+                }
+                else{
+                    depress(Button.RBUMPER);
+                }
+            }
+
+            @Override
+            public void leftThumb(boolean pressed)
+            {
+                if (pressed){
+                    press(Button.LTHUMB);
+                }
+                else{
+                    depress(Button.LTHUMB);
+                }
+            }
+
+            @Override
+            public void rightThumb(boolean pressed)
+            {
+                if (pressed){
+                    press(Button.RTHUMB);
+                }
+                else{
+                    depress(Button.RTHUMB);
+                }
+            }
+
+            @Override
+            public void dpad(int direction, boolean pressed) {
+                if (pressed) {
+                    switch (direction) {
+                        case 0:
+                            // N
+                            press(Button.NDPAD);
+                            break;
+                        case 1:
+                            // NE
+                            break;
+                        case 2:
+                            // E
+                            press(Button.EDPAD);
+                            break;
+                        case 3:
+                            // SE
+                            break;
+                        case 4:
+                            // S
+                            press(Button.SDPAD);
+                            break;
+                        case 5:
+                            // SW
+                            break;
+                        case 6:
+                            // W
+                            press(Button.WDPAD);
+                            break;
+                        case 7:
+                            // NW
+                            break;
+                    }
+                } else{
+                    switch (direction) {
+                        case 0:
+                            // N
+                            depress(Button.NDPAD);
+                            break;
+                        case 1:
+                            // NE
+                            break;
+                        case 2:
+                            // E
+                            depress(Button.EDPAD);
+                            break;
+                        case 3:
+                            // SE
+                            break;
+                        case 4:
+                            // S
+                            depress(Button.SDPAD);
+                            break;
+                        case 5:
+                            // SW
+                            break;
+                        case 6:
+                            // W
+                            depress(Button.WDPAD);
+                            break;
+                        case 7:
+                            // NW
+                            break;
+                    }
+                }
+            }
+
+            @Override
+            public void leftTrigger(double value)
+            {
+                //value is how hard you press. Between 0-1.0
+                controllerState.leftTriggerMagnitude = value;
+            }
+
+            @Override
+            public void rightTrigger(double value)
+            {
+                //value is how hard you press. Between 0-1.0
+                controllerState.rightTriggerMagnitude = value;
+            }
+
+            @Override
+            public void leftThumbMagnitude(double magnitude)
+            {
+                //magnitude is how hard you press. Between 0-1.0
+                controllerState.leftThumbstickMagnitude = magnitude;
+                if( magnitude < 0.2){
+                    controllerState.leftThumbstickDirection = 'Z';
+                    controllerState.leftThumbstickRotation = 0.0;
+                }
+            }
+
+            @Override
+            public void leftThumbDirection(double direction)
+            {
+                //direction is angle. Between 0-360.0, at top
+                controllerState.leftThumbstickRotation = (direction);
+                if (direction < 45 || direction > 315){
+                    controllerState.setLeftThumbDir('N');
+                } else if (direction < 135){
+                    controllerState.setLeftThumbDir('E');
+                } else if (direction < 225){
+                    controllerState.setLeftThumbDir('S');
+                } else if (direction < 315){
+                    controllerState.setLeftThumbDir('W');
+                } else {
+                    controllerState.setLeftThumbDir('Z');
+                }
+            }
+
+            @Override
+            public void rightThumbMagnitude(double magnitude)
+            {
+                //magnitude is how hard you press. Between 0-1.0
+                controllerState.rightThumbstickMagnitude = magnitude;
+                if( magnitude < 0.2){
+                    controllerState.rightThumbstickDirection = 'Z';
+                    controllerState.rightThumbstickRotation = 0.0;
+                }
+            }
+
+            @Override
+            public void rightThumbDirection(double direction)
+            {
+                //direction is angle. Between 0-360.0, at top
+                controllerState.rightThumbstickRotation = (direction);
+                if (direction < 45 || direction > 315){
+                    controllerState.setRightThumbstickDirection('N');
+                } else if (direction < 135){
+                    controllerState.setRightThumbstickDirection('E');
+                } else if (direction < 225){
+                    controllerState.setRightThumbstickDirection('S');
+                } else if (direction < 315){
+                    controllerState.setRightThumbstickDirection('W');
+                } else {
+                    controllerState.setRightThumbstickDirection('Z');
+                }
+            }
+
+            @Override
+            public void isConnected(boolean b) {
+                Log(String.format("Controller connected: %s",Boolean.toString(b)));
+            }
+        });
         connectedController.setLeftThumbDeadZone(0.2);
         connectedController.setRightThumbDeadZone(0.2);
 
-        makePeriodicSender();
+//        makePeriodicSender();
     }
 
     public void makePeriodicSender(){
@@ -314,17 +336,17 @@ public class Controller extends XboxControllerAdapter{
             return;
         }
 
-        ControllerMessageSender = ScheduledManager.scheduleAtFixedRate(
-                () -> {
-                    if(connector.HasActiveConnection() && !connector.IsBroken()) {
-                        if(connectedController.isConnected())
-                            connector.SendMessage(new ControllerMessage(controllerState));
-                    }else{
-                        ControllerMessageSender.cancel(false); //Don't interrupt yourself.
-                        ControllerMessageSender = null;
-                    }
-                },
-                1,1, TimeUnit.SECONDS
-        );
+//        ControllerMessageSender = ScheduledManager.scheduleAtFixedRate(
+//                () -> {
+//                    if(connector.HasActiveConnection() && !connector.IsBroken()) {
+//                        if(connectedController.isConnected())
+//                            connector.SendMessage(new ControllerMessage(controllerState));
+//                    }else{
+//                        ControllerMessageSender.cancel(false); //Don't interrupt yourself.
+//                        ControllerMessageSender = null;
+//                    }
+//                },
+//                1,1, TimeUnit.SECONDS
+//        );
     }
 }

@@ -291,6 +291,7 @@ public class CMD {
         @Override
         public boolean Invoke(HoneybadgerV6 badger, String[] params) {
             badger.sendDebugMessageToDesktop(Arrays.toString(params));
+            Log(String.format("ACK: %s",Arrays.toString(params)));
             return true;
         }
 

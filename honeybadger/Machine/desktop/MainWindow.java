@@ -55,6 +55,8 @@ public class MainWindow {
 
     private static String ConnectionIP;
 
+    private static Controller Xbox;
+
     private MainWindow() {
 
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
@@ -425,7 +427,21 @@ public class MainWindow {
         singleton.messageReader = new NetworkConnector.MessageReader(singleton.networkBus);
         singleton.startVideoStream();
 
-        Controller Xbox = new Controller(singleton.networkBus);
+        Thread controllerThread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                Xbox = new Controller(singleton.networkBus);
+                while(true){
+                    try {
+                        Thread.sleep(500);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        });
+        controllerThread.start();
+
         Thread readMessages = new Thread(singleton.messageReader);
 
         readMessages.start();
