@@ -63,7 +63,7 @@ public class Utils {
         Date date = new Date(Calendar.getInstance().getTime().getTime());
         String formatted = String.format("%s: %s\n", formatter.format(date), log);
 
-        System.out.format(formatted);
+        System.out.print(formatted);
         if(Constants.getActivePlatform()== Constants.PLATFORM.DESKTOP_GUI){
             MainWindow.writeToMessageFeed(formatted);
         }
@@ -74,15 +74,14 @@ public class Utils {
         Date date = new Date(Calendar.getInstance().getTime().getTime());
         String formatted = String.format("%s: %s\n", formatter.format(date), message);
 
-        System.out.format(formatted);
-        System.err.format(formatted);
+        System.out.flush();
+        System.err.print(formatted);
         if(Constants.getActivePlatform() == Constants.PLATFORM.DESKTOP_GUI){
             MainWindow.writeToMessageFeed(formatted);
         }
 
         //Print immediately
         System.err.flush();
-        System.out.flush();
     }
 
     public static String Prompt(char symbol, Scanner kb){

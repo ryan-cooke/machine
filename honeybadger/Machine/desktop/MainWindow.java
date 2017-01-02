@@ -310,8 +310,8 @@ public class MainWindow {
                 JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
 
         if (dialogResult == JOptionPane.YES_OPTION) {
-            //TODO: close all network connections
-//            dispose();
+            networkBus.SendMessage("close");
+            networkBus.End();
             System.exit(0);
         }
     }
@@ -348,7 +348,7 @@ public class MainWindow {
     public static String promptForIP() {
         String ConnectionIP = JOptionPane.showInputDialog(
                 "Honeybadger IP: ",
-                "192.168.137.69");
+                "192.168.0.1");
 
         if (ConnectionIP == null) {
             JOptionPane.showMessageDialog(null,

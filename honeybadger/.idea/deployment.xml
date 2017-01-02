@@ -5,7 +5,7 @@
       <paths name="Badger">
         <serverdata>
           <mappings>
-            <mapping local="$PROJECT_DIR$" web="/" />
+            <mapping deploy="/intellij" local="$PROJECT_DIR$" web="/" />
           </mappings>
         </serverdata>
       </paths>
