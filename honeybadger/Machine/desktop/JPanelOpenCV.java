@@ -12,11 +12,11 @@ import java.util.List;
 
 import javax.imageio.ImageIO;
 import javax.swing.JPanel;
+
 import org.opencv.core.*;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.video.BackgroundSubtractorMOG2;
 import org.opencv.videoio.VideoCapture;
-import org.opencv.videoio.VideoWriter;
 
 import static Machine.Common.Utils.ErrorLog;
 import static Machine.Common.Utils.Log;
@@ -25,21 +25,21 @@ import static Machine.Common.Utils.Log;
 public class JPanelOpenCV extends JPanel {
     static JPanelOpenCV instance;
     static BufferedImage image;
-    private static boolean target=false;
-    private static boolean blueTarget=false;
-    private static int center=320;
+    private static boolean target = false;
+    private static boolean blueTarget = false;
+    private static int center = 320;
 
-    private Scalar lowerBlack = new Scalar(0, 0, 0);
-    private Scalar upperBlack = new Scalar(180, 255, 90);
+    private static Scalar lowerBlack = new Scalar(0, 0, 0);
+    private static Scalar upperBlack = new Scalar(180, 255, 90);
 
-    private Scalar lowerBlue = new Scalar(5, 140, 100);
-    private Scalar upperBlue = new Scalar(20, 255, 255);
+    private static Scalar lowerBlue = new Scalar(5, 140, 100);
+    private static Scalar upperBlue = new Scalar(20, 255, 255);
 
-    private Scalar lowerb = new Scalar(35, 140, 60);
-    private Scalar upperb = new Scalar(70, 255, 255);
+    private static Scalar lowerGreen = new Scalar(35, 140, 60);
+    private static Scalar upperGreen = new Scalar(70, 255, 255);
 
-    private int erode=3;
-    private int dilate=10;
+    private int erode = 3;
+    private int dilate = 10;
 
     private static String ConnectURL;
     private static boolean ShouldDraw;
@@ -54,22 +54,27 @@ public class JPanelOpenCV extends JPanel {
         ShouldDraw = true;
     }
 
-    public void setDilate(int d){dilate=d;}
-    public void setErode(int e){erode=e;}
+    public void setDilate(int d) {
+        dilate = d;
+    }
+
+    public void setErode(int e) {
+        erode = e;
+    }
 
     public void setGreen(Scalar upper, Scalar lower) {
-        lowerb = lower;
-        upperb = upper;
+        lowerGreen = lower;
+        upperGreen = upper;
     }
-    public Scalar[] getColorScalars()
-    {
+
+    public static Scalar[] getColorScalars() {
         Scalar[] ar = new Scalar[6];
-        ar[0]=lowerb;
-        ar[1]=upperb;
-        ar[2]=lowerBlue;
-        ar[3]=upperBlue;
-        ar[4]=lowerBlack;
-        ar[5]=upperBlack;
+        ar[0] = lowerGreen;
+        ar[1] = upperGreen;
+        ar[2] = lowerBlue;
+        ar[3] = upperBlue;
+        ar[4] = lowerBlack;
+        ar[5] = upperBlack;
         return ar;
     }
 
@@ -77,9 +82,13 @@ public class JPanelOpenCV extends JPanel {
         ShouldDraw = shouldDraw;
     }
 
-    public boolean isTarget(){return target;}
+    public boolean isTarget() {
+        return target;
+    }
 
-    public boolean isBlueTarget(){return blueTarget;}
+    public boolean isBlueTarget() {
+        return blueTarget;
+    }
 
     public void setBlue(Scalar upper, Scalar lower) {
         upperBlue = upper;
@@ -153,7 +162,7 @@ public class JPanelOpenCV extends JPanel {
         hsv2 = hsv.clone();
         hsv3 = hsv.clone();
 
-        Core.inRange(hsv, lowerb, upperb, hsv);
+        Core.inRange(hsv, lowerGreen, upperGreen, hsv);
         Core.inRange(hsv2, lowerBlue, upperBlue, hsv2);
         Core.inRange(hsv3, lowerBlack, upperBlack, hsv3);
 
@@ -172,6 +181,7 @@ public class JPanelOpenCV extends JPanel {
     public void paint(Graphics g) {
         g.drawImage(image, 0, 0, this);
     }
+
     //Load an image
     public BufferedImage loadImage(String file) {
         BufferedImage img;
@@ -265,8 +275,8 @@ public class JPanelOpenCV extends JPanel {
                 Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
 
         Rect objectBoundingRectangle = new Rect(0, 0, 0, 0);
-        target=false;
-        blueTarget=false;
+        target = false;
+        blueTarget = false;
         for (int i = 0; i < contours.size(); i++) {
             objectBoundingRectangle = Imgproc.boundingRect(contours.get(i));
             objectBoundingRectangle.width -= 13;
@@ -280,10 +290,12 @@ public class JPanelOpenCV extends JPanel {
 
             if (skinnyRect) {
                 Imgproc.rectangle(frame, objectBoundingRectangle.tl(), objectBoundingRectangle.br(), new Scalar(0, 255, 0));
-                int rectCenter=objectBoundingRectangle.x+objectBoundingRectangle.width/2;
-                if(Math.abs(rectCenter-center)<5){
-                    target=true;
-                    if(color.equals("blue")){blueTarget=true;}
+                int rectCenter = objectBoundingRectangle.x + objectBoundingRectangle.width / 2;
+                if (Math.abs(rectCenter - center) < 5) {
+                    target = true;
+                    if (color.equals("blue")) {
+                        blueTarget = true;
+                    }
 
                 }
 
