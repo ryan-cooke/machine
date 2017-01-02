@@ -34,30 +34,31 @@ import static Machine.Common.Utils.ErrorLog;
 import static Machine.Common.Utils.Log;
 
 
-public class JPanelOpenCV extends JPanel{
-    public static JPanelOpenCV instance;
-    public static BufferedImage image;
-    Scalar lowerBlack = new Scalar(0,0,0);
-    Scalar upperBlack = new Scalar(180,255,90);
+public class JPanelOpenCV extends JPanel {
+    static JPanelOpenCV instance;
+    static BufferedImage image;
+    private Scalar lowerBlack = new Scalar(0, 0, 0);
+    private Scalar upperBlack = new Scalar(180, 255, 90);
 
-    Scalar lowerBlue = new Scalar(5, 140, 100);
-    Scalar upperBlue = new Scalar(20, 255, 255);
+    private Scalar lowerBlue = new Scalar(5, 140, 100);
+    private Scalar upperBlue = new Scalar(20, 255, 255);
 
-    Scalar lowerb = new Scalar(35, 140, 60);
-    Scalar upperb = new Scalar(70, 255, 255);
+    private Scalar lowerb = new Scalar(35, 140, 60);
+    private Scalar upperb = new Scalar(70, 255, 255);
 
     private static String ConnectURL;
     private static boolean ShouldDraw;
 
-    public static void main (String args[]) throws InterruptedException{
+    public static void main(String args[]) throws InterruptedException {
         JPanelOpenCV j1 = new JPanelOpenCV();
         j1.startLoop();
     }
 
-    public static void SetConnectionHost(String host){
-        ConnectURL = String.format("http://%s:8090/?action=stream",host);
+    public static void SetConnectionHost(String host) {
+        ConnectURL = String.format("http://%s:8090/?action=stream", host);
         ShouldDraw = true;
     }
+
     public void setGreen(Scalar upper, Scalar lower) {
         lowerb = lower;
         upperb = upper;
@@ -78,19 +79,18 @@ public class JPanelOpenCV extends JPanel{
     }
 
 
-    public void startLoop()
-    {
+    public void startLoop() {
         String arch = System.getProperty("os.arch");
         System.out.println(arch);
-        String openCVLib = arch.contains("x86")? "opencv_java310" : "opencv_java310_64";
-        String ffmpegLib = arch.contains("x86")? "opencv_ffmpeg310" : "opencv_ffmpeg310_64";
+        String openCVLib = arch.contains("x86") ? "opencv_java310" : "opencv_java310_64";
+        String ffmpegLib = arch.contains("x86") ? "opencv_ffmpeg310" : "opencv_ffmpeg310_64";
         System.loadLibrary(openCVLib);
         System.loadLibrary(ffmpegLib);
 
         //******VideoCapture camera = new VideoCapture("http://192.168.1.117:8090/?action=stream.mjpg");
         //TODO: For Joey: you might want to change the IP
         VideoCapture camera = new VideoCapture(ConnectURL);
-        if(!camera.isOpened()){
+        if (!camera.isOpened()) {
             ErrorLog("Error opening stream");
             return;
         }
@@ -110,24 +110,22 @@ public class JPanelOpenCV extends JPanel{
             Log("Error 1 again");
         }
 
-        int count =0;
+        int count = 0;
         double rstTime = System.currentTimeMillis();
-        int secondsRec=300;
+        int secondsRec = 300;
 
 
         Mat resized = new Mat();
-        Size outputSize = new Size(640,480);
-        while(ShouldDraw)
-        {
+        Size outputSize = new Size(640, 480);
+        while (ShouldDraw) {
             camera.read(frame);
             color(frame);
 
             //if (System.currentTimeMillis() - rstTime > 1000) {
-                System.out.println(count);
-                rstTime = System.currentTimeMillis();
-                count = 0;
-                secondsRec--;
-            }
+            System.out.println(count);
+            rstTime = System.currentTimeMillis();
+            count = 0;
+            secondsRec--;
 
             image = instance.MatToBufferedImage(frame);
             try {
@@ -136,12 +134,12 @@ public class JPanelOpenCV extends JPanel{
                 e.printStackTrace();
             }
             count++;
-//            if(secondsRec<0){
-//                break;
-//            }
+            if (secondsRec < 0) {
+                break;
+            }
 
             //@foxtrot94: resize whatever stream to 640x480
-            Imgproc.resize(frame,resized,outputSize);
+            Imgproc.resize(frame, resized, outputSize);
             image = MatToBufferedImage(resized);
             instance.invalidate();
             instance.repaint();
@@ -314,8 +312,7 @@ public class JPanelOpenCV extends JPanel{
         //drawnWindow.showImage(frame);
     }
 
-    public static Mat searchCircle(Mat rawMat, Mat out)
-    {
+    public static Mat searchCircle(Mat rawMat, Mat out) {
         Mat raw = rawMat;
         Mat greyscale = new Mat();
         Imgproc.cvtColor(raw, greyscale, Imgproc.COLOR_BGR2GRAY);
