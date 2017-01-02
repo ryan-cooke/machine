@@ -25,6 +25,10 @@ import static Machine.Common.Utils.Log;
 public class JPanelOpenCV extends JPanel {
     static JPanelOpenCV instance;
     static BufferedImage image;
+    private static boolean target=false;
+    private static boolean blueTarget=false;
+    private static int center=320;
+
     private Scalar lowerBlack = new Scalar(0, 0, 0);
     private Scalar upperBlack = new Scalar(180, 255, 90);
 
@@ -33,6 +37,9 @@ public class JPanelOpenCV extends JPanel {
 
     private Scalar lowerb = new Scalar(35, 140, 60);
     private Scalar upperb = new Scalar(70, 255, 255);
+
+    private int erode=3;
+    private int dilate=10;
 
     private static String ConnectURL;
     private static boolean ShouldDraw;
@@ -47,14 +54,32 @@ public class JPanelOpenCV extends JPanel {
         ShouldDraw = true;
     }
 
+    public void setDilate(int d){dilate=d;}
+    public void setErode(int e){erode=e;}
+
     public void setGreen(Scalar upper, Scalar lower) {
         lowerb = lower;
         upperb = upper;
+    }
+    public Scalar[] getColorScalars()
+    {
+        Scalar[] ar = new Scalar[6];
+        ar[0]=lowerb;
+        ar[1]=upperb;
+        ar[2]=lowerBlue;
+        ar[3]=upperBlue;
+        ar[4]=lowerBlack;
+        ar[5]=upperBlack;
+        return ar;
     }
 
     synchronized public static void renderActive(boolean shouldDraw) {
         ShouldDraw = shouldDraw;
     }
+
+    public boolean isTarget(){return target;}
+
+    public boolean isBlueTarget(){return blueTarget;}
 
     public void setBlue(Scalar upper, Scalar lower) {
         upperBlue = upper;
@@ -132,9 +157,9 @@ public class JPanelOpenCV extends JPanel {
         Core.inRange(hsv2, lowerBlue, upperBlue, hsv2);
         Core.inRange(hsv3, lowerBlack, upperBlack, hsv3);
 
-        hsv = erodeDilate(hsv, 10, 3);
-        hsv2 = erodeDilate(hsv2, 10, 3);
-        hsv3 = erodeDilate(hsv3, 10, 3);
+        hsv = erodeDilate(hsv, dilate, erode);
+        hsv2 = erodeDilate(hsv2, dilate, erode);
+        hsv3 = erodeDilate(hsv3, dilate, erode);
 
         frame = searchForMovement(hsv, frame, "green");
         frame = searchForMovement(hsv2, frame, "blue");
@@ -240,6 +265,8 @@ public class JPanelOpenCV extends JPanel {
                 Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
 
         Rect objectBoundingRectangle = new Rect(0, 0, 0, 0);
+        target=false;
+        blueTarget=false;
         for (int i = 0; i < contours.size(); i++) {
             objectBoundingRectangle = Imgproc.boundingRect(contours.get(i));
             objectBoundingRectangle.width -= 13;
@@ -253,7 +280,14 @@ public class JPanelOpenCV extends JPanel {
 
             if (skinnyRect) {
                 Imgproc.rectangle(frame, objectBoundingRectangle.tl(), objectBoundingRectangle.br(), new Scalar(0, 255, 0));
-                System.out.println("width of rect is " + objectBoundingRectangle.width + "it is " + color);
+                int rectCenter=objectBoundingRectangle.x+objectBoundingRectangle.width/2;
+                if(Math.abs(rectCenter-center)<5){
+                    target=true;
+                    if(color.equals("blue")){blueTarget=true;}
+
+                }
+
+
             }
         }
         return frame;
