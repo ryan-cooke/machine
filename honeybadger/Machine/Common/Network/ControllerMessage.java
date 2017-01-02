@@ -131,17 +131,11 @@ public class ControllerMessage extends BaseMsg implements Serializable {
         //If the badger wasn't null, do actions dependent on the object
         //@foxtrot94: minimum needed buttons for today.
         badger.updateMovement(leftThumbstickDirection, (float) leftThumbstickMagnitude * 100.f);
-
-        if(buttons.get(Button.LBUMPER)){
-            badger.buttonsPressed.replace(Button.LBUMPER, false);
-            badger.disarmFlywheel();
-        }
-        if(buttons.get(Button.RBUMPER)){
-            badger.armFlywheel();
-        }
-
+        badger.updateRotation(rightThumbstickDirection, (int) rightThumbstickMagnitude * 100);
         badger.setFlywheelSpeed((float)rightTriggerMagnitude);
         badger.moveConveyor((float)leftTriggerMagnitude);
+        badger.handleButtonPress(buttons);
+
 
         badger.updateRotation(rightThumbstickDirection, (int) leftThumbstickMagnitude*100);
         //TODO: handle more buttons

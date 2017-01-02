@@ -9,6 +9,7 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 import static Machine.Common.Utils.Log;
+import Machine.Common.Utils.Button;
 
 
 public class Controller extends XboxControllerAdapter{
@@ -23,12 +24,12 @@ public class Controller extends XboxControllerAdapter{
 
     private ScheduledFuture<?> ControllerMessageSender;
 
-    private void press(ControllerMessage.Button button){
+    private void press(Button button){
         controllerState.setButtonsPressed(controllerState.getButtonsPressed()+1);
         controllerState.buttons.replace(button, true);
     }
     
-    private void depress(ControllerMessage.Button button){
+    private void depress(Button button){
         controllerState.setButtonsPressed(controllerState.getButtonsPressed()-1);
         controllerState.buttons.replace(button, false);
     }
@@ -36,100 +37,100 @@ public class Controller extends XboxControllerAdapter{
     public void buttonA(boolean pressed)
     {
         if(pressed){
-            press(ControllerMessage.Button.A);
+            press(Button.A);
         }
         else{
-            depress(ControllerMessage.Button.A);
+            depress(Button.A);
         }
     }
 
     public void buttonB(boolean pressed)
     {
         if(pressed){
-            press(ControllerMessage.Button.B);
+            press(Button.B);
         }
         else{
-            depress(ControllerMessage.Button.B);
+            depress(Button.B);
         }
     }
 
     public void buttonX(boolean pressed)
     {
         if(pressed){
-            press(ControllerMessage.Button.X);
+            press(Button.X);
         }
         else{
-            depress(ControllerMessage.Button.X);
+            depress(Button.X);
         }
     }
 
     public void buttonY(boolean pressed)
     {
         if (pressed){
-            press(ControllerMessage.Button.Y);
+            press(Button.Y);
         }
         else{
-            depress(ControllerMessage.Button.Y);
+            depress(Button.Y);
         }
     }
 
     public void back(boolean pressed)
     {
         if (pressed){
-            press(ControllerMessage.Button.BACK);
+            press(Button.BACK);
         }
         else{
-            depress(ControllerMessage.Button.START);
+            depress(Button.START);
         }
     }
 
     public void start(boolean pressed)
     {
         if (pressed){
-            press(ControllerMessage.Button.RBUMPER);
+            press(Button.RBUMPER);
         }
         else{
-            depress(ControllerMessage.Button.RBUMPER);
+            depress(Button.RBUMPER);
         }
     }
 
     public void leftShoulder(boolean pressed)
     {
         if (pressed){
-            press(ControllerMessage.Button.LBUMPER);
+            press(Button.LBUMPER);
         }
         else{
-            depress(ControllerMessage.Button.LBUMPER);
+            depress(Button.LBUMPER);
         }
     }
 
     public void rightShoulder(boolean pressed)
     {
         if (pressed){
-            press(ControllerMessage.Button.RBUMPER);
+            press(Button.RBUMPER);
         }
         else{
-            depress(ControllerMessage.Button.RBUMPER);
+            depress(Button.RBUMPER);
         }
     }
 
     public void leftThumb(boolean pressed)
     {
         if (pressed){
-            press(ControllerMessage.Button.LTHUMB);
+            press(Button.LTHUMB);
         }
         else{
-            depress(ControllerMessage.Button.LTHUMB);
+            depress(Button.LTHUMB);
         }
     }
 
     public void rightThumb(boolean pressed)
     {
         if (pressed){
-            press(ControllerMessage.Button.RTHUMB);
+            press(Button.RTHUMB);
         }
         else{
-            depress(ControllerMessage.Button.RTHUMB);
+            depress(Button.RTHUMB);
         }
     }
 
@@ -139,28 +140,28 @@ public class Controller extends XboxControllerAdapter{
             switch (direction) {
                 case 0:
                     // N
-                    press(ControllerMessage.Button.NDPAD);
+                    press(Button.NDPAD);
                     break;
                 case 1:
                     // NE
                     break;
                 case 2:
                     // E
-                    press(ControllerMessage.Button.EDPAD);
+                    press(Button.EDPAD);
                     break;
                 case 3:
                     // SE
                     break;
                 case 4:
                     // S
-                    press(ControllerMessage.Button.SDPAD);
+                    press(Button.SDPAD);
                     break;
                 case 5:
                     // SW
                     break;
                 case 6:
                     // W
-                    press(ControllerMessage.Button.WDPAD);
+                    press(Button.WDPAD);
                     break;
                 case 7:
                     // NW
@@ -171,28 +172,28 @@ public class Controller extends XboxControllerAdapter{
             switch (direction) {
                 case 0:
                     // N
-                    depress(ControllerMessage.Button.NDPAD);
+                    depress(Button.NDPAD);
                     break;
                 case 1:
                     // NE
                     break;
                 case 2:
                     // E
-                    depress(ControllerMessage.Button.EDPAD);
+                    depress(Button.EDPAD);
                     break;
                 case 3:
                     // SE
                     break;
                 case 4:
                     // S
-                    depress(ControllerMessage.Button.SDPAD);
+                    depress(Button.SDPAD);
                     break;
                 case 5:
                     // SW
                     break;
                 case 6:
                     // W
-                    depress(ControllerMessage.Button.WDPAD);
+                    depress(Button.WDPAD);
                     break;
                 case 7:
                     // NW

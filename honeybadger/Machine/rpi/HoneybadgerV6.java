@@ -12,6 +12,9 @@ import Machine.Common.Utils.Button;
 import com.pi4j.io.gpio.Pin;
 
 import java.util.HashMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 
 import static Machine.Common.Utils.Log;
@@ -43,11 +46,14 @@ public class HoneybadgerV6 {
 
     public HashMap<Button, Boolean> buttonsPressed;
 
+    private ScheduledExecutorService executor;
+
     /**
      * Makes a new Honeybadger (this is version 6). Guaranteed not to give a shit
      * @throws Exception But honey badger don't give a shit
      */
     private HoneybadgerV6() throws Exception {
+        executor = (ScheduledExecutorService) Executors.newFixedThreadPool(12);
         motorController = new BadgerMotorController();
         networkServer = new BadgerNetworkServer(this);
 
@@ -63,7 +69,7 @@ public class HoneybadgerV6 {
         buttonsPressed.put(Button.BACK, false);
         buttonsPressed.put(Button.START, false);
         buttonsPressed.put(Button.RBUMPER, false);
-        buttonsPressed.put(Button.LBUMPER, false);
+        buttonsPressed.put(Button.LBUMPER, true);
         buttonsPressed.put(Button.RTHUMB, false);
         buttonsPressed.put(Button.LTHUMB, false);
         buttonsPressed.put(Button.NDPAD, false);
@@ -172,8 +178,125 @@ public class HoneybadgerV6 {
         }
     }
 
-    public void handleButton(boolean pressed){
-        //TODO:
+    public void handleButtonPress(HashMap<Button, Boolean> buttons){
+        if (buttons.get(Button.A) && buttonsPressed.get(Button.A)){
+            buttonsPressed.replace(Button.A, true);
+            handleA();
+        }
+        if (buttons.get(Button.B) && buttonsPressed.get(Button.B)){
+            buttonsPressed.replace(Button.B, true);
+            handleB();
+        }
+        if (buttons.get(Button.X) && buttonsPressed.get(Button.X)){
+            buttonsPressed.replace(Button.X, true);
+            handleX();
+        }
+        if (buttons.get(Button.Y) && buttonsPressed.get(Button.Y)){
+            buttonsPressed.replace(Button.A, true);
+            handleY();
+        }
+        if (buttons.get(Button.BACK) && buttonsPressed.get(Button.BACK)){
+            buttonsPressed.replace(Button.BACK, true);
+            handleBack();
+        }
+        if (buttons.get(Button.START) && buttonsPressed.get(Button.START)){
+            buttonsPressed.replace(Button.START, true);
+            handleStart();
+        }
+        if (buttons.get(Button.RBUMPER) && buttonsPressed.get(Button.RBUMPER)){
+            buttonsPressed.replace(Button.RBUMPER, true);
+            handleRBumper();
+        }
+        if (buttons.get(Button.LBUMPER) && buttonsPressed.get(Button.LBUMPER)){
+            buttonsPressed.replace(Button.LBUMPER, true);
+            handleLBumper();
+        }
+        if (buttons.get(Button.RTHUMB) && buttonsPressed.get(Button.RTHUMB)){
+            buttonsPressed.replace(Button.RTHUMB, true);
+            handleRThumb();
+        }
+        if (buttons.get(Button.LTHUMB) && buttonsPressed.get(Button.LTHUMB)){
+            buttonsPressed.replace(Button.LTHUMB, true);
+            handleLThumb();
+        }
+        if (buttons.get(Button.NDPAD) && buttonsPressed.get(Button.NDPAD)){
+            buttonsPressed.replace(Button.NDPAD, true);
+            handleNDPad();
+        }
+        if (buttons.get(Button.EDPAD) && buttonsPressed.get(Button.EDPAD)){
+            buttonsPressed.replace(Button.EDPAD, true);
+            handleEDPad();
+        }
+        if (buttons.get(Button.WDPAD) && buttonsPressed.get(Button.WDPAD)){
+            buttonsPressed.replace(Button.WDPAD, true);
+            handleWDPad();
+        }
+        if (buttons.get(Button.SDPAD) && buttonsPressed.get(Button.SDPAD)){
+            buttonsPressed.replace(Button.SDPAD, true);
+            handleSDPad();
+        }
+    }
+
+    private Runnable depressButton(Button button){
+        return () -> buttonsPressed.replace(button, false);
+    }
+
+    public void handleA(){
+        executor.schedule(depressButton(Button.A), 2, TimeUnit.SECONDS);
+    }
+
+    public void handleB(){
+
+    }
+
+    public void handleX(){
+
+    }
+
+    public void handleY(){
+
+    }
+
+    public void handleBack(){
+
+    }
+
+    public void handleStart(){
+
+    }
+
+    public void handleRBumper(){
+
+    }
+
+    public void handleLBumper(){
+        disarmFlywheel();
+        buttonsPressed.replace(Button.RTHUMB, false);
+    }
+
+    public void handleRThumb(){
+        armFlywheel();
+        buttonsPressed.replace(Button.LTHUMB, false);
+    }
+
+    public void handleLThumb(){
+
+    }
+
+    public void handleNDPad(){
+
+    }
+
+    public void handleEDPad(){
+
+    }
+
+    public void handleWDPad(){
+
+    }
+
+    public void handleSDPad(){
+
     }
 
     public void moveConveyor(float throttle){
@@ -338,7 +461,7 @@ public class HoneybadgerV6 {
     }
 
     public void setFlywheelSpeed(float speed){
-        float range = (float)(BadgerMotorController.FLYWHEEL_PERCENT_MAX -BadgerMotorController.FLYWHEEL_PERCENT_MIN);
+        float range = (BadgerMotorController.FLYWHEEL_PERCENT_MAX -BadgerMotorController.FLYWHEEL_PERCENT_MIN);
         float throttle = range*speed/100.f;
 
         motorController.setPWM(BadgerPWMProvider.FLYWHEEL_A,throttle);
