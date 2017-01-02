@@ -447,6 +447,9 @@ public class HoneybadgerV6 {
         //Stop the flywheels
         MotorController.setPWM(BadgerPWMProvider.FLYWHEEL_A, BadgerMotorController.FLYWHEEL_PERCENT_MIN);
         MotorController.setPWM(BadgerPWMProvider.FLYWHEEL_B, BadgerMotorController.FLYWHEEL_PERCENT_MIN);
+
+        this.IsListeningToController = false;
+        this.IsMoving = false;
     }
 
     /**
@@ -462,9 +465,9 @@ public class HoneybadgerV6 {
     }
 
     public void setConveyor(int direction, float throttle){
-        int opposingDir = direction==0? 1 : 0;
+        //Both go in same direction.
         MotorController.setDriveMotorDirection(RPI.CONVEYOR_A,direction);
-        MotorController.setDriveMotorDirection(RPI.CONVEYOR_B,opposingDir);
+        MotorController.setDriveMotorDirection(RPI.CONVEYOR_B,direction);
 
         MotorController.setDriveMotorSpeed(BadgerPWMProvider.CONVEYOR_A,throttle);
         MotorController.setDriveMotorSpeed(BadgerPWMProvider.CONVEYOR_B,throttle);
