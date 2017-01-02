@@ -114,21 +114,6 @@ public class OpenCVConfig extends JDialog {
     }
 
     public static void main(String[] args) {
-        if (Toolkit.getDefaultToolkit().getScreenSize().getWidth() > 1920) {
-            Font highDPI = new Font(null, Font.PLAIN, 24);
-            UIManager.put("MenuBar.font", highDPI);
-            UIManager.put("Menu.font", highDPI);
-            UIManager.put("MenuItem.font", highDPI);
-            UIManager.put("Slider.thumbHeight", 34);
-            UIManager.put("Slider.thumbWidth", 34);
-            UIManager.put("OptionPane.messageFont", highDPI);
-            UIManager.put("OptionPane.buttonFont", highDPI);
-            UIManager.put("TextField.font", highDPI);
-            UIManager.put("TextArea.font", highDPI);
-            UIManager.put("Label.font", highDPI);
-            UIManager.put("Button.font", highDPI);
-            UIManager.put("ToolTip.font", highDPI);
-        }
         OpenCVConfig dialog = new OpenCVConfig();
         dialog.pack();
         dialog.setVisible(true);

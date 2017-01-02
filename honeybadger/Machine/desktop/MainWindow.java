@@ -394,6 +394,7 @@ public class MainWindow {
             UIManager.put("TextArea.font", highDPI);
             UIManager.put("Label.font", highDPI);
             UIManager.put("Button.font", highDPI);
+            UIManager.put("ToolTip.font", highDPI);
         }
 
         //Get the IP first.
