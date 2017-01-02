@@ -12,6 +12,7 @@ import java.util.List;
 import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+
 import org.opencv.core.*;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.video.BackgroundSubtractorMOG2;
@@ -36,16 +37,23 @@ public class JPanelOpenCV extends JPanel {
         j1.startLoop();
     }
 
+    public void setGreen(Scalar upper, Scalar lower) {
+        lowerb = lower;
+        upperb = upper;
+    }
+
+    public void setBlue(Scalar upper, Scalar lower) {
+        upperBlue = upper;
+        lowerBlue = lower;
+    }
+
+    public void setBlack(Scalar upper, Scalar lower) {
+        upperBlack = upper;
+        lowerBlack = lower;
+    }
+
+
     public void startLoop() {
-    public void setGreen(Scalar upper,Scalar lower){lowerb=lower;upperb=upper;}
-
-    public void setBlue(Scalar upper,Scalar lower){upperBlue=upper;lowerBlue=lower;}
-
-    public void setBlack(Scalar upper,Scalar lower){upperBlack=upper;lowerBlack=lower;}
-
-
-    public void startLoop()
-    {
         System.loadLibrary("opencv_java310");
         System.loadLibrary("opencv_ffmpeg310_64");
         JPanelOpenCV t = new JPanelOpenCV();
@@ -77,7 +85,12 @@ public class JPanelOpenCV extends JPanel {
 
             camera.read(frame);
             color(frame);
-            if(System.currentTimeMillis()-rstTime>1000){System.out.println(count);rstTime=System.currentTimeMillis();count=0;secondsRec--;}
+            if (System.currentTimeMillis() - rstTime > 1000) {
+                System.out.println(count);
+                rstTime = System.currentTimeMillis();
+                count = 0;
+                secondsRec--;
+            }
             image = t.MatToBufferedImage(frame);
             try {
                 Thread.sleep(10);
