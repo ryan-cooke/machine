@@ -1,6 +1,7 @@
 package Machine.desktop;
 
 import Machine.Common.Constants;
+import Machine.Common.Shell;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.Size;
@@ -46,7 +47,6 @@ public class MainWindow {
     private ArrayList<String> inputHistory;
     private int inputOffset;
     private double fontSize;
-
 
     private MainWindow() {
 
@@ -106,6 +106,26 @@ public class MainWindow {
                 String input = Prompt.getText().substring(2);
                 if (input.length() > 0) {
                     Prompt.setText(promptChar);
+                    if(input.contains("update")){
+                        //TODO: obfuscate password input!
+                        //Will likely need a JOptionPane.showOptionDialog with custom components.
+                        String password = JOptionPane.showInputDialog(
+                                "Remote host password",
+                                "");
+                        if (password == null) {
+                            return;
+                        }
+
+                        //TODO: keep track of thread...
+                        Thread updater=new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                BadgerUpdater.sendUpdate(networkBus.getHost(),password);
+                                networkBus.SendMessage("reconnect");
+                            }
+                        });
+                        updater.start();
+                    }
 
                     inputHistory.add(input);
                     boolean messageSuccess = singleton.networkBus.HandleMessage(input);

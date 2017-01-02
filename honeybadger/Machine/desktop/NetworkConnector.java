@@ -195,5 +195,7 @@ public class NetworkConnector {
             return true;
         }
     }
-
+    public String getHost() {
+        return host;
+    }
 }
