@@ -52,10 +52,10 @@ public class JPanelOpenCV extends JPanel {
     private static Scalar lowerGreen = new Scalar(35, 140, 60);
     private static Scalar upperGreen = new Scalar(70, 255, 255);
 
-    private static Scalar lowerYellow = new Scalar(90,100,60);
+    private static Scalar lowerYellow = new Scalar(90,150,150);
     private static Scalar upperYellow = new Scalar(110,255,255);
 
-    private static Scalar lowerRed = new Scalar(110,100,60);
+    private static Scalar lowerRed = new Scalar(115,100,100);
     private static Scalar upperRed = new Scalar(140,255,255);
 
 
@@ -89,7 +89,7 @@ public class JPanelOpenCV extends JPanel {
     }
 
     public static Scalar[] getColorScalars() {
-        Scalar[] ar = new Scalar[6];
+        Scalar[] ar = new Scalar[10];
         ar[0] = lowerGreen;
         ar[1] = upperGreen;
         ar[2] = lowerBlue;
@@ -136,6 +136,7 @@ public class JPanelOpenCV extends JPanel {
 
         //TODO: For Joey: you might want to change the IP
         VideoCapture camera = new VideoCapture(ConnectURL);
+        //VideoCapture camera = new VideoCapture(1);
         if (!camera.isOpened()) {
             ErrorLog("Error opening stream");
             return;
@@ -208,6 +209,9 @@ public class JPanelOpenCV extends JPanel {
 
         frame = searchForMovement(hsv, frame, "green");
         frame = searchForMovement(hsv2, frame, "blue");
+        frame = searchForMovement(hsv4,frame, "yellow");
+        frame = searchForMovement(hsv5,frame,"red");
+
 
         frame = searchLine(hough, frame);
         frame = drawCrosshair(frame, 30, 320, 240, new Scalar(0, 0, 255));
@@ -335,10 +339,12 @@ public class JPanelOpenCV extends JPanel {
             objectBoundingRectangle.width -= 13;
             objectBoundingRectangle.x += 3;
             boolean skinnyRect = false;
+            boolean floorPanels =false;
             if (objectBoundingRectangle.width == 0) {
             } else if (objectBoundingRectangle.height / objectBoundingRectangle.width > 3) {
                 skinnyRect = true;
             }
+            if (color.equals("red")||color.equals("yellow")){floorPanels=true;}
 
             if (skinnyRect) {
                 Imgproc.rectangle(frame, objectBoundingRectangle.tl(), objectBoundingRectangle.br(), new Scalar(0, 255, 0));
@@ -348,6 +354,14 @@ public class JPanelOpenCV extends JPanel {
                     if (color.equals("blue")) {
                         blueTarget = true;
                     }
+                }
+            }
+
+            if (floorPanels)
+            {
+                if(objectBoundingRectangle.width*objectBoundingRectangle.height>2000) {
+                    Imgproc.rectangle(frame, objectBoundingRectangle.tl(), objectBoundingRectangle.br(), new Scalar(255, 0, 0));
+
                 }
             }
         }
