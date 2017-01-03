@@ -12,6 +12,7 @@ import java.util.List;
 
 import javax.imageio.ImageIO;
 import javax.swing.JPanel;
+
 import org.opencv.core.*;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.video.BackgroundSubtractorMOG2;
@@ -36,16 +37,30 @@ public class JPanelOpenCV extends JPanel {
 
     private static BufferedImage HoughBuffer;
 
-    private static BUFFER_TYPE FrameBufferType;
+    private static BUFFER_TYPE FrameBufferType = BUFFER_TYPE.REGULAR;
 
-    private Scalar lowerBlack = new Scalar(0, 0, 0);
-    private Scalar upperBlack = new Scalar(180, 255, 90);
+    private static boolean target = false;
+    private static boolean blueTarget = false;
+    private static int center = 320;
 
-    private Scalar lowerBlue = new Scalar(5, 140, 100);
-    private Scalar upperBlue = new Scalar(20, 255, 255);
+    private static Scalar lowerBlack = new Scalar(0, 0, 0);
+    private static Scalar upperBlack = new Scalar(180, 255, 90);
 
-    private Scalar lowerb = new Scalar(35, 140, 60);
-    private Scalar upperb = new Scalar(70, 255, 255);
+    private static Scalar lowerBlue = new Scalar(5, 140, 100);
+    private static Scalar upperBlue = new Scalar(20, 255, 255);
+
+    private static Scalar lowerGreen = new Scalar(35, 140, 60);
+    private static Scalar upperGreen = new Scalar(70, 255, 255);
+
+    private static Scalar lowerYellow = new Scalar(90,100,60);
+    private static Scalar upperYellow = new Scalar(110,255,255);
+
+    private static Scalar lowerRed = new Scalar(110,100,60);
+    private static Scalar upperRed = new Scalar(140,255,255);
+
+
+    private int erode = 3;
+    private int dilate = 10;
 
     private static String ConnectURL;
     private static boolean ShouldDraw;
@@ -60,21 +75,52 @@ public class JPanelOpenCV extends JPanel {
         ShouldDraw = true;
     }
 
-    public void setGreen(Scalar upper, Scalar lower) {
-        lowerb = lower;
-        upperb = upper;
+    public void setDilate(int d) {
+        dilate = d;
+    }
+
+    public void setErode(int e) {
+        erode = e;
+    }
+
+    public static void setGreen(Scalar upper, Scalar lower) {
+        lowerGreen = lower;
+        upperGreen = upper;
+    }
+
+    public static Scalar[] getColorScalars() {
+        Scalar[] ar = new Scalar[6];
+        ar[0] = lowerGreen;
+        ar[1] = upperGreen;
+        ar[2] = lowerBlue;
+        ar[3] = upperBlue;
+        ar[4] = lowerBlack;
+        ar[5] = upperBlack;
+        ar[6] = lowerRed;
+        ar[7] = upperRed;
+        ar[8] = lowerYellow;
+        ar[9] = upperYellow;
+        return ar;
     }
 
     synchronized public static void renderActive(boolean shouldDraw) {
         ShouldDraw = shouldDraw;
     }
 
-    public void setBlue(Scalar upper, Scalar lower) {
+    public boolean isTarget() {
+        return target;
+    }
+
+    public boolean isBlueTarget() {
+        return blueTarget;
+    }
+
+    public static void setBlue(Scalar upper, Scalar lower) {
         upperBlue = upper;
         lowerBlue = lower;
     }
 
-    public void setBlack(Scalar upper, Scalar lower) {
+    public static void setBlack(Scalar upper, Scalar lower) {
         upperBlack = upper;
         lowerBlack = lower;
     }
@@ -82,7 +128,7 @@ public class JPanelOpenCV extends JPanel {
 
     public void startLoop() {
         String arch = System.getProperty("os.arch");
-        System.out.println(arch);
+        //System.out.println(arch);
         String openCVLib = arch.contains("x86") ? "opencv_java310" : "opencv_java310_64";
         String ffmpegLib = arch.contains("x86") ? "opencv_ffmpeg310" : "opencv_ffmpeg310_64";
         System.loadLibrary(openCVLib);
@@ -111,7 +157,7 @@ public class JPanelOpenCV extends JPanel {
             camera.read(frame);
             processFrame(frame);
 
-            processedImage = instance.MatToBufferedImage(frame);
+            processedImage = MatToBufferedImage(frame);
             try {
                 Thread.sleep(10);
             } catch (InterruptedException e) {
@@ -135,20 +181,25 @@ public class JPanelOpenCV extends JPanel {
         Mat hsv = original.clone();
         Mat hsv2 = original.clone();
         Mat hsv3 = original.clone();
+        Mat hsv4 = original.clone();
+        Mat hsv5 = original.clone();
         Mat hough = original.clone();
 
         Imgproc.cvtColor(original, hsv, Imgproc.COLOR_RGB2HSV);
 
         hsv2 = hsv.clone();
         hsv3 = hsv.clone();
+        hsv4 = hsv.clone();
+        hsv5 = hsv.clone();
 
-        Core.inRange(hsv, lowerb, upperb, hsv);
+
+        Core.inRange(hsv, lowerGreen, upperGreen, hsv);
         Core.inRange(hsv2, lowerBlue, upperBlue, hsv2);
         Core.inRange(hsv3, lowerBlack, upperBlack, hsv3);
 
-        hsv = erodeDilate(hsv, 10, 3);
-        hsv2 = erodeDilate(hsv2, 10, 3);
-        hsv3 = erodeDilate(hsv3, 10, 3);
+        hsv = erodeDilate(hsv, dilate, erode);
+        hsv2 = erodeDilate(hsv2, dilate, erode);
+        hsv3 = erodeDilate(hsv3, dilate, erode);
 
         frame = searchForMovement(hsv, frame, "green");
         frame = searchForMovement(hsv2, frame, "blue");
@@ -272,6 +323,8 @@ public class JPanelOpenCV extends JPanel {
                 Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
 
         Rect objectBoundingRectangle = new Rect(0, 0, 0, 0);
+        target = false;
+        blueTarget = false;
         for (int i = 0; i < contours.size(); i++) {
             objectBoundingRectangle = Imgproc.boundingRect(contours.get(i));
             objectBoundingRectangle.width -= 13;
@@ -282,10 +335,15 @@ public class JPanelOpenCV extends JPanel {
                 skinnyRect = true;
             }
 
-
             if (skinnyRect) {
                 Imgproc.rectangle(frame, objectBoundingRectangle.tl(), objectBoundingRectangle.br(), new Scalar(0, 255, 0));
-                System.out.println("width of rect is " + objectBoundingRectangle.width + "it is " + color);
+                int rectCenter = objectBoundingRectangle.x + objectBoundingRectangle.width / 2;
+                if (Math.abs(rectCenter - center) < 5) {
+                    target = true;
+                    if (color.equals("blue")) {
+                        blueTarget = true;
+                    }
+                }
             }
         }
         return frame;
@@ -299,8 +357,8 @@ public class JPanelOpenCV extends JPanel {
         Mat circles = new Mat();
 
         Imgproc.HoughCircles(greyscale, circles, Imgproc.CV_HOUGH_GRADIENT, 1, (double) greyscale.rows() / 8, 50, 80, 0, 0);
-        System.out.println("got here");
-        System.out.println(circles);
+        //System.out.println("got here");
+        //System.out.println(circles);
         for (int i = 0; i < circles.cols(); i++) {
             double[] vecCircle = circles.get(0, i);
 
@@ -308,7 +366,7 @@ public class JPanelOpenCV extends JPanel {
             int y = (int) vecCircle[1];
             int r = (int) vecCircle[2];
             Imgproc.circle(out, new Point(x, y), r, new Scalar(0, 0, 255), 10);
-            System.out.println("x detected as " + x);
+            //System.out.println("x detected as " + x);
         }
 
         return out;
@@ -325,7 +383,7 @@ public class JPanelOpenCV extends JPanel {
         int ratio = 20;
         Imgproc.Canny(greyscale, edges, lowThreshold, lowThreshold * ratio);
 
-        Mat can = edges.clone();
+        CannyBuffer = MatToBufferedImage(edges);
         Mat lines = new Mat();
         int threshold = 70;
         int minLineSize = 100;
@@ -345,9 +403,9 @@ public class JPanelOpenCV extends JPanel {
             }
         }
 
+        HoughBuffer = MatToBufferedImage(out);
 
         return out;
-
     }
 
     public static Mat erodeDilate(Mat inMat, int dilate, int erode) {
