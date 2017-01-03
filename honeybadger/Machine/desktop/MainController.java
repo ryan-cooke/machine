@@ -20,19 +20,23 @@ public class MainController {
     private Controller connectedController;
     private BadgerAutonomousController autonomousController;
     private ControllerMessage controllerState;
-
     private final ScheduledExecutorService ScheduledManager;
     private ScheduledFuture<?> ControllerMessageSender;
 
+    public boolean isAutonomousRunning() {
+        return isAutonomousRunning;
+    }
 
+    public void setAutonomousRunning(boolean autonomousRunning) {
+        isAutonomousRunning = autonomousRunning;
+    }
 
     public MainController(NetworkConnector messageConnector){
         connector = messageConnector;
         controllerState = new ControllerMessage();
         controllerState.Initialize();
-        Controller connectedController = new Controller(controllerState);
-        BadgerAutonomousController autonomousController =
-                new BadgerAutonomousController(controllerState);
+        connectedController = new Controller(controllerState);
+        autonomousController = new BadgerAutonomousController(controllerState);
 
         ScheduledManager = Executors.newScheduledThreadPool(1);
 

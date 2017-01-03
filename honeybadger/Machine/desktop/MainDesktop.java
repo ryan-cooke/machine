@@ -64,7 +64,7 @@ public class MainDesktop {
             MessageReader readerHandle = new MessageReader(nc);
             Thread readMessages = new Thread(readerHandle);
             MainController mainController = new MainController(nc);
-                        input = "";
+            input = "";
             keepAlive = true;
             isActive = true;
             readMessages.start();
@@ -88,10 +88,8 @@ public class MainDesktop {
                                 Log(String.format("\t%s | call: %s",functor.getClass().getSimpleName(),functor.Explain()));
                             }
                         }
-                        else if (keywords[1].contains("TAKE")){
-                            if (keywords[2].contains("")){
-
-                            }
+                        else if (keywords[1].contains("AUTO")){
+                            mainController.setAutonomousRunning(!mainController.isAutonomousRunning());
                         }
                         else {
                             Log(String.format("Sending TextCommandMessage \'%s\'", input.substring(4)));
