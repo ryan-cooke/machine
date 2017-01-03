@@ -14,17 +14,13 @@ import static Machine.Common.Utils.Log;
  */
 public class BadgerAutonomousController {
 
-    private Thread autoThread;
-
-    private NetworkConnector connector;
-
     private ControllerMessage controllerState;
 
     private boolean scriptRunning;
 
-    public BadgerAutonomousController(NetworkConnector nc){
-        connector = nc;
-        controllerState = new ControllerMessage();
+    public BadgerAutonomousController(ControllerMessage controllerState){
+        this.controllerState = controllerState;
+        scriptRunning = false;
     }
 
     /**
@@ -32,9 +28,6 @@ public class BadgerAutonomousController {
      */
     public void TakeOver(){
         scriptRunning = true;
-        while(scriptRunning){
-
-        }
     }
 
     /**

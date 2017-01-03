@@ -63,9 +63,8 @@ public class MainDesktop {
             NetworkConnector nc = new NetworkConnector(IP, 2017);
             MessageReader readerHandle = new MessageReader(nc);
             Thread readMessages = new Thread(readerHandle);
-            Controller Xbox = new Controller(nc);
-            BadgerAutonomousController autonomousController = new BadgerAutonomousController(nc);
-            input = "";
+            MainController mainController = new MainController(nc);
+                        input = "";
             keepAlive = true;
             isActive = true;
             readMessages.start();
