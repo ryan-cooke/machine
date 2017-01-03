@@ -63,15 +63,15 @@ public class Controller extends XboxControllerAdapter {
         if (pressed) {
             press(Button.BACK);
         } else {
-            depress(Button.START);
+            depress(Button.BACK);
         }
     }
 
     public void start(boolean pressed) {
         if (pressed) {
-            press(Button.RBUMPER);
+            press(Button.START);
         } else {
-            depress(Button.RBUMPER);
+            depress(Button.START);
         }
     }
 
