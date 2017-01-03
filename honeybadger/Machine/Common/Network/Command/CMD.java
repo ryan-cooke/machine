@@ -333,6 +333,12 @@ public class CMD {
                     badger.strafeRight(throttle);
                     break;
                 }
+                case '0':{
+                    badger.spinLeft(throttle);
+                }
+                case '1':{
+                    badger.spinRight(throttle);
+                }
                 default:{
                     badger.moveForward(0);
                     break;

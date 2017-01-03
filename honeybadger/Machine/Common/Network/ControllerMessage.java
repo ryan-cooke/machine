@@ -135,8 +135,8 @@ public class ControllerMessage extends BaseMsg implements Serializable {
         }
 
         if(badger.isListeningToController()) {
-            badger.updateMovement(leftThumbstickDirection, (float) leftThumbstickMagnitude * 100.f);
-            badger.updateRotation(rightThumbstickDirection, (int) rightThumbstickMagnitude * 100);
+            badger.updateMovement(leftThumbstickDirection, (float) leftThumbstickMagnitude * 60.f);
+            badger.updateRotation(rightThumbstickDirection, (float) rightThumbstickMagnitude * 60.f);
             badger.updateFlywheel((float) rightTriggerMagnitude);
             badger.updateConveyor((float) leftTriggerMagnitude);
             badger.handleButtonPress(buttons);

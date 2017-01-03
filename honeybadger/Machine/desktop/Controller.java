@@ -321,8 +321,8 @@ public class Controller extends XboxControllerAdapter{
                             connector.SendMessage(new ControllerMessage(controllerState));
                     }
                 },
-                //TODO: Fastest we can send is 13ms. Don't go lower.
-                1000,250, TimeUnit.MILLISECONDS
+                //Fastest we can send is 13ms. Don't go lower!
+                1000,100, TimeUnit.MILLISECONDS
         );
     }
 }
