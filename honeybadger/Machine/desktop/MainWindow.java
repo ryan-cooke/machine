@@ -405,6 +405,7 @@ public class MainWindow {
         singleton.networkBus.End();
         singleton.messageReader.end();
 
+
         singleton.networkBus = new NetworkConnector(ConnectionIP, 2017);
         singleton.messageReader = new NetworkConnector.MessageReader(singleton.networkBus);
         Thread readMessages = new Thread(singleton.messageReader);

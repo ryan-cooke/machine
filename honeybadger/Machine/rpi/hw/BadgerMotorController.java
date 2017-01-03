@@ -1,5 +1,6 @@
 package Machine.rpi.hw;
 
+import Machine.Common.Utils;
 import Machine.rpi.HoneybadgerV6;
 
 import com.pi4j.io.gpio.*;
@@ -183,8 +184,8 @@ public class BadgerMotorController {
         }
 
         if (speedPercent < 0 || speedPercent > 100){
-            Log("[BadgerMotorController.setDriveSpeed] Speed percentage out of range.");
-            return;
+            Log("[BadgerMotorController.setDriveSpeed] Speed percentage out of range. Clamping to 0.f or 100.f");
+            speedPercent = Utils.Clamp(speedPercent,0.f,100.f);
         }
 
         float percent = speedPercent/100.f;

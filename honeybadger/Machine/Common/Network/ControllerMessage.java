@@ -131,6 +131,7 @@ public class ControllerMessage extends BaseMsg implements Serializable {
 
         //If the badger wasn't null, do actions dependent on the object
         if (buttons.get(Button.START)){
+            badger.sendAckMessageToDesktop("Listening to Controller 1");
             badger.listenToController(true);
         }
 
