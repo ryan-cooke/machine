@@ -13,7 +13,6 @@ import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.DataBufferByte;
 import java.io.File;
-import java.security.Key;
 import java.util.ArrayList;
 
 import static Machine.Common.Utils.ErrorLog;
@@ -47,7 +46,7 @@ public class MainWindow {
     private JMenuItem openCVConfigMenuItem;
     private JMenuItem regularBuffer;
     private JMenuItem cannyBuffer;
-    private JMenuItem hougheBuffer;
+    private JMenuItem houghBuffer;
 
     private JTextArea messageFeed;
     private JPanelOpenCV videoPanel;
@@ -198,19 +197,19 @@ public class MainWindow {
         regularBuffer = new JMenuItem("Regular");
         regularBuffer.setMnemonic(KeyEvent.VK_R);
         regularBuffer.addActionListener(e -> {
-
+            JPanelOpenCV.setDrawingBuffer(JPanelOpenCV.BUFFER_TYPE.REGULAR);
         });
 
         cannyBuffer = new JMenuItem("Canny");
         cannyBuffer.setMnemonic(KeyEvent.VK_C);
         cannyBuffer.addActionListener(e -> {
-
+            JPanelOpenCV.setDrawingBuffer(JPanelOpenCV.BUFFER_TYPE.CANNY);
         });
 
-        hougheBuffer = new JMenuItem("Houghe");
-        hougheBuffer.setMnemonic(KeyEvent.VK_H);
-        hougheBuffer.addActionListener(e -> {
-
+        houghBuffer = new JMenuItem("Hough");
+        houghBuffer.setMnemonic(KeyEvent.VK_H);
+        houghBuffer.addActionListener(e -> {
+            JPanelOpenCV.setDrawingBuffer(JPanelOpenCV.BUFFER_TYPE.HOUGH);
         });
 
         fontSizeIncrease = new JMenuItem("Increase Font Size");
@@ -231,7 +230,7 @@ public class MainWindow {
 
         opencvBuffers.add(regularBuffer);
         opencvBuffers.add(cannyBuffer);
-        opencvBuffers.add(hougheBuffer);
+        opencvBuffers.add(houghBuffer);
 
         opencv.add(openCVConfigMenuItem);
         opencv.add(opencvBuffers);

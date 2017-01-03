@@ -335,7 +335,6 @@ public class JPanelOpenCV extends JPanel {
                 skinnyRect = true;
             }
 
-
             if (skinnyRect) {
                 Imgproc.rectangle(frame, objectBoundingRectangle.tl(), objectBoundingRectangle.br(), new Scalar(0, 255, 0));
                 int rectCenter = objectBoundingRectangle.x + objectBoundingRectangle.width / 2;
@@ -344,10 +343,7 @@ public class JPanelOpenCV extends JPanel {
                     if (color.equals("blue")) {
                         blueTarget = true;
                     }
-
                 }
-
-
             }
         }
         return frame;
