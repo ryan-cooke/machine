@@ -36,7 +36,7 @@ public class JPanelOpenCV extends JPanel {
 
     private static BufferedImage HoughBuffer;
 
-    private static BUFFER_TYPE FrameBufferType;
+    private static BUFFER_TYPE FrameBufferType = BUFFER_TYPE.REGULAR;
 
     private Scalar lowerBlack = new Scalar(0, 0, 0);
     private Scalar upperBlack = new Scalar(180, 255, 90);
@@ -82,7 +82,7 @@ public class JPanelOpenCV extends JPanel {
 
     public void startLoop() {
         String arch = System.getProperty("os.arch");
-        System.out.println(arch);
+        //System.out.println(arch);
         String openCVLib = arch.contains("x86") ? "opencv_java310" : "opencv_java310_64";
         String ffmpegLib = arch.contains("x86") ? "opencv_ffmpeg310" : "opencv_ffmpeg310_64";
         System.loadLibrary(openCVLib);
@@ -111,7 +111,7 @@ public class JPanelOpenCV extends JPanel {
             camera.read(frame);
             processFrame(frame);
 
-            processedImage = instance.MatToBufferedImage(frame);
+            processedImage = MatToBufferedImage(frame);
             try {
                 Thread.sleep(10);
             } catch (InterruptedException e) {
@@ -285,7 +285,7 @@ public class JPanelOpenCV extends JPanel {
 
             if (skinnyRect) {
                 Imgproc.rectangle(frame, objectBoundingRectangle.tl(), objectBoundingRectangle.br(), new Scalar(0, 255, 0));
-                System.out.println("width of rect is " + objectBoundingRectangle.width + "it is " + color);
+                //System.out.println("width of rect is " + objectBoundingRectangle.width + "it is " + color);
             }
         }
         return frame;
@@ -299,8 +299,8 @@ public class JPanelOpenCV extends JPanel {
         Mat circles = new Mat();
 
         Imgproc.HoughCircles(greyscale, circles, Imgproc.CV_HOUGH_GRADIENT, 1, (double) greyscale.rows() / 8, 50, 80, 0, 0);
-        System.out.println("got here");
-        System.out.println(circles);
+        //System.out.println("got here");
+        //System.out.println(circles);
         for (int i = 0; i < circles.cols(); i++) {
             double[] vecCircle = circles.get(0, i);
 
@@ -308,7 +308,7 @@ public class JPanelOpenCV extends JPanel {
             int y = (int) vecCircle[1];
             int r = (int) vecCircle[2];
             Imgproc.circle(out, new Point(x, y), r, new Scalar(0, 0, 255), 10);
-            System.out.println("x detected as " + x);
+            //System.out.println("x detected as " + x);
         }
 
         return out;
@@ -325,7 +325,7 @@ public class JPanelOpenCV extends JPanel {
         int ratio = 20;
         Imgproc.Canny(greyscale, edges, lowThreshold, lowThreshold * ratio);
 
-        Mat can = edges.clone();
+        CannyBuffer = MatToBufferedImage(edges);
         Mat lines = new Mat();
         int threshold = 70;
         int minLineSize = 100;
@@ -345,9 +345,9 @@ public class JPanelOpenCV extends JPanel {
             }
         }
 
+        HoughBuffer = MatToBufferedImage(out);
 
         return out;
-
     }
 
     public static Mat erodeDilate(Mat inMat, int dilate, int erode) {
