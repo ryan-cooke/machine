@@ -16,18 +16,19 @@ public class BadgerAutonomousController {
 
     private ControllerMessage controllerState;
 
-    private boolean scriptRunning;
+    public ControllerMessage getControllerState() {
+        return controllerState;
+    }
 
     public BadgerAutonomousController(ControllerMessage controllerState){
         this.controllerState = controllerState;
-        scriptRunning = false;
     }
 
     /**
      * Runs the autonomous script that begins sending messages to the RPi
      */
     public void TakeOver(){
-        scriptRunning = true;
+
     }
 
     /**

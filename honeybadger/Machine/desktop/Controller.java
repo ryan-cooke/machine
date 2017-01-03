@@ -13,6 +13,10 @@ public class Controller extends XboxControllerAdapter {
 
     private ControllerMessage controllerState;
 
+    public ControllerMessage getControllerState() {
+        return controllerState;
+    }
+
     public XboxController getXboxController() {
         return xboxController;
     }

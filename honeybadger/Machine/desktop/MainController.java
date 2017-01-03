@@ -16,6 +16,7 @@ import static Machine.Common.Utils.Log;
 public class MainController {
 
     private NetworkConnector connector;
+    private boolean isAutonomousRunning;
     private Controller connectedController;
     private BadgerAutonomousController autonomousController;
     private ControllerMessage controllerState;
@@ -29,7 +30,7 @@ public class MainController {
         connector = messageConnector;
         controllerState = new ControllerMessage();
         controllerState.Initialize();
-        Controller xbox = new Controller(controllerState);
+        Controller connectedController = new Controller(controllerState);
         BadgerAutonomousController autonomousController =
                 new BadgerAutonomousController(controllerState);
 
@@ -38,23 +39,23 @@ public class MainController {
         makePeriodicSender();
 
     }
-//TODO: Need to make autonomous take control of the network connector for scripts.
+
     public void makePeriodicSender(){
         if (connector==null || ControllerMessageSender!=null || connector.IsBroken()){
             Log("Unable to make periodic controller message sender.");
             return;
         }
         ControllerMessageSender = ScheduledManager.scheduleAtFixedRate(
-                () -> {
-                    if(connector.HasActiveConnection() && !connector.IsBroken()) {
-                        if(connectedController.getXboxController().isConnected())
-                            connector.SendMessage(new ControllerMessage(controllerState));
-                    }else{
-                        ControllerMessageSender.cancel(false); //Don't interrupt yourself.
-                        ControllerMessageSender = null;
+            () -> {
+                if(connector.HasActiveConnection() && !connector.IsBroken()) {
+                    if (isAutonomousRunning){
+                        connector.SendMessage(new ControllerMessage(autonomousController.getControllerState()));
                     }
-                },
-                1,1, TimeUnit.SECONDS
+                    else if(connectedController.getXboxController().isConnected())
+                        connector.SendMessage(new ControllerMessage(connectedController.getControllerState()));
+                }
+            },
+            1,1, TimeUnit.SECONDS
         );
     }
 }

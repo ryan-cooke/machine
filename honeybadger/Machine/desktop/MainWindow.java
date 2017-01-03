@@ -58,7 +58,7 @@ public class MainWindow {
 
     private static String ConnectionIP;
 
-    private static Controller Xbox;
+    private static MainController Controller;
 
     private MainWindow() {
 
@@ -476,7 +476,7 @@ public class MainWindow {
         Thread controllerThread = new Thread(new Runnable() {
             @Override
             public void run() {
-                Xbox = new Controller(singleton.networkBus);
+                Controller = new MainController(singleton.networkBus);
                 while(true){
                     try {
                         Thread.sleep(500);
