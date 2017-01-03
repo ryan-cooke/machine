@@ -89,7 +89,7 @@ public class JPanelOpenCV extends JPanel {
     }
 
     public static Scalar[] getColorScalars() {
-        Scalar[] ar = new Scalar[6];
+        Scalar[] ar = new Scalar[10];
         ar[0] = lowerGreen;
         ar[1] = upperGreen;
         ar[2] = lowerBlue;
