@@ -21,6 +21,8 @@ public class Controller extends XboxControllerAdapter{
 
     private ControllerMessage controllerState;
 
+    private String dllPath;
+
     private ScheduledFuture<?> ControllerMessageSender;
 
     private void press(Button button){
@@ -286,9 +288,16 @@ public class Controller extends XboxControllerAdapter{
         baseDir+="\\bin";
         String arch = System.getProperty("os.arch");
         System.out.println(arch);
-        String dllPath = String.format("%s\\%s",baseDir,
+        dllPath = String.format("%s\\%s",baseDir,
                 arch.contains("x86")? "xboxcontroller.dll" : "xboxcontroller64.dll");
 
+        ScheduledManager = Executors.newScheduledThreadPool(1);
+        controllerState = new ControllerMessage();
+
+        Initialize();
+    }
+
+    private void Initialize(){
         connectedController = new XboxController(
                 dllPath,
                 1,
@@ -296,11 +305,8 @@ public class Controller extends XboxControllerAdapter{
                 50);
 
         isConnected();
-        ScheduledManager = Executors.newScheduledThreadPool(1);
 
-        controllerState = new ControllerMessage();
         controllerState.Initialize();
-
         connectedController.addXboxControllerListener(this);
         connectedController.setLeftThumbDeadZone(0.2);
         connectedController.setRightThumbDeadZone(0.2);
@@ -308,7 +314,7 @@ public class Controller extends XboxControllerAdapter{
         makePeriodicSender();
     }
 
-    public void makePeriodicSender(){
+    private void makePeriodicSender(){
         if (connector==null || ControllerMessageSender!=null || connector.IsBroken()){
             Log("Unable to make periodic controller message sender.");
             return;
@@ -324,5 +330,17 @@ public class Controller extends XboxControllerAdapter{
                 //Fastest we can send is 13ms. Don't go lower!
                 1000,100, TimeUnit.MILLISECONDS
         );
+    }
+
+    public void Reinitialize(NetworkConnector nc){
+        if(nc==null){
+            return;
+        }
+
+        ControllerMessageSender.cancel(true);
+        connectedController.release();
+        connector = nc;
+
+        Initialize();
     }
 }

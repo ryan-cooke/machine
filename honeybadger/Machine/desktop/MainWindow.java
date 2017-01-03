@@ -58,7 +58,7 @@ public class MainWindow {
 
     private static String ConnectionIP;
 
-    private static Controller Xbox;
+    private static Controller Xbox360Controller;
 
     private MainWindow() {
 
@@ -402,13 +402,14 @@ public class MainWindow {
     private void resetConnection() {
         Log("Connection died. Attempting to reset...");
         String ConnectionIP = singleton.networkBus.host;
+
         singleton.networkBus.End();
         singleton.messageReader.end();
-
 
         singleton.networkBus = new NetworkConnector(ConnectionIP, 2017);
         singleton.messageReader = new NetworkConnector.MessageReader(singleton.networkBus);
         Thread readMessages = new Thread(singleton.messageReader);
+        Xbox360Controller.Reinitialize(singleton.networkBus);
         readMessages.start();
     }
 
@@ -477,7 +478,7 @@ public class MainWindow {
         Thread controllerThread = new Thread(new Runnable() {
             @Override
             public void run() {
-                Xbox = new Controller(singleton.networkBus);
+                Xbox360Controller = new Controller(singleton.networkBus);
                 while(true){
                     try {
                         Thread.sleep(500);
