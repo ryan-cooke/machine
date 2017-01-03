@@ -43,6 +43,10 @@ public class JPanelOpenCV extends JPanel {
     private static boolean blueTarget = false;
     private static int center = 320;
 
+    private static int topWall=0;
+    private static int[]topWallAr = {0,0,0,0,0};
+    private static int countTop=0;
+
     private static Scalar lowerBlack = new Scalar(0, 0, 0);
     private static Scalar upperBlack = new Scalar(180, 255, 90);
 
@@ -417,8 +421,13 @@ public class JPanelOpenCV extends JPanel {
             double run = Math.abs(val[2] - val[0]);
             if ((rise / run) > 0.8) {
             } else {
-
-                Imgproc.line(out, new Point(val[0], val[1]), new Point(val[2], val[3]), new Scalar(0, 0, 255), 2);
+                Scalar c1 = new Scalar(200,200,0);
+                if(val[1]<250){c1= new Scalar(0,0,255);}
+                Imgproc.line(out, new Point(val[0], val[1]), new Point(val[2], val[3]), c1, 2);
+            }
+            if(val[1]<250){
+            avgTop((int)val[1]);
+            Log(topWall+"height of the top wall is");
             }
         }
 
@@ -459,6 +468,13 @@ public class JPanelOpenCV extends JPanel {
 
     synchronized static void setDrawingBuffer(BUFFER_TYPE drawingBuffer){
         FrameBufferType = drawingBuffer;
+    }
+
+    public static void avgTop(int x)
+    {
+        countTop++;
+        topWall=((topWallAr[0]+topWallAr[1]+topWallAr[2]+topWallAr[3]+topWallAr[4])/5);
+        topWallAr[countTop%5]=x;
     }
 
 }
