@@ -334,12 +334,13 @@ public class MainWindow {
         final int[] option = {1};
         JDialog dialog = new JDialog();
         JPanel panel = new JPanel();
+        JPanel panel2 = new JPanel();
+        JPanel panel3 = new JPanel();
         JLabel label = new JLabel("Remote host password:");
         JPasswordField pass = new JPasswordField(20);
         JButton ok = new JButton("OK");
         JButton cancel = new JButton("Cancel");
         ok.addActionListener(e -> {
-
             char[] passwordC = pass.getPassword();
             if (passwordC.length > 0) {
                 String password = new String(passwordC);
@@ -360,12 +361,15 @@ public class MainWindow {
             Log("Update canceled");
         });
 
-        panel.add(label);
-        panel.add(pass);
-        panel.add(ok);
-        panel.add(cancel);
+        panel3.add(label);
+        panel3.add(pass);
+        panel2.add(ok);
+        panel2.add(cancel);
+        panel.add(panel3);
+        panel.add(panel2);
         dialog.add(panel);
         dialog.pack();
+        dialog.setLocationRelativeTo(null);
         pass.requestFocusInWindow();
         dialog.setModal(true);
         dialog.setVisible(true);
@@ -455,8 +459,8 @@ public class MainWindow {
         singleton.messageFeed.append(input);
         if (!input.endsWith("\n")) {
             singleton.messageFeed.append("\n");
-            singleton.messageFeed.setCaretPosition(singleton.messageFeed.getDocument().getLength());
         }
+        singleton.messageFeed.setCaretPosition(singleton.messageFeed.getDocument().getLength());
     }
 
     synchronized public static void dieWithError(String errorMessage) {
