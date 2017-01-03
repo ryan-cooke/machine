@@ -1,8 +1,6 @@
 package Machine.desktop;
 
 import Machine.Common.Constants;
-import org.opencv.core.Core;
-import Machine.Common.Shell;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.Size;
@@ -39,11 +37,16 @@ public class MainWindow {
     private JMenuBar menuBar;
     private JMenu file;
     private JMenu view;
+    private JMenu opencv;
+    private JMenu opencvBuffers;
     private JMenuItem update;
     private JMenuItem exit;
     private JMenuItem fontSizeIncrease;
     private JMenuItem fontSizeDecrease;
     private JMenuItem openCVConfigMenuItem;
+    private JMenuItem regularBuffer;
+    private JMenuItem cannyBuffer;
+    private JMenuItem houghBuffer;
 
     private JTextArea messageFeed;
     private JPanelOpenCV videoPanel;
@@ -54,6 +57,8 @@ public class MainWindow {
     private double fontSize;
 
     private static String ConnectionIP;
+
+    private static Controller Xbox;
 
     private MainWindow() {
 
@@ -90,14 +95,14 @@ public class MainWindow {
                 System.loadLibrary("opencv_ffmpeg310_64");
             }
 
-            JPanelOpenCV.image = ImageIO.read(new File("maxresdefault.jpg"));
-            Mat original = new Mat(JPanelOpenCV.image.getHeight(), JPanelOpenCV.image.getWidth(), CvType.CV_8UC3);
-            original.put(0, 0, ((DataBufferByte) JPanelOpenCV.image.getRaster().getDataBuffer()).getData());
+            JPanelOpenCV.processedImage = ImageIO.read(new File("maxresdefault.jpg"));
+            Mat original = new Mat(JPanelOpenCV.processedImage.getHeight(), JPanelOpenCV.processedImage.getWidth(), CvType.CV_8UC3);
+            original.put(0, 0, ((DataBufferByte) JPanelOpenCV.processedImage.getRaster().getDataBuffer()).getData());
             Mat reduced = new Mat();
             Size newSize = new Size(640, 480);
             Imgproc.resize(original, reduced, newSize);
 
-            JPanelOpenCV.image = JPanelOpenCV.MatToBufferedImage(reduced);
+            JPanelOpenCV.processedImage = JPanelOpenCV.MatToBufferedImage(reduced);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -167,6 +172,9 @@ public class MainWindow {
         view = new JMenu("View");
         view.setMnemonic(KeyEvent.VK_V);
 
+        opencv = new JMenu("OpenCV");
+        opencv.setMnemonic(KeyEvent.VK_O);
+
         exit = new JMenuItem("Exit");
         exit.setMnemonic(KeyEvent.VK_E);
         exit.setToolTipText("If you really need a tool tip for this button, you shouldn't be in engineering");
@@ -182,6 +190,28 @@ public class MainWindow {
             OpenCVConfig.main(new String[0]);
         });
 
+        //reg canny houghe
+        opencvBuffers = new JMenu("Change OpenCV Buffer");
+        opencvBuffers.setMnemonic(KeyEvent.VK_B);
+
+        regularBuffer = new JMenuItem("Regular");
+        regularBuffer.setMnemonic(KeyEvent.VK_R);
+        regularBuffer.addActionListener(e -> {
+            JPanelOpenCV.setDrawingBuffer(JPanelOpenCV.BUFFER_TYPE.REGULAR);
+        });
+
+        cannyBuffer = new JMenuItem("Canny");
+        cannyBuffer.setMnemonic(KeyEvent.VK_C);
+        cannyBuffer.addActionListener(e -> {
+            JPanelOpenCV.setDrawingBuffer(JPanelOpenCV.BUFFER_TYPE.CANNY);
+        });
+
+        houghBuffer = new JMenuItem("Hough");
+        houghBuffer.setMnemonic(KeyEvent.VK_H);
+        houghBuffer.addActionListener(e -> {
+            JPanelOpenCV.setDrawingBuffer(JPanelOpenCV.BUFFER_TYPE.HOUGH);
+        });
+
         fontSizeIncrease = new JMenuItem("Increase Font Size");
         fontSizeIncrease.setMnemonic(KeyEvent.VK_PLUS);
         fontSizeIncrease.setToolTipText("Increases the font size");
@@ -193,14 +223,21 @@ public class MainWindow {
         fontSizeDecrease.addActionListener(e -> decreaseFontSize());
 
         file.add(update);
-        file.add(openCVConfigMenuItem);
         file.add(exit);
 
         view.add(fontSizeIncrease);
         view.add(fontSizeDecrease);
 
+        opencvBuffers.add(regularBuffer);
+        opencvBuffers.add(cannyBuffer);
+        opencvBuffers.add(houghBuffer);
+
+        opencv.add(openCVConfigMenuItem);
+        opencv.add(opencvBuffers);
+
         menuBar.add(file);
         menuBar.add(view);
+        menuBar.add(opencv);
         mainFrame.setJMenuBar(menuBar);
     }
 
@@ -272,7 +309,6 @@ public class MainWindow {
     }
 
     private void runRemoteUpdate() {
-        String password = null;
         if (updaterThread != null) {
             JOptionPane.showMessageDialog(null,
                     "An update is in progress. Please wait",
@@ -281,32 +317,44 @@ public class MainWindow {
             return;
         }
 
+        final int[] option = {1};
+        JDialog dialog = new JDialog();
         JPanel panel = new JPanel();
         JLabel label = new JLabel("Remote host password:");
         JPasswordField pass = new JPasswordField(20);
+        JButton ok = new JButton("OK");
+        JButton cancel = new JButton("Cancel");
+        ok.addActionListener(e -> {
+
+            char[] passwordC = pass.getPassword();
+            if (passwordC.length > 0) {
+                String password = new String(passwordC);
+                String finalPassword = password;
+                updaterThread = new Thread(() -> {
+                    boolean success = BadgerUpdater.sendUpdate(ConnectionIP, finalPassword);
+                    //resetConnection();
+                    updaterThread = null;
+                });
+                updaterThread.start();
+            } else {
+                Log("No password was entered");
+            }
+            dialog.dispose();
+        });
+        cancel.addActionListener(e -> {
+            dialog.dispose();
+            Log("Update canceled");
+        });
+
         panel.add(label);
         panel.add(pass);
-        String[] options = new String[]{"OK", "Cancel"};
-        int option = JOptionPane.showOptionDialog(null, panel, "RasPI Update authentication",
-                JOptionPane.NO_OPTION, JOptionPane.PLAIN_MESSAGE,
-                null, options, options[1]);
-        if(option == 0) // pressing OK button
-        {
-            char[] passwordC = pass.getPassword();
-            password = new String(passwordC);
-        }
-        if (password == null) {
-            Log("Cancelling update");
-            return;
-        }
-
-        String finalPassword = password;
-        updaterThread = new Thread(() -> {
-            boolean success = BadgerUpdater.sendUpdate(ConnectionIP, finalPassword);
-            //resetConnection();
-            updaterThread = null;
-        });
-        updaterThread.start();
+        panel.add(ok);
+        panel.add(cancel);
+        dialog.add(panel);
+        dialog.pack();
+        pass.requestFocusInWindow();
+        dialog.setModal(true);
+        dialog.setVisible(true);
     }
 
     private void startVideoStream() {
@@ -413,7 +461,7 @@ public class MainWindow {
             UIManager.put("Label.font", highDPI);
             UIManager.put("Button.font", highDPI);
             UIManager.put("ToolTip.font", highDPI);
-            UIManager.put("FormattedTextField.font" , highDPI);
+            UIManager.put("FormattedTextField.font", highDPI);
             UIManager.put("PasswordField.font", highDPI);
         }
 
@@ -425,7 +473,21 @@ public class MainWindow {
         singleton.messageReader = new NetworkConnector.MessageReader(singleton.networkBus);
         singleton.startVideoStream();
 
-        Controller Xbox = new Controller(singleton.networkBus);
+        Thread controllerThread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                Xbox = new Controller(singleton.networkBus);
+                while(true){
+                    try {
+                        Thread.sleep(500);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        });
+        controllerThread.start();
+
         Thread readMessages = new Thread(singleton.messageReader);
 
         readMessages.start();

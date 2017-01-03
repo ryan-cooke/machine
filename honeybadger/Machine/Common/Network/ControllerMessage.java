@@ -8,13 +8,12 @@ import java.io.Serializable;
 import java.util.HashMap;
 
 import static Machine.Common.Utils.Log;
+import Machine.Common.Utils.Button;
 
 /**
  * Handles everything related to networking the controller
  */
 public class ControllerMessage extends BaseMsg implements Serializable {
-    public enum Button {A, B, X, Y, BACK, START, RBUMPER, LBUMPER, RTHUMB,
-        LTHUMB, NDPAD, EDPAD, SDPAD, WDPAD, LTRIGGER, RTRIGGER}
 
     public int buttonsPressed; // Number of buttons currently pressed
 
@@ -131,21 +130,17 @@ public class ControllerMessage extends BaseMsg implements Serializable {
         }
 
         //If the badger wasn't null, do actions dependent on the object
-
-        //Handle digital button input
-        if(buttons.get(Button.LBUMPER)){
-            badger.disarmFlywheel();
+        //@foxtrot94: minimum needed buttons for today.
+        if(badger.isListeningToController()) {
+            badger.updateMovement(leftThumbstickDirection, (float) leftThumbstickMagnitude * 100.f);
+            badger.updateRotation(rightThumbstickDirection, (int) rightThumbstickMagnitude * 100);
+            badger.updateFlywheel((float) rightTriggerMagnitude);
+            badger.updateConveyor((float) leftTriggerMagnitude);
+            badger.handleButtonPress(buttons);
         }
-        if(buttons.get(Button.RBUMPER)){
-            badger.armFlywheel();
+        if (buttons.get(Button.START) && !badger.isListeningToController()){
+            badger.listenToController(true);
         }
-        //TODO: handle more buttons
-
-        //Handle any analog inputs
-        badger.updateMovement(leftThumbstickDirection, (float) leftThumbstickMagnitude);
-        badger.updateFlywheel((float)rightTriggerMagnitude);
-        badger.updateConveyor((float)leftTriggerMagnitude);
-        badger.updateRotation(rightThumbstickDirection, (float) leftThumbstickMagnitude);
     }
 
     @Override

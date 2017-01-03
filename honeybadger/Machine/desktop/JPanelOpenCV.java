@@ -23,8 +23,22 @@ import static Machine.Common.Utils.Log;
 
 
 public class JPanelOpenCV extends JPanel {
+    enum BUFFER_TYPE{
+        REGULAR,
+        CANNY,
+        HOUGH,
+    }
+
     static JPanelOpenCV instance;
-    static BufferedImage image;
+
+    static BufferedImage processedImage;
+
+    private static BufferedImage CannyBuffer;
+
+    private static BufferedImage HoughBuffer;
+
+    private static BUFFER_TYPE FrameBufferType = BUFFER_TYPE.REGULAR;
+
     private static boolean target = false;
     private static boolean blueTarget = false;
     private static int center = 320;
@@ -69,7 +83,7 @@ public class JPanelOpenCV extends JPanel {
         erode = e;
     }
 
-    public void setGreen(Scalar upper, Scalar lower) {
+    public static void setGreen(Scalar upper, Scalar lower) {
         lowerGreen = lower;
         upperGreen = upper;
     }
@@ -82,6 +96,10 @@ public class JPanelOpenCV extends JPanel {
         ar[3] = upperBlue;
         ar[4] = lowerBlack;
         ar[5] = upperBlack;
+        ar[6] = lowerRed;
+        ar[7] = upperRed;
+        ar[8] = lowerYellow;
+        ar[9] = upperYellow;
         return ar;
     }
 
@@ -97,12 +115,12 @@ public class JPanelOpenCV extends JPanel {
         return blueTarget;
     }
 
-    public void setBlue(Scalar upper, Scalar lower) {
+    public static void setBlue(Scalar upper, Scalar lower) {
         upperBlue = upper;
         lowerBlue = lower;
     }
 
-    public void setBlack(Scalar upper, Scalar lower) {
+    public static void setBlack(Scalar upper, Scalar lower) {
         upperBlack = upper;
         lowerBlack = lower;
     }
@@ -110,7 +128,7 @@ public class JPanelOpenCV extends JPanel {
 
     public void startLoop() {
         String arch = System.getProperty("os.arch");
-        System.out.println(arch);
+        //System.out.println(arch);
         String openCVLib = arch.contains("x86") ? "opencv_java310" : "opencv_java310_64";
         String ffmpegLib = arch.contains("x86") ? "opencv_ffmpeg310" : "opencv_ffmpeg310_64";
         System.loadLibrary(openCVLib);
@@ -137,9 +155,9 @@ public class JPanelOpenCV extends JPanel {
         Size outputSize = new Size(640, 480);
         while (ShouldDraw) {
             camera.read(frame);
-            color(frame);
+            processFrame(frame);
 
-            image = instance.MatToBufferedImage(frame);
+            processedImage = MatToBufferedImage(frame);
             try {
                 Thread.sleep(10);
             } catch (InterruptedException e) {
@@ -148,7 +166,7 @@ public class JPanelOpenCV extends JPanel {
 
             //@foxtrot94: resize whatever stream to 640x480
             Imgproc.resize(frame, resized, outputSize);
-            image = MatToBufferedImage(resized);
+            processedImage = MatToBufferedImage(resized);
             instance.invalidate();
             instance.repaint();
             //@foxtrot94: END
@@ -157,8 +175,9 @@ public class JPanelOpenCV extends JPanel {
         camera.release();
     }
 
-    public void color(Mat frame) {
+    public void processFrame(Mat frame) {
         Mat original = frame.clone();
+
         Mat hsv = original.clone();
         Mat hsv2 = original.clone();
         Mat hsv3 = original.clone();
@@ -191,15 +210,32 @@ public class JPanelOpenCV extends JPanel {
         frame = searchForMovement(hsv2, frame, "blue");
 
         frame = searchLine(hough, frame);
-        frame = drawCrosshair(frame, 30, 250, 250, new Scalar(0, 0, 255));
+        frame = drawCrosshair(frame, 30, 320, 240, new Scalar(0, 0, 255));
     }
 
     @Override
     public void paint(Graphics g) {
-        g.drawImage(image, 0, 0, this);
+        BufferedImage frameBuffer;
+
+        switch (FrameBufferType){
+            case CANNY:{
+                frameBuffer = CannyBuffer;
+                break;
+            }
+            case HOUGH:{
+                frameBuffer = HoughBuffer;
+                break;
+            }
+            case REGULAR:
+            default:
+                frameBuffer = processedImage;
+                break;
+        }
+
+        g.drawImage(frameBuffer, 0, 0, this);
     }
 
-    //Load an image
+    //Load an processedImage
     public BufferedImage loadImage(String file) {
         BufferedImage img;
 
@@ -215,7 +251,7 @@ public class JPanelOpenCV extends JPanel {
         return null;
     }
 
-    //Save an image
+    //Save an processedImage
     public void saveImage(BufferedImage img) {
         try {
             File outputfile = new File("Images/new.png");
@@ -304,7 +340,6 @@ public class JPanelOpenCV extends JPanel {
                 skinnyRect = true;
             }
 
-
             if (skinnyRect) {
                 Imgproc.rectangle(frame, objectBoundingRectangle.tl(), objectBoundingRectangle.br(), new Scalar(0, 255, 0));
                 int rectCenter = objectBoundingRectangle.x + objectBoundingRectangle.width / 2;
@@ -313,14 +348,10 @@ public class JPanelOpenCV extends JPanel {
                     if (color.equals("blue")) {
                         blueTarget = true;
                     }
-
                 }
-
-
             }
         }
         return frame;
-        //drawnWindow.showImage(frame);
     }
 
     public static Mat searchCircle(Mat rawMat, Mat out) {
@@ -331,8 +362,8 @@ public class JPanelOpenCV extends JPanel {
         Mat circles = new Mat();
 
         Imgproc.HoughCircles(greyscale, circles, Imgproc.CV_HOUGH_GRADIENT, 1, (double) greyscale.rows() / 8, 50, 80, 0, 0);
-        System.out.println("got here");
-        System.out.println(circles);
+        //System.out.println("got here");
+        //System.out.println(circles);
         for (int i = 0; i < circles.cols(); i++) {
             double[] vecCircle = circles.get(0, i);
 
@@ -340,7 +371,7 @@ public class JPanelOpenCV extends JPanel {
             int y = (int) vecCircle[1];
             int r = (int) vecCircle[2];
             Imgproc.circle(out, new Point(x, y), r, new Scalar(0, 0, 255), 10);
-            System.out.println("x detected as " + x);
+            //System.out.println("x detected as " + x);
         }
 
         return out;
@@ -357,7 +388,7 @@ public class JPanelOpenCV extends JPanel {
         int ratio = 20;
         Imgproc.Canny(greyscale, edges, lowThreshold, lowThreshold * ratio);
 
-        Mat can = edges.clone();
+        CannyBuffer = MatToBufferedImage(edges);
         Mat lines = new Mat();
         int threshold = 70;
         int minLineSize = 100;
@@ -365,25 +396,6 @@ public class JPanelOpenCV extends JPanel {
 
         Imgproc.HoughLinesP(edges, lines, 1, Math.PI / 180, threshold, minLineSize, lineGap);
 
-    	  /*  for (int i = 0; i < lines.rows(); i++)
-            {
-    	    	double linesAr[] = lines.get(i,0);
-    	    	 double rho = linesAr[0], theta = linesAr[1];
-
-    	    	  double a = Math.cos(Math.toRadians(theta)), b = Math.sin(Math.toRadians(theta));
-
-    	    	  double x0 = a*rho, y0 = b*rho;
-    	    	  int x1 = (int)(x0 + 1000*(-b));
-    	    	  int y1 = (int)(y0 + 1000*(a));
-    	    	  int x2 = (int)(x0 - 1000*(-b));
-    	    	  int y2 = (int)(y0 - 1000*(a));
-
-    	    	  Point pt1 = new Point(x1,y1);
-    	    	  Point pt2 = new Point(x2,y2);
-
-    	          Imgproc.line(out, pt1, pt2, new Scalar(255,0,0));
-
-    	    }*/
         for (int i = 0; i < lines.cols(); i++) {
             double[] val = lines.get(0, i);
 
@@ -396,9 +408,9 @@ public class JPanelOpenCV extends JPanel {
             }
         }
 
+        HoughBuffer = MatToBufferedImage(out);
 
         return out;
-
     }
 
     public static Mat erodeDilate(Mat inMat, int dilate, int erode) {
@@ -431,5 +443,8 @@ public class JPanelOpenCV extends JPanel {
         return cross;
     }
 
+    synchronized static void setDrawingBuffer(BUFFER_TYPE drawingBuffer){
+        FrameBufferType = drawingBuffer;
+    }
 
 }
