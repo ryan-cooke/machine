@@ -427,7 +427,7 @@ public class JPanelOpenCV extends JPanel {
             }
             if(val[1]<250){
             avgTop((int)val[1]);
-            Log(topWall+"height of the top wall is");
+            Log(getDistances()+" inches is distance");
             }
         }
 
@@ -475,6 +475,16 @@ public class JPanelOpenCV extends JPanel {
         countTop++;
         topWall=((topWallAr[0]+topWallAr[1]+topWallAr[2]+topWallAr[3]+topWallAr[4])/5);
         topWallAr[countTop%5]=x;
+    }
+    public static double getDistances(){
+        double distance=0;
+        if (topWall>120){distance = ((topWall-120)/5.45)+25;}
+        if (topWall<=120){distance = (topWall/11)+15;}
+
+
+
+
+        return distance;
     }
 
 }
