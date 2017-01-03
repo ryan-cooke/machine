@@ -264,6 +264,7 @@ public class Controller extends XboxControllerAdapter {
                 50);
 
         isConnected();
+        ScheduledManager = Executors.newScheduledThreadPool(1);
 
         this.controllerState = controllerState;
 
