@@ -60,6 +60,9 @@ public class MainWindow {
 
     private static Controller Xbox;
 
+    private int selectedCamera;
+    private JMenuItem changeStream;
+
     private MainWindow() {
 
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
@@ -212,6 +215,16 @@ public class MainWindow {
             JPanelOpenCV.setDrawingBuffer(JPanelOpenCV.BUFFER_TYPE.HOUGH);
         });
 
+        changeStream = new JMenuItem("Change Stream");
+        changeStream.setMnemonic(KeyEvent.VK_C);
+        changeStream.addActionListener(e -> {
+            if (selectedCamera == 0){
+                resetVideoFeed(8080);
+            } else if (selectedCamera == 1){
+                resetVideoFeed(8090);
+            }
+        });
+
         fontSizeIncrease = new JMenuItem("Increase Font Size");
         fontSizeIncrease.setMnemonic(KeyEvent.VK_PLUS);
         fontSizeIncrease.setToolTipText("Increases the font size");
@@ -233,6 +246,7 @@ public class MainWindow {
         opencvBuffers.add(houghBuffer);
 
         opencv.add(openCVConfigMenuItem);
+        opencv.add(changeStream);
         opencv.add(opencvBuffers);
 
         menuBar.add(file);
@@ -363,7 +377,30 @@ public class MainWindow {
             JPanelOpenCV.instance = videoPanel;
             videoThread = new Thread(() -> {
                 try {
-                    JPanelOpenCV.SetConnectionHost(ConnectionIP);
+                    JPanelOpenCV.SetConnectionHost(ConnectionIP, 8090);
+                    videoPanel.startLoop();
+                } catch (Exception e) {
+                    MainWindow.writeToMessageFeed("Failed to open video stream");
+                    e.printStackTrace();
+                } finally {
+                    videoThread = null;
+                }
+            });
+            videoThread.start();
+        }
+    }
+
+    private void resetVideoFeed(int port) {
+        if (videoThread != null) {
+            videoThread.stop();
+            videoThread = null;
+        }
+        if (videoThread == null) {
+            MainWindow.writeToMessageFeed("Opening video stream...");
+            JPanelOpenCV.instance = videoPanel;
+            videoThread = new Thread(() -> {
+                try {
+                    JPanelOpenCV.SetConnectionHost(ConnectionIP, port);
                     videoPanel.startLoop();
                 } catch (Exception e) {
                     MainWindow.writeToMessageFeed("Failed to open video stream");

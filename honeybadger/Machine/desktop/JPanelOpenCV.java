@@ -70,8 +70,8 @@ public class JPanelOpenCV extends JPanel {
         j1.startLoop();
     }
 
-    public static void SetConnectionHost(String host) {
-        ConnectURL = String.format("http://%s:8090/?action=stream", host);
+    public static void SetConnectionHost(String host, int port) {
+        ConnectURL = String.format("http://%s:8090/?action=%d", host, port);
         ShouldDraw = true;
     }
 
