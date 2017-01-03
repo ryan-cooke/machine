@@ -64,6 +64,7 @@ public class MainDesktop {
             MessageReader readerHandle = new MessageReader(nc);
             Thread readMessages = new Thread(readerHandle);
             Controller Xbox = new Controller(nc);
+            BadgerAutonomousController autonomousController = new BadgerAutonomousController(nc);
             input = "";
             keepAlive = true;
             isActive = true;
@@ -86,6 +87,11 @@ public class MainDesktop {
                             Collection<IBadgerFunction> functors = TextCommandMessage.getCommandHandlers();
                             for(IBadgerFunction functor : functors){
                                 Log(String.format("\t%s | call: %s",functor.getClass().getSimpleName(),functor.Explain()));
+                            }
+                        }
+                        else if (keywords[1].contains("TAKE")){
+                            if (keywords[2].contains("")){
+
                             }
                         }
                         else {

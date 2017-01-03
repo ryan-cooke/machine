@@ -5,6 +5,9 @@ import Machine.Common.Network.ControllerMessage;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
+
+import static Machine.Common.Utils.Log;
 
 /**
  * The autonomous controller class that will run at the beggining of the match
@@ -17,6 +20,8 @@ public class BadgerAutonomousController {
 
     private ControllerMessage controllerState;
 
+    private boolean scriptRunning;
+
     public BadgerAutonomousController(NetworkConnector nc){
         connector = nc;
         controllerState = new ControllerMessage();
@@ -26,7 +31,10 @@ public class BadgerAutonomousController {
      * Runs the autonomous script that begins sending messages to the RPi
      */
     public void TakeOver(){
+        scriptRunning = true;
+        while(scriptRunning){
 
+        }
     }
 
     /**
@@ -87,4 +95,5 @@ public class BadgerAutonomousController {
         controllerState.leftTriggerMagnitude = 0.0;
         controllerState.rightTriggerMagnitude = 0.0;
     }
+
 }
