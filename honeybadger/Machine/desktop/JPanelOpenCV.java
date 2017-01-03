@@ -38,11 +38,11 @@ public class JPanelOpenCV extends JPanel {
     private static Scalar lowerGreen = new Scalar(35, 140, 60);
     private static Scalar upperGreen = new Scalar(70, 255, 255);
 
-    private Scalar lowerYellow = new Scalar(90,100,60);
-    private Scalar upperYellow = new Scalar(110,255,255);
+    private static Scalar lowerYellow = new Scalar(90,100,60);
+    private static Scalar upperYellow = new Scalar(110,255,255);
 
-    private Scalar lowerRed = new Scalar(110,100,60);
-    private Scalar upperRed = new Scalar(140,255,255);
+    private static Scalar lowerRed = new Scalar(110,100,60);
+    private static Scalar upperRed = new Scalar(140,255,255);
 
 
     private int erode = 3;
@@ -177,10 +177,15 @@ public class JPanelOpenCV extends JPanel {
         Core.inRange(hsv, lowerGreen, upperGreen, hsv);
         Core.inRange(hsv2, lowerBlue, upperBlue, hsv2);
         Core.inRange(hsv3, lowerBlack, upperBlack, hsv3);
+        Core.inRange(hsv4, lowerYellow, upperYellow,hsv4);
+        Core.inRange(hsv5, lowerRed, upperRed, hsv5);
 
         hsv = erodeDilate(hsv, dilate, erode);
         hsv2 = erodeDilate(hsv2, dilate, erode);
         hsv3 = erodeDilate(hsv3, dilate, erode);
+        hsv4 = erodeDilate(hsv4, dilate, erode);
+        hsv5 = erodeDilate(hsv5, dilate, erode);
+
 
         frame = searchForMovement(hsv, frame, "green");
         frame = searchForMovement(hsv2, frame, "blue");
