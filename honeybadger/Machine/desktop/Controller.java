@@ -86,10 +86,10 @@ public class Controller extends XboxControllerAdapter{
     public void start(boolean pressed)
     {
         if (pressed){
-            press(Button.RBUMPER);
+            press(Button.START);
         }
         else{
-            depress(Button.RBUMPER);
+            depress(Button.START);
         }
     }
 
@@ -319,12 +319,10 @@ public class Controller extends XboxControllerAdapter{
                     if(connector.HasActiveConnection() && !connector.IsBroken()) {
                         if(connectedController.isConnected())
                             connector.SendMessage(new ControllerMessage(controllerState));
-                    }else{
-                        ControllerMessageSender.cancel(false); //Don't interrupt yourself.
-                        ControllerMessageSender = null;
                     }
                 },
-                1,1, TimeUnit.SECONDS
+                //TODO: Fastest we can send is 13ms. Don't go lower.
+                1000,250, TimeUnit.MILLISECONDS
         );
     }
 }
