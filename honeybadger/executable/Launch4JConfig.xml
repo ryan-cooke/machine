@@ -12,7 +12,7 @@
   <supportUrl></supportUrl>
   <stayAlive>false</stayAlive>
   <restartOnCrash>false</restartOnCrash>
-  <manifest></manifest>
+  <manifest>launcher.manifest</manifest>
   <icon>bin\icon.ico</icon>
   <singleInstance>
     <mutexName>EngGamesBadgerController</mutexName>
