@@ -1,5 +1,6 @@
 package Machine.rpi.hw;
 
+import Machine.Common.Constants;
 import Machine.Common.Utils;
 import Machine.rpi.HoneybadgerV6;
 
@@ -112,6 +113,13 @@ public class BadgerMotorController {
     public BadgerMotorController(){
         IsReady = false;
         DriveMotorLimiting = true;
+
+        //@foxtrot94: added for quick iteration on desktop
+        if(Constants.getActivePlatform()== Constants.PLATFORM.MOCK_PI){
+            Log("Abstracting hardware for working with Mock Pi");
+            return;
+        }
+
         try {
             Log("Enabling I2C Bus");
             I2CBus bus = I2CFactory.getInstance(I2CBus.BUS_1);

@@ -442,4 +442,11 @@ public class JPanelOpenCV extends JPanel {
         FrameBufferType = drawingBuffer;
     }
 
+    synchronized static void shouldRender(boolean shouldDraw){
+        ShouldDraw = shouldDraw;
+    }
+
+    synchronized static boolean isrendering(){
+        return ShouldDraw;
+    }
 }
