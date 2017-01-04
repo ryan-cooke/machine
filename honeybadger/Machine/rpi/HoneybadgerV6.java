@@ -260,11 +260,11 @@ public class HoneybadgerV6 {
     }
 
     private void handleRBumper(){
-        armFlywheel();
+        setConveyor(BadgerMotorController.FORWARD,100.f);
     }
 
     private void handleLBumper(){
-        disarmFlywheel();
+        setConveyor(BadgerMotorController.BACKWARD,100.f);
     }
 
     private void handleRThumb(){
@@ -276,7 +276,7 @@ public class HoneybadgerV6 {
     }
 
     private void handleNDPad(){
-        setConveyor(1,100.f);
+
     }
 
     private void handleEDPad(){
@@ -288,7 +288,7 @@ public class HoneybadgerV6 {
     }
 
     private void handleSDPad() {
-        setConveyor(0,100.f);
+
     }
 
 
@@ -307,13 +307,25 @@ public class HoneybadgerV6 {
     /**
      * Update the flywheel cannon speed by a regular step
      * @param updateFactor a float between 0.0 and 1.0 that will be used to determine the step update, as given by controller input
+     * @param wantsAdditional5Percent boolean that will be true if the leftTrigger is pressed.
      */
-    public void updateFlywheel(float updateFactor){
+    public void updateFlywheel(float updateFactor, boolean wantsAdditional5Percent){
         final float minFlywheelPower = BadgerMotorController.FLYWHEEL_PERCENT_MIN;
 
         //Values determined empirically.
-        final float maxFlywheelPowerA = 25.f;
-        final float maxFlywheelPowerB = 20.f;
+        final float maxFlywheelPowerA;
+        final float maxFlywheelPowerB;
+
+        if (updateFactor > 0.1 && wantsAdditional5Percent) {
+            maxFlywheelPowerA = 30.f;
+            maxFlywheelPowerB = 20.f;
+        } else if (updateFactor < 0.1 && wantsAdditional5Percent) {
+            maxFlywheelPowerA = 5.f;
+            maxFlywheelPowerB = 5.f;
+        } else  {
+            maxFlywheelPowerA = 25.f;
+            maxFlywheelPowerB = 20.f;
+        }
 
         final float step = 0.1f;
 
@@ -401,8 +413,8 @@ public class HoneybadgerV6 {
         MotorController.setDriveMotorDirection(RPI.DRIVE_FRONT_RIGHT, BadgerMotorController.FORWARD);
         MotorController.setDriveMotorDirection(RPI.DRIVE_BACK_RIGHT, BadgerMotorController.FORWARD);
 
-        MotorController.setDriveMotorSpeed(BadgerPWMProvider.DRIVE_FRONT_LEFT, throttle);
-        MotorController.setDriveMotorSpeed(BadgerPWMProvider.DRIVE_BACK_LEFT, throttle);
+        MotorController.setDriveMotorSpeed(BadgerPWMProvider.DRIVE_FRONT_LEFT, throttle*5/3);
+        MotorController.setDriveMotorSpeed(BadgerPWMProvider.DRIVE_BACK_LEFT, throttle*5/3);
         MotorController.setDriveMotorSpeed(BadgerPWMProvider.DRIVE_FRONT_RIGHT, throttle);
         MotorController.setDriveMotorSpeed(BadgerPWMProvider.DRIVE_BACK_RIGHT, throttle);
     }
@@ -419,8 +431,8 @@ public class HoneybadgerV6 {
 
         MotorController.setDriveMotorSpeed(BadgerPWMProvider.DRIVE_FRONT_LEFT, throttle);
         MotorController.setDriveMotorSpeed(BadgerPWMProvider.DRIVE_BACK_LEFT, throttle);
-        MotorController.setDriveMotorSpeed(BadgerPWMProvider.DRIVE_FRONT_RIGHT, throttle);
-        MotorController.setDriveMotorSpeed(BadgerPWMProvider.DRIVE_BACK_RIGHT, throttle);
+        MotorController.setDriveMotorSpeed(BadgerPWMProvider.DRIVE_FRONT_RIGHT, throttle*5/3);
+        MotorController.setDriveMotorSpeed(BadgerPWMProvider.DRIVE_BACK_RIGHT, throttle*5/3);
     }
 
     /**
