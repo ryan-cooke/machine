@@ -1,5 +1,6 @@
 package Machine.rpi;
 
+import Machine.Common.Constants;
 import Machine.Common.Network.BaseMsg;
 
 import java.io.ObjectInputStream;
@@ -34,9 +35,15 @@ public class BadgerNetworkServer {
 
     private boolean KeepAlive;
 
+    private boolean PrintPayload;
+
     BadgerNetworkServer(HoneybadgerV6 badger){
         Badger = badger;
         ScheduledManager = Executors.newScheduledThreadPool(1);
+
+        if(Constants.getActivePlatform() == Constants.PLATFORM.MOCK_PI){
+            PrintPayload = true;
+        }
 
         SetupNetwork();
     }
@@ -172,7 +179,9 @@ public class BadgerNetworkServer {
                 while(KeepAlive && !shouldClose && !shouldQuit){
                     message = ReceiveMessage();
                     //only for DEBUG
-                    //Log(String.format("RX: %s",message));
+                    if(PrintPayload) {
+                        Log(String.format("RX: %s",message));
+                    }
                     shouldClose = message.contains("close");
                     shouldQuit = message.contains("quit");
                 }

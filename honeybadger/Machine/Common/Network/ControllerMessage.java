@@ -130,16 +130,17 @@ public class ControllerMessage extends BaseMsg implements Serializable {
         }
 
         //If the badger wasn't null, do actions dependent on the object
-        //@foxtrot94: minimum needed buttons for today.
+        if (buttons.get(Button.START)){
+            badger.sendAckMessageToDesktop("Listening to Controller 1");
+            badger.listenToController(true);
+        }
+
         if(badger.isListeningToController()) {
-            badger.updateMovement(leftThumbstickDirection, (float) leftThumbstickMagnitude * 100.f);
-            badger.updateRotation(rightThumbstickDirection, (int) rightThumbstickMagnitude * 100);
+            badger.updateMovement(leftThumbstickDirection, (float) leftThumbstickMagnitude * 60.f);
+            badger.updateRotation(rightThumbstickDirection, (float) rightThumbstickMagnitude * 60.f);
             badger.updateFlywheel((float) rightTriggerMagnitude);
             badger.updateConveyor((float) leftTriggerMagnitude);
             badger.handleButtonPress(buttons);
-        }
-        if (buttons.get(Button.START) && !badger.isListeningToController()){
-            badger.listenToController(true);
         }
     }
 

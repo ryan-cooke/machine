@@ -1,5 +1,6 @@
 package Machine.rpi;
 
+import Machine.Common.Constants;
 import Machine.Common.Network.BaseMsg;
 import Machine.Common.Network.ErrorMessage;
 import Machine.Common.Network.StatusMessage;
@@ -112,6 +113,8 @@ public class HoneybadgerV6 {
      * @param throttle a float between 0.0 and 1.0, as given by controller input (for example)
      */
     public void updateMovement(char dir, float throttle){
+        sendAckMessageToDesktop(String.format("Moving direction %s",dir));
+
         //Change to a map with lambdas or something...
         switch (dir){
             case 'N':{ //up
@@ -152,7 +155,9 @@ public class HoneybadgerV6 {
      * @param dir Single character representing the direction (N,S,E,W or Z)
      * @param throttle a float between 0.0 and 1.0, as given by controller input (for example)
      */
-    public void updateRotation(char dir, int throttle){
+    public void updateRotation(char dir, float throttle){
+        sendAckMessageToDesktop(String.format("Rotating in direction %s",dir));
+
         if( !IsMoving){
             switch (dir){
                 case 'N':{
@@ -225,60 +230,62 @@ public class HoneybadgerV6 {
         }
     }
 
-    public void handleA(){
+    private void handleA(){
 
     }
 
-    public void handleB(){
+    private void handleB(){
 
     }
 
-    public void handleX(){
+    private void handleX(){
 
     }
 
-    public void handleY(){
+    private void handleY(){
 
     }
 
-    public void handleBack(){
+    private void handleBack(){
         listenToController(false);
     }
 
-    public void handleStart(){
+    private void handleStart(){
         listenToController(true);
     }
 
-    public void handleRBumper(){
+    private void handleRBumper(){
         armFlywheel();
     }
 
-    public void handleLBumper(){
+    private void handleLBumper(){
         disarmFlywheel();
     }
 
-    public void handleRThumb(){
+    private void handleRThumb(){
+        STOP();
+    }
+
+    private void handleLThumb(){
 
     }
 
-    public void handleLThumb(){
+    private void handleNDPad(){
 
     }
 
-    public void handleNDPad(){
+    private void handleEDPad(){
 
     }
 
-    public void handleEDPad(){
+    private void handleWDPad(){
 
     }
 
-    public void handleWDPad(){
-
+    private void handleSDPad() {
     }
 
-    public void handleSDPad() {
-    }
+
 
     /**
      * Move the conveyor in one direction
@@ -286,6 +293,7 @@ public class HoneybadgerV6 {
      */
     public void updateConveyor (float throttle){
         throttle = Utils.Clamp(throttle*100.f,0.f,100.f);
+        sendAckMessageToDesktop(String.format("Conveyor speed %f",throttle));
         MotorController.setDriveMotorSpeed(BadgerPWMProvider.CONVEYOR_A,throttle);
         MotorController.setDriveMotorSpeed(BadgerPWMProvider.CONVEYOR_B,throttle);
     }
@@ -317,6 +325,7 @@ public class HoneybadgerV6 {
         FlywheelThrottleB = Utils.Clamp(FlywheelThrottleB+delta ,minFlywheelPower,maxFlywheelPowerB);
 
         if(FlywheelIsReady) {
+            sendAckMessageToDesktop(String.format("Flywheel speed A:%f B:%f",FlywheelThrottleA,FlywheelThrottleB));
             MotorController.setPWM(BadgerPWMProvider.FLYWHEEL_A, FlywheelThrottleA);
             MotorController.setPWM(BadgerPWMProvider.FLYWHEEL_B, FlywheelThrottleB);
         }
@@ -327,7 +336,7 @@ public class HoneybadgerV6 {
             //Everything should be ready.
             return;
         }
-
+        sendAckMessageToDesktop("Flywheel Armed");
         MotorController.setPWM(BadgerPWMProvider.FLYWHEEL_A,BadgerMotorController.FLYWHEEL_PERCENT_MIN);
         MotorController.setPWM(BadgerPWMProvider.FLYWHEEL_B,BadgerMotorController.FLYWHEEL_PERCENT_MIN);
         FlywheelIsReady = true;
@@ -338,7 +347,7 @@ public class HoneybadgerV6 {
             //Already disarmed
             return;
         }
-
+        sendAckMessageToDesktop("Flywheel Disarmed");
         MotorController.setPWM(BadgerPWMProvider.FLYWHEEL_A,0);
         MotorController.setPWM(BadgerPWMProvider.FLYWHEEL_A,0);
         FlywheelIsReady = false;
@@ -352,7 +361,7 @@ public class HoneybadgerV6 {
         MotorController.setDriveMotorDirection(RPI.DRIVE_FRONT_LEFT, BadgerMotorController.CLOCKWISE);
         MotorController.setDriveMotorDirection(RPI.DRIVE_BACK_LEFT, BadgerMotorController.CLOCKWISE);
         MotorController.setDriveMotorDirection(RPI.DRIVE_FRONT_RIGHT, BadgerMotorController.CLOCKWISE);
-        MotorController.setDriveMotorDirection(RPI.DRIVE_BACK_RIGHT, BadgerMotorController.COUNTER_CLOCKWISE);
+        MotorController.setDriveMotorDirection(RPI.DRIVE_BACK_RIGHT, BadgerMotorController.CLOCKWISE);
 
         MotorController.setDriveMotorSpeed(BadgerPWMProvider.DRIVE_FRONT_LEFT, throttle);
         MotorController.setDriveMotorSpeed(BadgerPWMProvider.DRIVE_BACK_LEFT, throttle);
@@ -378,29 +387,30 @@ public class HoneybadgerV6 {
 
     /**
      * Sets the direction of the badger's movement to spin to the right at the given speed percentage
-     * @param speed Int value between 0 (no motion) and 100 (max speed)
+     * @param throttle Int value between 0 (no motion) and 100 (max speed)
      */
-    public void spinRight(int speed) {
-        MotorController.setDriveMotorDirection(BadgerPWMProvider.DRIVE_FRONT_LEFT, BadgerMotorController.CLOCKWISE);
-        MotorController.setDriveMotorDirection(BadgerPWMProvider.DRIVE_BACK_LEFT, BadgerMotorController.CLOCKWISE);
-        MotorController.setDriveMotorDirection(BadgerPWMProvider.DRIVE_FRONT_RIGHT, BadgerMotorController.CLOCKWISE);
-        MotorController.setDriveMotorDirection(BadgerPWMProvider.DRIVE_BACK_RIGHT, BadgerMotorController.CLOCKWISE);
+    public void spinRight(float throttle) {
+        MotorController.setDriveMotorDirection(RPI.DRIVE_FRONT_LEFT, BadgerMotorController.CLOCKWISE);
+        MotorController.setDriveMotorDirection(RPI.DRIVE_BACK_LEFT, BadgerMotorController.CLOCKWISE);
+        MotorController.setDriveMotorDirection(RPI.DRIVE_FRONT_RIGHT, BadgerMotorController.COUNTER_CLOCKWISE);
+        MotorController.setDriveMotorDirection(RPI.DRIVE_BACK_RIGHT, BadgerMotorController.COUNTER_CLOCKWISE);
 
-        MotorController.setDriveMotorSpeed(BadgerPWMProvider.DRIVE_FRONT_LEFT, speed);
-        MotorController.setDriveMotorSpeed(BadgerPWMProvider.DRIVE_BACK_LEFT, speed);
-        MotorController.setDriveMotorSpeed(BadgerPWMProvider.DRIVE_FRONT_RIGHT, speed);
-        MotorController.setDriveMotorSpeed(BadgerPWMProvider.DRIVE_BACK_RIGHT, speed);
+        MotorController.setDriveMotorSpeed(BadgerPWMProvider.DRIVE_FRONT_LEFT, throttle);
+        MotorController.setDriveMotorSpeed(BadgerPWMProvider.DRIVE_BACK_LEFT, throttle);
+        MotorController.setDriveMotorSpeed(BadgerPWMProvider.DRIVE_FRONT_RIGHT, throttle);
+        MotorController.setDriveMotorSpeed(BadgerPWMProvider.DRIVE_BACK_RIGHT, throttle);
     }
 
     /**
      * Sets the direction of the badger's movement to spin left at the given speed percentage
      * @param speed Int value between 0 (no motion) and 100 (max speed)
      */
-    public void spinLeft(int speed) {
-        MotorController.setDriveMotorDirection(BadgerPWMProvider.DRIVE_FRONT_LEFT, BadgerMotorController.COUNTER_CLOCKWISE);
-        MotorController.setDriveMotorDirection(BadgerPWMProvider.DRIVE_BACK_LEFT, BadgerMotorController.COUNTER_CLOCKWISE);
-        MotorController.setDriveMotorDirection(BadgerPWMProvider.DRIVE_FRONT_RIGHT, BadgerMotorController.COUNTER_CLOCKWISE);
-        MotorController.setDriveMotorDirection(BadgerPWMProvider.DRIVE_BACK_RIGHT, BadgerMotorController.COUNTER_CLOCKWISE);
+    public void spinLeft(float speed) {
+        //TODO:VERIFY MOTOR DIRECTION
+        MotorController.setDriveMotorDirection(RPI.DRIVE_FRONT_LEFT, BadgerMotorController.COUNTER_CLOCKWISE);
+        MotorController.setDriveMotorDirection(RPI.DRIVE_BACK_LEFT, BadgerMotorController.COUNTER_CLOCKWISE);
+        MotorController.setDriveMotorDirection(RPI.DRIVE_FRONT_RIGHT, BadgerMotorController.CLOCKWISE);
+        MotorController.setDriveMotorDirection(RPI.DRIVE_BACK_RIGHT, BadgerMotorController.CLOCKWISE);
 
         MotorController.setDriveMotorSpeed(BadgerPWMProvider.DRIVE_FRONT_LEFT, speed);
         MotorController.setDriveMotorSpeed(BadgerPWMProvider.DRIVE_BACK_LEFT, speed);
@@ -441,6 +451,8 @@ public class HoneybadgerV6 {
     }
 
     public void STOP(){
+        sendDebugMessageToDesktop("Motor Controllers stopped.");
+
         //KILL the Drive Motors
         MotorController.stopDriveMotors();
 
@@ -465,6 +477,8 @@ public class HoneybadgerV6 {
     }
 
     public void setConveyor(int direction, float throttle){
+        sendDebugMessageToDesktop("Moving conveyors!");
+
         //Both go in same direction.
         MotorController.setDriveMotorDirection(RPI.CONVEYOR_A,direction);
         MotorController.setDriveMotorDirection(RPI.CONVEYOR_B,direction);
@@ -490,6 +504,12 @@ public class HoneybadgerV6 {
         message.appendDeviceStatus(this);
 
         NetworkServer.SendMessage(message);
+    }
+
+    public void sendAckMessageToDesktop(String msg){
+        if(Constants.DEBUG_MODE_ON){
+            sendDebugMessageToDesktop(msg);
+        }
     }
 
     /**
