@@ -338,9 +338,10 @@ public class Controller extends XboxControllerAdapter{
         }
 
         ControllerMessageSender.cancel(true);
-        connectedController.release();
+//        connectedController.release();
+        ControllerMessageSender = null;
         connector = nc;
 
-        Initialize();
+        makePeriodicSender();
     }
 }
