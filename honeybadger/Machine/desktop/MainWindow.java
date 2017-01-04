@@ -31,8 +31,8 @@ public class MainWindow {
     private Thread updaterThread;
 
     private JPanel contentPane;
-    private JButton buttonReboot;
-    private JButton buttonExit;
+    private JButton buttonAutonomous;
+    private JButton buttonStop;
     private JFormattedTextField Prompt;
     private JMenuBar menuBar;
     private JMenu file;
@@ -265,8 +265,8 @@ public class MainWindow {
         size *= 1.4;
         fontSize = size;
         setFontSize(size, messageFeed);
-        setFontSize(size, buttonExit);
-        setFontSize(size, buttonReboot);
+        setFontSize(size, buttonStop);
+        setFontSize(size, buttonAutonomous);
         setFontSize(size, Prompt);
         setFontSize(size, exit);
         setFontSize(size, fontSizeIncrease);
@@ -285,8 +285,8 @@ public class MainWindow {
         size *= 0.3;
         fontSize = size;
         setFontSize(size, messageFeed);
-        setFontSize(size, buttonExit);
-        setFontSize(size, buttonReboot);
+        setFontSize(size, buttonStop);
+        setFontSize(size, buttonAutonomous);
         setFontSize(size, Prompt);
         setFontSize(size, exit);
         setFontSize(size, fontSizeIncrease);
@@ -301,12 +301,21 @@ public class MainWindow {
     }
 
     private void registerCallbacks() {
-        buttonReboot.addActionListener(e -> onPressReboot());
+        buttonAutonomous.addActionListener(e -> onPressStartAutonomous());
 
-        buttonExit.addActionListener(e -> onPressExit());
+        buttonStop.addActionListener(e -> onPressStop());
 
         // call onPressExit() on ESCAPE
         contentPane.registerKeyboardAction(e -> onPressExit(), KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+    }
+
+    private void onPressStop() {
+        if (singleton.networkBus != null) {
+            boolean messageSuccess = singleton.networkBus.HandleMessage("CMD stop");
+            if (!messageSuccess) {
+                resetConnection();
+            }
+        }
     }
 
     private void previousInputLookup() {
@@ -417,7 +426,7 @@ public class MainWindow {
         }
     }
 
-    private void onPressReboot() {
+    private void onPressStartAutonomous() {
         //TODO: Send a network command to quit.
 
     }

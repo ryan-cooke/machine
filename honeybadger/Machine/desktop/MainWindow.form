@@ -35,23 +35,23 @@
             </properties>
             <border type="none"/>
             <children>
-              <component id="e7465" class="javax.swing.JButton" binding="buttonReboot">
+              <component id="e7465" class="javax.swing.JButton" binding="buttonAutonomous">
                 <constraints>
                   <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
                 </constraints>
                 <properties>
                   <background color="-2246144"/>
-                  <text value="Reboot Badger"/>
+                  <text value="AUTONOMOUS"/>
                 </properties>
               </component>
-              <component id="5723f" class="javax.swing.JButton" binding="buttonExit">
+              <component id="5723f" class="javax.swing.JButton" binding="buttonStop">
                 <constraints>
                   <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
                 </constraints>
                 <properties>
                   <background color="-4519149"/>
-                  <foreground color="-14013910"/>
-                  <text value="Exit"/>
+                  <foreground color="-1"/>
+                  <text value="STOP"/>
                 </properties>
               </component>
             </children>
