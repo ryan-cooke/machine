@@ -2,7 +2,6 @@ package Machine.rpi.hw;
 
 import Machine.Common.Constants;
 import Machine.Common.Utils;
-import Machine.rpi.HoneybadgerV6;
 
 import com.pi4j.io.gpio.*;
 import com.pi4j.io.i2c.I2CBus;
@@ -98,14 +97,14 @@ public class BadgerMotorController {
     public static final int FLYWHEEL_ANGLE_HIGHEST = 420;
 
     /**
-     * Constant that defines integer representation of clockwise rotation
+     * Constant that defines integer representation of a drive wheel going backwards
      */
-    public static final int CLOCKWISE = 0;
+    public static final int BACKWARD = 0;
 
     /**
-     * Constant that defines integer representation of counter clockwise rotation
+     * Constant that defines integer representation of a drive wheel going forward
      */
-    public static final int COUNTER_CLOCKWISE = 1;
+    public static final int FORWARD = 1;
 
     /**
      * Initializes the BadgerI2C class and creates it's provider
@@ -235,18 +234,18 @@ public class BadgerMotorController {
     }
 
     /**
-     * Sets the direction of rotation of the motor, either BadgerMotorController.CLOCKWISE or BadgerMotorController.COUNTER_CLOCKWISE
+     * Sets the direction of rotation of the motor, either BadgerMotorController.BACKWARD or BadgerMotorController.FORWARD
      * @param pin RaspberryPI pin that controlling direction of the desired motor. EX: RPI.DRIVE_FRONT_LEFT
-     * @param direction Direction in which the motor will rotate. EX: BadgerMotorController.CLOCKWISE or BadgerMotorController.COUNTER_CLOCKWISE
+     * @param direction Direction in which the motor will rotate. EX: BadgerMotorController.BACKWARD or BadgerMotorController.FORWARD
      */
     public void setDriveMotorDirection(Pin pin, int direction) {
         if(!IsReady || pin==null){
             return;
         }
 
-        if (direction == CLOCKWISE)
+        if (direction == BACKWARD)
             this.RPIProvider.setState(pin, PinState.LOW);
-        else if (direction == COUNTER_CLOCKWISE)
+        else if (direction == FORWARD)
             this.RPIProvider.setState(pin, PinState.HIGH);
         else
             Log("[BadgerMotorController.setMotorDirection] Invalid motor direction given");
