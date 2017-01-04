@@ -1,5 +1,6 @@
 package Machine.desktop;
 
+import Machine.Common.Constants;
 import Machine.Common.Network.ControllerMessage;
 import ch.aplu.xboxcontroller.*;
 
@@ -328,7 +329,7 @@ public class Controller extends XboxControllerAdapter{
                     }
                 },
                 //Fastest we can send is 13ms. Don't go lower!
-                1000,100, TimeUnit.MILLISECONDS
+                1000, Constants.UPDATE_SPEED, Constants.UPDATE_TIME_UNIT
         );
     }
 

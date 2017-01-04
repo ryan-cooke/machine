@@ -30,9 +30,6 @@ public class ControllerMessage extends BaseMsg implements Serializable {
     public double leftTriggerMagnitude;
     public double rightTriggerMagnitude;
 
-    public Utils.Vector2D RightThumbstick;
-    public Utils.Vector2D LeftThumbstick;
-
     public void Initialize(){
         buttons = new HashMap<>();
         buttons.put(Button.A, false);

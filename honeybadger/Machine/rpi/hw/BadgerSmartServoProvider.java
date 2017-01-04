@@ -17,6 +17,7 @@ public class BadgerSmartServoProvider {
         @Override
         public void dataReceived(SerialDataEvent event) {
             lastReceivedEvent = event;
+            //TODO: handle receiving the ServoStatus
         }
 
         public SerialDataEvent getLastReceivedEvent(){ return lastReceivedEvent; }
@@ -33,6 +34,10 @@ public class BadgerSmartServoProvider {
     protected SerialConfig config;
     protected SerialListener serialListener;
 
+    protected int ServoAPosition;
+    protected int ServoBPosition;
+    protected int ServoCPosition;
+
     public BadgerSmartServoProvider(){
         Log("Preconfiguring Serial devices");
         serialBus = SerialFactory.createInstance();
@@ -40,7 +45,6 @@ public class BadgerSmartServoProvider {
         serialBus.addListener(serialListener);
         config = new SerialConfig();
         try {
-//            serialPort = RaspberryPiSerial.DEFAULT_COM_PORT;
             serialPort = "/dev/serial0";
             config.device(serialPort)
                     .baud(Baud._115200)
@@ -133,5 +137,24 @@ public class BadgerSmartServoProvider {
         Log(String.format("Wrote to serial\n\tHEADER:%02x %02x %02x %02x %02x %02x %02x | DATA:%x %x %x %x %x",
                 MASK,MASK,packetSize,servoID,commandByte,checksum_1,checksum_2,
                 _data[0],_data[1],_data[2],_data[3],_data[4]));
+    }
+
+    private void ReadServoStatus(byte servoID){
+        //TODO: port from code below
+        //Original method call A1_16_ReadData(id, _CMD=CMD_RAM_READ, _addr_start=RAM_Joint_Position, _data_length=0x02)
+//        while(Serial1.read() != -1);
+//        checksum_1 = (9^_pID^_CMD^_addr_start^_data_length)&0xfe;
+//        checksum_2 = (~checksum_1)&0xfe;
+//        Serial1.write(0xff);
+//        Serial1.write(0xff);
+//        Serial1.write(0x09);						//packet size
+//        Serial1.write(_pID);
+//        Serial1.write(_CMD);
+//        Serial1.write(checksum_1);
+//        Serial1.write(checksum_2);
+//        Serial1.write(_addr_start);
+//        Serial1.write(_data_length);			//length of data
+//        int value = A1_16_ReadPacket(_data_length);
+//        return value;
     }
 }

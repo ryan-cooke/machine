@@ -1,5 +1,7 @@
 package Machine.Common;
 
+import java.util.concurrent.TimeUnit;
+
 /**
  * Container class for querying some Runtime constants to evaluate functionality
  */
@@ -28,6 +30,10 @@ public class Constants {
      * Use for debug only.
      */
     public static final boolean VERBOSE_MESSAGING = false;
+
+    public static final int UPDATE_SPEED = 100; //milliseconds. Can't go lower than 13ms
+
+    public static final TimeUnit UPDATE_TIME_UNIT = TimeUnit.MILLISECONDS;
 
     public static void setActivePlatform(PLATFORM current){
         if(ACTIVE_PLATFORM==PLATFORM.NO_INFO){

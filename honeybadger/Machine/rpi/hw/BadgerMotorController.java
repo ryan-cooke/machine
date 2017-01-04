@@ -65,6 +65,12 @@ public class BadgerMotorController {
      */
     private static final int DRIVE_PWM_MIN = 850;
 
+
+    /**
+     * The ID of the servo controlling the angle of the cannon
+     */
+    public static final byte FLYWHEEL_SERVO_ID = BadgerSmartServoProvider.SERVO_A;
+
     /**
      * Lowest percent for Flywheel PWM to be set.
      * Calling setPWM on the flywheel motors with this value will arm them.
@@ -77,6 +83,18 @@ public class BadgerMotorController {
      * DANGER! NEVER SET AT THIS VALUE IMMEDIATELY IN ONE SHOT!
      */
     public static final float FLYWHEEL_PERCENT_MAX = 90.f;
+
+    /**
+     * Lowest angle we can do in terms of the servo position
+     * TODO: SET EMPIRICALLY
+     */
+    public static final int FLYWHEEL_ANGLE_LOWEST = 100;
+
+    /**
+     * Highest angle we can do
+     * TODO: SET EMPIRICALLY
+     */
+    public static final int FLYWHEEL_ANGLE_HIGHEST = 420;
 
     /**
      * Constant that defines integer representation of clockwise rotation
