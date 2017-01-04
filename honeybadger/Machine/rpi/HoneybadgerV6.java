@@ -48,6 +48,8 @@ public class HoneybadgerV6 {
 
     private int FlywheelCannonAngle;
 
+    public static final float BACKWARDS_COMPENSATION_FACTOR = 5/3;
+
     /**
      * Makes a new Honeybadger (this is version 6). Guaranteed not to give a shit
      * @throws Exception But honey badger don't give a shit
@@ -413,8 +415,8 @@ public class HoneybadgerV6 {
         MotorController.setDriveMotorDirection(RPI.DRIVE_FRONT_RIGHT, BadgerMotorController.FORWARD);
         MotorController.setDriveMotorDirection(RPI.DRIVE_BACK_RIGHT, BadgerMotorController.FORWARD);
 
-        MotorController.setDriveMotorSpeed(BadgerPWMProvider.DRIVE_FRONT_LEFT, throttle*5/3);
-        MotorController.setDriveMotorSpeed(BadgerPWMProvider.DRIVE_BACK_LEFT, throttle*5/3);
+        MotorController.setDriveMotorSpeed(BadgerPWMProvider.DRIVE_FRONT_LEFT, throttle*BACKWARDS_COMPENSATION_FACTOR);
+        MotorController.setDriveMotorSpeed(BadgerPWMProvider.DRIVE_BACK_LEFT, throttle*BACKWARDS_COMPENSATION_FACTOR);
         MotorController.setDriveMotorSpeed(BadgerPWMProvider.DRIVE_FRONT_RIGHT, throttle);
         MotorController.setDriveMotorSpeed(BadgerPWMProvider.DRIVE_BACK_RIGHT, throttle);
     }
@@ -431,8 +433,8 @@ public class HoneybadgerV6 {
 
         MotorController.setDriveMotorSpeed(BadgerPWMProvider.DRIVE_FRONT_LEFT, throttle);
         MotorController.setDriveMotorSpeed(BadgerPWMProvider.DRIVE_BACK_LEFT, throttle);
-        MotorController.setDriveMotorSpeed(BadgerPWMProvider.DRIVE_FRONT_RIGHT, throttle*5/3);
-        MotorController.setDriveMotorSpeed(BadgerPWMProvider.DRIVE_BACK_RIGHT, throttle*5/3);
+        MotorController.setDriveMotorSpeed(BadgerPWMProvider.DRIVE_FRONT_RIGHT, throttle*BACKWARDS_COMPENSATION_FACTOR);
+        MotorController.setDriveMotorSpeed(BadgerPWMProvider.DRIVE_BACK_RIGHT, throttle*BACKWARDS_COMPENSATION_FACTOR);
     }
 
     /**
@@ -446,9 +448,9 @@ public class HoneybadgerV6 {
         MotorController.setDriveMotorDirection(RPI.DRIVE_BACK_RIGHT, BadgerMotorController.BACKWARD);
 
         MotorController.setDriveMotorSpeed(BadgerPWMProvider.DRIVE_FRONT_LEFT, throttle);
-        MotorController.setDriveMotorSpeed(BadgerPWMProvider.DRIVE_BACK_LEFT, throttle);
+        MotorController.setDriveMotorSpeed(BadgerPWMProvider.DRIVE_BACK_LEFT, throttle*BACKWARDS_COMPENSATION_FACTOR);
         MotorController.setDriveMotorSpeed(BadgerPWMProvider.DRIVE_FRONT_RIGHT, throttle);
-        MotorController.setDriveMotorSpeed(BadgerPWMProvider.DRIVE_BACK_RIGHT, throttle);
+        MotorController.setDriveMotorSpeed(BadgerPWMProvider.DRIVE_BACK_RIGHT, throttle*BACKWARDS_COMPENSATION_FACTOR);
     }
 
     /**
@@ -461,9 +463,9 @@ public class HoneybadgerV6 {
         MotorController.setDriveMotorDirection(RPI.DRIVE_FRONT_RIGHT, BadgerMotorController.BACKWARD);
         MotorController.setDriveMotorDirection(RPI.DRIVE_BACK_RIGHT, BadgerMotorController.FORWARD);
 
-        MotorController.setDriveMotorSpeed(BadgerPWMProvider.DRIVE_FRONT_LEFT, throttle);
+        MotorController.setDriveMotorSpeed(BadgerPWMProvider.DRIVE_FRONT_LEFT, throttle*BACKWARDS_COMPENSATION_FACTOR);
         MotorController.setDriveMotorSpeed(BadgerPWMProvider.DRIVE_BACK_LEFT, throttle);
-        MotorController.setDriveMotorSpeed(BadgerPWMProvider.DRIVE_FRONT_RIGHT, throttle);
+        MotorController.setDriveMotorSpeed(BadgerPWMProvider.DRIVE_FRONT_RIGHT, throttle*BACKWARDS_COMPENSATION_FACTOR);
         MotorController.setDriveMotorSpeed(BadgerPWMProvider.DRIVE_BACK_RIGHT, throttle);
     }
 
@@ -556,7 +558,7 @@ public class HoneybadgerV6 {
         MotorController.setDriveMotorDirection(BadgerPWMProvider.DRIVE_FRONT_LEFT, BadgerMotorController.BACKWARD);
         MotorController.setDriveMotorDirection(BadgerPWMProvider.DRIVE_BACK_RIGHT, BadgerMotorController.FORWARD);
 
-        MotorController.setDriveMotorSpeed(BadgerPWMProvider.DRIVE_FRONT_LEFT, speed);
+        MotorController.setDriveMotorSpeed(BadgerPWMProvider.DRIVE_FRONT_LEFT, speed*BACKWARDS_COMPENSATION_FACTOR);
         MotorController.setDriveMotorSpeed(BadgerPWMProvider.DRIVE_BACK_LEFT, 0);
         MotorController.setDriveMotorSpeed(BadgerPWMProvider.DRIVE_FRONT_RIGHT, 0);
         MotorController.setDriveMotorSpeed(BadgerPWMProvider.DRIVE_BACK_RIGHT, speed);
@@ -573,7 +575,7 @@ public class HoneybadgerV6 {
         MotorController.setDriveMotorSpeed(BadgerPWMProvider.DRIVE_FRONT_LEFT, speed);
         MotorController.setDriveMotorSpeed(BadgerPWMProvider.DRIVE_BACK_LEFT, 0);
         MotorController.setDriveMotorSpeed(BadgerPWMProvider.DRIVE_FRONT_RIGHT, 0);
-        MotorController.setDriveMotorSpeed(BadgerPWMProvider.DRIVE_BACK_RIGHT, speed);
+        MotorController.setDriveMotorSpeed(BadgerPWMProvider.DRIVE_BACK_RIGHT, speed*BACKWARDS_COMPENSATION_FACTOR);
     }
 
     /**
@@ -585,7 +587,7 @@ public class HoneybadgerV6 {
         MotorController.setDriveMotorDirection(BadgerPWMProvider.DRIVE_FRONT_RIGHT, BadgerMotorController.FORWARD);
 
         MotorController.setDriveMotorSpeed(BadgerPWMProvider.DRIVE_FRONT_LEFT, 0);
-        MotorController.setDriveMotorSpeed(BadgerPWMProvider.DRIVE_BACK_LEFT, speed);
+        MotorController.setDriveMotorSpeed(BadgerPWMProvider.DRIVE_BACK_LEFT, speed*BACKWARDS_COMPENSATION_FACTOR);
         MotorController.setDriveMotorSpeed(BadgerPWMProvider.DRIVE_FRONT_RIGHT, speed);
         MotorController.setDriveMotorSpeed(BadgerPWMProvider.DRIVE_BACK_RIGHT, 0);
     }
@@ -600,7 +602,7 @@ public class HoneybadgerV6 {
 
         MotorController.setDriveMotorSpeed(BadgerPWMProvider.DRIVE_FRONT_LEFT, 0);
         MotorController.setDriveMotorSpeed(BadgerPWMProvider.DRIVE_BACK_LEFT, speed);
-        MotorController.setDriveMotorSpeed(BadgerPWMProvider.DRIVE_FRONT_RIGHT, speed);
+        MotorController.setDriveMotorSpeed(BadgerPWMProvider.DRIVE_FRONT_RIGHT, speed*BACKWARDS_COMPENSATION_FACTOR);
         MotorController.setDriveMotorSpeed(BadgerPWMProvider.DRIVE_BACK_RIGHT, 0);
     }
 }
