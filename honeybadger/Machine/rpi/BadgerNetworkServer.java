@@ -40,10 +40,7 @@ public class BadgerNetworkServer {
     BadgerNetworkServer(HoneybadgerV6 badger){
         Badger = badger;
         ScheduledManager = Executors.newScheduledThreadPool(1);
-
-        if(Constants.getActivePlatform() == Constants.PLATFORM.MOCK_PI){
-            PrintPayload = true;
-        }
+        PrintPayload = Constants.getActivePlatform() == Constants.PLATFORM.MOCK_PI;
 
         SetupNetwork();
     }
@@ -170,10 +167,10 @@ public class BadgerNetworkServer {
                         new Runnable() {
                             @Override
                             public void run() {
-                                SendMessage(new BaseMsg("RPi OK!"));
+                                SendMessage(new BaseMsg("Badger OK!"));
                             }
                         },
-                        3,10, TimeUnit.SECONDS
+                        3,3, TimeUnit.SECONDS
                 );
 
                 while(KeepAlive && !shouldClose && !shouldQuit){
