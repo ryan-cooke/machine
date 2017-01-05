@@ -405,7 +405,7 @@ public class MainWindow {
 
     private void resetVideoFeed(int port) {
         if (videoThread != null) {
-            videoPanel.shouldRender(false);
+            videoPanel.renderActive(false);
             videoThread = null;
         }
         if (videoThread == null) {

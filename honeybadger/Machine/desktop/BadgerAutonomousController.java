@@ -31,6 +31,37 @@ public class BadgerAutonomousController {
 
     }
 
+    public void placeBadger(double first, double second, long time, double rotate){
+        goToOtherSide(first);
+        getToCenter(second, time);
+        rotateLeftToPole(rotate);
+    }
+
+    public void goToOtherSide(double throttle){
+        moveForward(throttle);
+        while(!JPanelOpenCV.isTgReached());
+        clear();
+    }
+
+    public void getToCenter(double throttle, long time){
+        strafeRight(throttle);
+        long currentTime = System.currentTimeMillis();
+        while(currentTime+time > System.currentTimeMillis());
+        clear();
+    }
+
+    public void rotateLeftToPole(double throttle){
+        rotateLeft(throttle);
+        while(!JPanelOpenCV.isTgReached());
+        clear();
+    }
+
+    public void rotateRightToPole(double throttle){
+        rotateRight(throttle);
+        while(!JPanelOpenCV.isTgReached());
+        clear();
+    }
+
     /**
      * Helper methods to move the badger in given directions, and to activate the motors.
      * @param throttle: between 0-1.0, throttle they will be given.
@@ -79,6 +110,12 @@ public class BadgerAutonomousController {
     public void conveyors(double throttle){
         clear();
         controllerState.leftTriggerMagnitude = throttle;
+    }
+
+    public void shoot(double flywheel, double conveyors){
+        clear();
+        controllerState.rightTriggerMagnitude = flywheel;
+        controllerState.leftTriggerMagnitude = conveyors;
     }
 
     public void clear(){

@@ -31,13 +31,17 @@ public class MainController {
         isAutonomousRunning = autonomousRunning;
     }
 
+
+    public BadgerAutonomousController getAutonomousController() {
+        return autonomousController;
+    }
+
     public MainController(NetworkConnector messageConnector){
         connector = messageConnector;
         controllerState = new ControllerMessage();
         controllerState.Initialize();
         connectedController = new Controller(controllerState);
         autonomousController = new BadgerAutonomousController(controllerState);
-
         ScheduledManager = Executors.newScheduledThreadPool(1);
 
         makePeriodicSender();
@@ -55,8 +59,9 @@ public class MainController {
                     if (isAutonomousRunning){
                         connector.SendMessage(new ControllerMessage(autonomousController.getControllerState()));
                     }
-                    else if(connectedController.getXboxController().isConnected())
+                    else if(connectedController.getXboxController().isConnected()) {
                         connector.SendMessage(new ControllerMessage(connectedController.getControllerState()));
+                    }
                 }
             },
             1,1, TimeUnit.SECONDS

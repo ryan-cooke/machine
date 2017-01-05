@@ -64,6 +64,7 @@ public class MainDesktop {
             MessageReader readerHandle = new MessageReader(nc);
             Thread readMessages = new Thread(readerHandle);
             MainController mainController = new MainController(nc);
+            BadgerAutonomousController auto = mainController.getAutonomousController();
             input = "";
             keepAlive = true;
             isActive = true;
@@ -89,7 +90,20 @@ public class MainDesktop {
                             }
                         }
                         else if (keywords[1].contains("AUTO")){
-                            mainController.setAutonomousRunning(!mainController.isAutonomousRunning());
+                            mainController.setAutonomousRunning(true);
+                            if (keywords[2] != null){
+                                auto.placeBadger(StoD(keywords[2]),StoD(keywords[3]),Long.parseLong(keywords[4]),StoD(keywords[5]));
+                            } else{
+                                auto.placeBadger(0.5,0.5,2000,0.5);
+                            }
+                            mainController.setAutonomousRunning(false);
+                        }
+                        else if (keywords[1].contains("COLOR")){
+                            if (keywords[2].contains("YELLOW")) {
+                                JPanelOpenCV.setStartSide("yellow");
+                            }else {
+                                JPanelOpenCV.setStartSide("red");
+                            }
                         }
                         else {
                             Log(String.format("Sending TextCommandMessage \'%s\'", input.substring(4)));
@@ -123,5 +137,9 @@ public class MainDesktop {
         //CommandLineRunner.SetDHCP();
 
         System.exit(0);
+    }
+
+    private static double StoD(String s){
+        return Double.parseDouble(s);
     }
 }
