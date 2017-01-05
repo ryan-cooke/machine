@@ -31,8 +31,8 @@ public class MainWindow {
     private Thread updaterThread;
 
     private JPanel contentPane;
-    private JButton buttonReboot;
-    private JButton buttonExit;
+    private JButton buttonAutonomous;
+    private JButton buttonStop;
     private JFormattedTextField Prompt;
     private JMenuBar menuBar;
     private JMenu file;
@@ -59,6 +59,9 @@ public class MainWindow {
     private static String ConnectionIP;
 
     private static MainController Controller;
+
+    private int selectedCamera;
+    private JMenuItem changeStream;
 
     private MainWindow() {
 
@@ -212,6 +215,16 @@ public class MainWindow {
             JPanelOpenCV.setDrawingBuffer(JPanelOpenCV.BUFFER_TYPE.HOUGH);
         });
 
+        changeStream = new JMenuItem("Change Stream");
+        changeStream.setMnemonic(KeyEvent.VK_C);
+        changeStream.addActionListener(e -> {
+            if (selectedCamera == 0){
+                resetVideoFeed(8080);
+            } else if (selectedCamera == 1){
+                resetVideoFeed(8090);
+            }
+        });
+
         fontSizeIncrease = new JMenuItem("Increase Font Size");
         fontSizeIncrease.setMnemonic(KeyEvent.VK_PLUS);
         fontSizeIncrease.setToolTipText("Increases the font size");
@@ -233,6 +246,7 @@ public class MainWindow {
         opencvBuffers.add(houghBuffer);
 
         opencv.add(openCVConfigMenuItem);
+        opencv.add(changeStream);
         opencv.add(opencvBuffers);
 
         menuBar.add(file);
@@ -251,8 +265,8 @@ public class MainWindow {
         size *= 1.4;
         fontSize = size;
         setFontSize(size, messageFeed);
-        setFontSize(size, buttonExit);
-        setFontSize(size, buttonReboot);
+        setFontSize(size, buttonStop);
+        setFontSize(size, buttonAutonomous);
         setFontSize(size, Prompt);
         setFontSize(size, exit);
         setFontSize(size, fontSizeIncrease);
@@ -271,8 +285,8 @@ public class MainWindow {
         size *= 0.3;
         fontSize = size;
         setFontSize(size, messageFeed);
-        setFontSize(size, buttonExit);
-        setFontSize(size, buttonReboot);
+        setFontSize(size, buttonStop);
+        setFontSize(size, buttonAutonomous);
         setFontSize(size, Prompt);
         setFontSize(size, exit);
         setFontSize(size, fontSizeIncrease);
@@ -287,12 +301,21 @@ public class MainWindow {
     }
 
     private void registerCallbacks() {
-        buttonReboot.addActionListener(e -> onPressReboot());
+        buttonAutonomous.addActionListener(e -> onPressStartAutonomous());
 
-        buttonExit.addActionListener(e -> onPressExit());
+        buttonStop.addActionListener(e -> onPressStop());
 
         // call onPressExit() on ESCAPE
         contentPane.registerKeyboardAction(e -> onPressExit(), KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+    }
+
+    private void onPressStop() {
+        if (singleton.networkBus != null) {
+            boolean messageSuccess = singleton.networkBus.HandleMessage("CMD stop");
+            if (!messageSuccess) {
+                resetConnection();
+            }
+        }
     }
 
     private void previousInputLookup() {
@@ -320,12 +343,13 @@ public class MainWindow {
         final int[] option = {1};
         JDialog dialog = new JDialog();
         JPanel panel = new JPanel();
+        JPanel panel2 = new JPanel();
+        JPanel panel3 = new JPanel();
         JLabel label = new JLabel("Remote host password:");
         JPasswordField pass = new JPasswordField(20);
         JButton ok = new JButton("OK");
         JButton cancel = new JButton("Cancel");
         ok.addActionListener(e -> {
-
             char[] passwordC = pass.getPassword();
             if (passwordC.length > 0) {
                 String password = new String(passwordC);
@@ -346,12 +370,15 @@ public class MainWindow {
             Log("Update canceled");
         });
 
-        panel.add(label);
-        panel.add(pass);
-        panel.add(ok);
-        panel.add(cancel);
+        panel3.add(label);
+        panel3.add(pass);
+        panel2.add(ok);
+        panel2.add(cancel);
+        panel.add(panel3);
+        panel.add(panel2);
         dialog.add(panel);
         dialog.pack();
+        dialog.setLocationRelativeTo(null);
         pass.requestFocusInWindow();
         dialog.setModal(true);
         dialog.setVisible(true);
@@ -363,7 +390,7 @@ public class MainWindow {
             JPanelOpenCV.instance = videoPanel;
             videoThread = new Thread(() -> {
                 try {
-                    JPanelOpenCV.SetConnectionHost(ConnectionIP);
+                    JPanelOpenCV.SetConnectionHost(ConnectionIP, 8090);
                     videoPanel.startLoop();
                 } catch (Exception e) {
                     MainWindow.writeToMessageFeed("Failed to open video stream");
@@ -376,7 +403,30 @@ public class MainWindow {
         }
     }
 
-    private void onPressReboot() {
+    private void resetVideoFeed(int port) {
+        if (videoThread != null) {
+            videoPanel.shouldRender(false);
+            videoThread = null;
+        }
+        if (videoThread == null) {
+            MainWindow.writeToMessageFeed("Opening video stream...");
+            JPanelOpenCV.instance = videoPanel;
+            videoThread = new Thread(() -> {
+                try {
+                    JPanelOpenCV.SetConnectionHost(ConnectionIP, port);
+                    videoPanel.startLoop();
+                } catch (Exception e) {
+                    MainWindow.writeToMessageFeed("Failed to open video stream");
+                    e.printStackTrace();
+                } finally {
+                    videoThread = null;
+                }
+            });
+            videoThread.start();
+        }
+    }
+
+    private void onPressStartAutonomous() {
         //TODO: Send a network command to quit.
 
     }
@@ -402,12 +452,14 @@ public class MainWindow {
     private void resetConnection() {
         Log("Connection died. Attempting to reset...");
         String ConnectionIP = singleton.networkBus.host;
+
         singleton.networkBus.End();
         singleton.messageReader.end();
 
         singleton.networkBus = new NetworkConnector(ConnectionIP, 2017);
         singleton.messageReader = new NetworkConnector.MessageReader(singleton.networkBus);
         Thread readMessages = new Thread(singleton.messageReader);
+        Xbox360Controller.Reinitialize(singleton.networkBus);
         readMessages.start();
     }
 
@@ -418,8 +470,8 @@ public class MainWindow {
         singleton.messageFeed.append(input);
         if (!input.endsWith("\n")) {
             singleton.messageFeed.append("\n");
-            singleton.messageFeed.setCaretPosition(singleton.messageFeed.getDocument().getLength());
         }
+        singleton.messageFeed.setCaretPosition(singleton.messageFeed.getDocument().getLength());
     }
 
     synchronized public static void dieWithError(String errorMessage) {

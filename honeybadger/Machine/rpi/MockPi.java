@@ -21,8 +21,14 @@ public class MockPi {
             e.printStackTrace();
         }
 
-        BadgerNetworkServer ns = new BadgerNetworkServer(null);
-        ns.Run();
+        try {
+            HoneybadgerV6 badger = HoneybadgerV6.getInstance();
+            badger.getNetworkServer().Run();
+        }
+        catch(Exception e){
+            e.printStackTrace();
+            System.exit(-1);
+        }
 
         Log("Ending mock session");
         System.exit(0);

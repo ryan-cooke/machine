@@ -333,6 +333,12 @@ public class CMD {
                     badger.strafeRight(throttle);
                     break;
                 }
+                case '0':{
+                    badger.spinLeft(throttle);
+                }
+                case '1':{
+                    badger.spinRight(throttle);
+                }
                 default:{
                     badger.moveForward(0);
                     break;
@@ -405,7 +411,7 @@ public class CMD {
                 badger.sendDebugMessageToDesktop(String.format("Ramping flywheel with update factor %f",updateFactor));
                 Thread.sleep(1000);
                 for (int i = 0; i < 200; i++) {
-                    badger.updateFlywheel(updateFactor);
+                    badger.updateFlywheel(updateFactor, true);
                     Thread.sleep(500);//200*.5 = 100 seconds to fully ramp up
                 }
             } catch (InterruptedException e) {

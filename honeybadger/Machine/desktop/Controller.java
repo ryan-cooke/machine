@@ -1,5 +1,6 @@
 package Machine.desktop;
 
+import Machine.Common.Constants;
 import Machine.Common.Network.ControllerMessage;
 import ch.aplu.xboxcontroller.*;
 
@@ -20,6 +21,7 @@ public class Controller extends XboxControllerAdapter {
     public XboxController getXboxController() {
         return xboxController;
     }
+    private String dllPath;
 
     private void press(Button button) {
         controllerState.setButtonsPressed(controllerState.getButtonsPressed() + 1);

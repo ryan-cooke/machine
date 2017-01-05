@@ -70,8 +70,8 @@ public class JPanelOpenCV extends JPanel {
         j1.startLoop();
     }
 
-    public static void SetConnectionHost(String host) {
-        ConnectURL = String.format("http://%s:8090/?action=stream", host);
+    public static void SetConnectionHost(String host, int port) {
+        ConnectURL = String.format("http://%s:8090/?action=%d", host, port);
         ShouldDraw = true;
     }
 
@@ -89,7 +89,7 @@ public class JPanelOpenCV extends JPanel {
     }
 
     public static Scalar[] getColorScalars() {
-        Scalar[] ar = new Scalar[6];
+        Scalar[] ar = new Scalar[10];
         ar[0] = lowerGreen;
         ar[1] = upperGreen;
         ar[2] = lowerBlue;
@@ -442,4 +442,11 @@ public class JPanelOpenCV extends JPanel {
         FrameBufferType = drawingBuffer;
     }
 
+    synchronized static void shouldRender(boolean shouldDraw){
+        ShouldDraw = shouldDraw;
+    }
+
+    synchronized static boolean isrendering(){
+        return ShouldDraw;
+    }
 }

@@ -30,9 +30,6 @@ public class ControllerMessage extends BaseMsg implements Serializable {
     public double leftTriggerMagnitude;
     public double rightTriggerMagnitude;
 
-    public Utils.Vector2D RightThumbstick;
-    public Utils.Vector2D LeftThumbstick;
-
     public void Initialize(){
         buttons = new HashMap<>();
         buttons.put(Button.A, false);
@@ -131,14 +128,15 @@ public class ControllerMessage extends BaseMsg implements Serializable {
 
         //If the badger wasn't null, do actions dependent on the object
         if (buttons.get(Button.START)){
+            badger.sendAckMessageToDesktop("Listening to Controller 1");
             badger.listenToController(true);
         }
 
         if(badger.isListeningToController()) {
-            badger.updateMovement(leftThumbstickDirection, (float) leftThumbstickMagnitude * 100.f);
-            badger.updateRotation(rightThumbstickDirection, (int) rightThumbstickMagnitude * 100);
-            badger.updateFlywheel((float) rightTriggerMagnitude);
-            badger.updateConveyor((float) leftTriggerMagnitude);
+            badger.updateMovement(leftThumbstickDirection, (float) leftThumbstickMagnitude * 60.f);
+            badger.updateRotation(rightThumbstickDirection, (float) rightThumbstickMagnitude * 60.f);
+            badger.updateFlywheel((float) rightTriggerMagnitude, leftThumbstickMagnitude > 0.9);
+//            badger.updateConveyor((float) leftTriggerMagnitude);
             badger.handleButtonPress(buttons);
         }
     }
