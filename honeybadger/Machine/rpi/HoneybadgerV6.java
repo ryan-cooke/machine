@@ -321,14 +321,14 @@ public class HoneybadgerV6 {
         final float minFlywheelPower = BadgerMotorController.FLYWHEEL_PERCENT_MIN;
 
         //Values determined empirically.
-        final float maxFlywheelPowerA;
-        final float maxFlywheelPowerB;
+        float maxFlywheelPowerA = MaxFlywheelPowerA;
+        float maxFlywheelPowerB = MaxFlywheelPowerB;
 
         if (updateFactor > 0.1 && wantsAdditional5Percent) {
-            MaxFlywheelPowerA += 5.f;
+            maxFlywheelPowerA = MaxFlywheelPowerA+5.f;
         } else if (updateFactor < 0.1 && wantsAdditional5Percent) {
-            MaxFlywheelPowerA = 5.f;
-            MaxFlywheelPowerB = 5.f;
+            maxFlywheelPowerA = 5.f;
+            maxFlywheelPowerB = 5.f;
         }
 
         final float step = 0.1f;
@@ -343,8 +343,8 @@ public class HoneybadgerV6 {
         }
 
         //Update and keep it in the safe ranges.
-        FlywheelThrottleA = Utils.Clamp(FlywheelThrottleA+delta ,minFlywheelPower,MaxFlywheelPowerA);
-        FlywheelThrottleB = Utils.Clamp(FlywheelThrottleB+delta ,minFlywheelPower,MaxFlywheelPowerB);
+        FlywheelThrottleA = Utils.Clamp(FlywheelThrottleA+delta ,minFlywheelPower,maxFlywheelPowerA);
+        FlywheelThrottleB = Utils.Clamp(FlywheelThrottleB+delta ,minFlywheelPower,maxFlywheelPowerB);
 
         if(FlywheelIsReady) {
             sendAckMessageToDesktop(String.format("Flywheel speed A:%f B:%f",FlywheelThrottleA,FlywheelThrottleB));
