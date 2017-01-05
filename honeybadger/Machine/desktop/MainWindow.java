@@ -29,6 +29,7 @@ public class MainWindow {
     private Thread networkThread;
     private Thread videoThread;
     private Thread updaterThread;
+    private Thread autonomousThread;
 
     private JPanel contentPane;
     private JButton buttonAutonomous;
@@ -47,6 +48,7 @@ public class MainWindow {
     private JMenuItem regularBuffer;
     private JMenuItem cannyBuffer;
     private JMenuItem houghBuffer;
+    private JMenuItem changeStream;
 
     private JTextArea messageFeed;
     private JPanelOpenCV videoPanel;
@@ -61,7 +63,7 @@ public class MainWindow {
     private static Controller Xbox360Controller;
 
     private int selectedCamera;
-    private JMenuItem changeStream;
+    private BadgerAutonomousController BAC;
 
     private MainWindow() {
 
@@ -427,8 +429,12 @@ public class MainWindow {
     }
 
     private void onPressStartAutonomous() {
-        //TODO: Send a network command to quit.
+        if(BAC!=null){
+            return;
+        }
 
+        BAC = new BadgerAutonomousController(networkBus);
+        BAC.TakeOver();
     }
 
     private void onPressExit() {

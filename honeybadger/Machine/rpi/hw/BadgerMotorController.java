@@ -97,6 +97,11 @@ public class BadgerMotorController {
     public static final int FLYWHEEL_ANGLE_HIGHEST = 420;
 
     /**
+     *
+     */
+    public static final int FLYWHEEL_ANGLE_START = 400;
+
+    /**
      * Constant that defines integer representation of a drive wheel going backwards
      */
     public static final int BACKWARD = 0;
@@ -277,7 +282,8 @@ public class BadgerMotorController {
         if(!IsReady){
             return;
         }
-        this.SerialServo.SetPosition((byte)(servoID&0xFF),250,position);
+        //flightTime used to be 250. Changed to hook it up to the same as the controller update speed.
+        this.SerialServo.SetPosition((byte)(servoID&0xFF),Constants.UPDATE_SPEED,position);
     }
 
     /**

@@ -6,6 +6,7 @@ import Machine.rpi.hw.BadgerPWMProvider;
 import Machine.rpi.hw.RPI;
 import com.pi4j.io.gpio.Pin;
 
+import java.lang.reflect.Field;
 import java.util.Arrays;
 
 import static Machine.Common.Utils.Log;
@@ -457,6 +458,41 @@ public class CMD {
         @Override
         public int MinimumParameterNum() {
             return 1;
+        }
+    }
+
+    public static class setFloat extends CheckedFunction{
+        @Override
+        public boolean Invoke(HoneybadgerV6 badger, String[] params) {
+            if(!super.Invoke(badger,params)){
+                return false;
+            }
+
+            String field = params[0];
+            boolean success = false;
+            float value = Float.parseFloat(params[1]);
+
+            try {
+                Field floatField = badger.getClass().getDeclaredField(field);
+                floatField.setAccessible(true);
+                floatField.set(badger,value);
+
+                success = true;
+            }catch (Exception e){
+                success = false;
+            }
+
+            return success;
+        }
+
+        @Override
+        public String Explain() {
+            return "\'CMD setFloat <Badger member name> <float value>\'";
+        }
+
+        @Override
+        public int MinimumParameterNum() {
+            return 2;
         }
     }
 }

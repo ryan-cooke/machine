@@ -136,7 +136,6 @@ public class ControllerMessage extends BaseMsg implements Serializable {
             badger.updateMovement(leftThumbstickDirection, (float) leftThumbstickMagnitude * 60.f);
             badger.updateRotation(rightThumbstickDirection, (float) rightThumbstickMagnitude * 60.f);
             badger.updateFlywheel((float) rightTriggerMagnitude, leftThumbstickMagnitude > 0.9);
-//            badger.updateConveyor((float) leftTriggerMagnitude);
             badger.handleButtonPress(buttons);
         }
     }
