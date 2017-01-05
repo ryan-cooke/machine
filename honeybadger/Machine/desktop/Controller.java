@@ -256,9 +256,10 @@ public class Controller extends XboxControllerAdapter {
         baseDir += "\\bin";
         String arch = System.getProperty("os.arch");
         System.out.println(arch);
-        String dllPath = String.format("%s\\%s", baseDir,
-                arch.contains("x86") ? "xboxcontroller.dll" : "xboxcontroller64.dll");
-
+        if(dllPath == null) {
+            dllPath = String.format("%s\\%s", baseDir,
+                    arch.contains("x86") ? "xboxcontroller.dll" : "xboxcontroller64.dll");
+        }
         xboxController = new XboxController(
                 dllPath,
                 1,
@@ -266,7 +267,6 @@ public class Controller extends XboxControllerAdapter {
                 50);
 
         isConnected();
-        ScheduledManager = Executors.newScheduledThreadPool(1);
 
         this.controllerState = controllerState;
 

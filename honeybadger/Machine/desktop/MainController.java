@@ -62,4 +62,17 @@ public class MainController {
             1,1, TimeUnit.SECONDS
         );
     }
+
+    public void Reinitialize(NetworkConnector nc){
+        if(nc==null){
+            return;
+        }
+
+        ControllerMessageSender.cancel(true);
+//        connectedController.release();
+        ControllerMessageSender = null;
+        connector = nc;
+
+        makePeriodicSender();
+    }
 }

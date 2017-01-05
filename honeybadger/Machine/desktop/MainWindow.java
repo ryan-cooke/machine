@@ -459,7 +459,7 @@ public class MainWindow {
         singleton.networkBus = new NetworkConnector(ConnectionIP, 2017);
         singleton.messageReader = new NetworkConnector.MessageReader(singleton.networkBus);
         Thread readMessages = new Thread(singleton.messageReader);
-        Xbox360Controller.Reinitialize(singleton.networkBus);
+        Controller.Reinitialize(singleton.networkBus);
         readMessages.start();
     }
 
