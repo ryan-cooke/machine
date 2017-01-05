@@ -52,7 +52,7 @@ public class HoneybadgerV6 {
     public static float MaxFlywheelPowerA = 25.f;
     public static float MaxFlywheelPowerB = 30.f;
 
-    public static final float BACKWARDS_COMPENSATION_FACTOR = 5/3;
+    public static final float BACKWARDS_COMPENSATION_FACTOR = 1; //(5/3)
 
     /**
      * Makes a new Honeybadger (this is version 6). Guaranteed not to give a shit
