@@ -65,6 +65,8 @@ public class MainWindow {
 
     private MainWindow() {
 
+        CommandLineRunner.SetStaticIP();
+
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         double width = 0.75 * screenSize.getWidth();
         double height = 0.75 * screenSize.getHeight();
@@ -441,6 +443,7 @@ public class MainWindow {
             try {
                 networkBus.SendMessage("close");
                 networkBus.End();
+                CommandLineRunner.SetDHCP();
             } catch (Exception e) {
                 e.printStackTrace();
             } finally {
