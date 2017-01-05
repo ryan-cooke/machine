@@ -52,13 +52,24 @@ public class BadgerAutonomousController {
 
     public void rotateLeftToPole(double throttle){
         rotateLeft(throttle);
-        while(!JPanelOpenCV.isTgReached());
+        while(!JPanelOpenCV.isBlueTarget());
         clear();
     }
 
     public void rotateRightToPole(double throttle){
         rotateRight(throttle);
-        while(!JPanelOpenCV.isTgReached());
+        while(!JPanelOpenCV.isBlueTarget());
+        clear();
+    }
+
+    public void shootBalls(double conveyors, double flywheel){
+        shootBalls(conveyors, flywheel, 5000);
+    }
+
+    public void shootBalls(double flywheel, double conveyors, long time){
+        shoot(flywheel, conveyors);
+        long currentTime = System.currentTimeMillis();
+        while(currentTime+time > System.currentTimeMillis());
         clear();
     }
 

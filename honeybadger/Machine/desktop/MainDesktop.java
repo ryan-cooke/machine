@@ -89,6 +89,8 @@ public class MainDesktop {
                                 Log(String.format("\t%s | call: %s",functor.getClass().getSimpleName(),functor.Explain()));
                             }
                         }
+                        // SHOOT 0.5 0.5 2000 0.5 will move to other side at 0.5 throttle, get to center at 0.5 throttle for 2000 ms
+                        // and rotate at a 0.5 throttle.
                         else if (keywords[1].contains("AUTO")){
                             mainController.setAutonomousRunning(true);
                             if (keywords[2] != null){
@@ -97,6 +99,17 @@ public class MainDesktop {
                                 auto.placeBadger(0.5,0.5,2000,0.5);
                             }
                             mainController.setAutonomousRunning(false);
+                        }
+                        // SHOOT 0.5 0.5 3000 will start flywheel at 0.5, conveyors at 0.5 and last 3000 ms.
+                        else if (keywords[1].contains("SHOOT")){
+                            if(keywords[2] != null && keywords[3] != null){
+                                mainController.setAutonomousRunning(true);
+                                if(keywords[4] != null){
+                                    auto.shootBalls(StoD(keywords[2]),StoD(keywords[3]),Long.parseLong(keywords[4]));
+                                } else
+                                auto.shootBalls(StoD(keywords[2]),StoD(keywords[3]));
+                                mainController.setAutonomousRunning(false);
+                            }
                         }
                         else if (keywords[1].contains("COLOR")){
                             if (keywords[2].contains("YELLOW")) {
