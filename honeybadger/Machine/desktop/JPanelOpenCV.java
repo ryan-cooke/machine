@@ -115,11 +115,11 @@ public class JPanelOpenCV extends JPanel {
         ShouldDraw = shouldDraw;
     }
 
-    public boolean isTarget() {
+    public static boolean isTarget() {
         return target;
     }
 
-    public boolean isBlueTarget() {
+    public static boolean isBlueTarget() {
         return blueTarget;
     }
 
