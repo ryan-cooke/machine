@@ -49,8 +49,8 @@ public class HoneybadgerV6 {
     private int FlywheelCannonAngle;
 
     //Values determined empirically.
-    public static final float MaxFlywheelPowerA = 25.f;
-    public static final float MaxFlywheelPowerB = 30.f;
+    public static float MaxFlywheelPowerA = 25.f;
+    public static float MaxFlywheelPowerB = 30.f;
 
     public static final float BACKWARDS_COMPENSATION_FACTOR = 5/3;
 
@@ -325,14 +325,10 @@ public class HoneybadgerV6 {
         final float maxFlywheelPowerB;
 
         if (updateFactor > 0.1 && wantsAdditional5Percent) {
-            maxFlywheelPowerA = 30.f;
-            maxFlywheelPowerB = 20.f;
+            MaxFlywheelPowerA += 5.f;
         } else if (updateFactor < 0.1 && wantsAdditional5Percent) {
-            maxFlywheelPowerA = 5.f;
-            maxFlywheelPowerB = 5.f;
-        } else  {
-            maxFlywheelPowerA = 25.f;
-            maxFlywheelPowerB = 20.f;
+            MaxFlywheelPowerA = 5.f;
+            MaxFlywheelPowerB = 5.f;
         }
 
         final float step = 0.1f;
