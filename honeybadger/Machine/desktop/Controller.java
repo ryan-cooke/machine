@@ -4,134 +4,111 @@ import Machine.Common.Constants;
 import Machine.Common.Network.ControllerMessage;
 import ch.aplu.xboxcontroller.*;
 
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
-
 import static Machine.Common.Utils.Log;
 import Machine.Common.Utils.Button;
 
 
-public class Controller extends XboxControllerAdapter{
+public class Controller extends XboxControllerAdapter {
 
-    private final ScheduledExecutorService ScheduledManager;
-
-    private NetworkConnector connector;
-    private XboxController connectedController;
+    private XboxController xboxController;
 
     private ControllerMessage controllerState;
 
+    public ControllerMessage getControllerState() {
+        return controllerState;
+    }
+
+    public XboxController getXboxController() {
+        return xboxController;
+    }
     private String dllPath;
 
-    private ScheduledFuture<?> ControllerMessageSender;
-
-    private void press(Button button){
-        controllerState.setButtonsPressed(controllerState.getButtonsPressed()+1);
+    private void press(Button button) {
+        controllerState.setButtonsPressed(controllerState.getButtonsPressed() + 1);
         controllerState.buttons.replace(button, true);
     }
-    
-    private void depress(Button button){
-        controllerState.setButtonsPressed(controllerState.getButtonsPressed()-1);
+
+    private void depress(Button button) {
+        controllerState.setButtonsPressed(controllerState.getButtonsPressed() - 1);
         controllerState.buttons.replace(button, false);
     }
-    
-    public void buttonA(boolean pressed)
-    {
-        if(pressed){
+
+    public void buttonA(boolean pressed) {
+        if (pressed) {
             press(Button.A);
-        }
-        else{
+        } else {
             depress(Button.A);
         }
     }
 
-    public void buttonB(boolean pressed)
-    {
-        if(pressed){
+    public void buttonB(boolean pressed) {
+        if (pressed) {
             press(Button.B);
-        }
-        else{
+        } else {
             depress(Button.B);
         }
     }
 
-    public void buttonX(boolean pressed)
-    {
-        if(pressed){
+    public void buttonX(boolean pressed) {
+        if (pressed) {
             press(Button.X);
-        }
-        else{
+        } else {
             depress(Button.X);
         }
     }
 
-    public void buttonY(boolean pressed)
-    {
-        if (pressed){
+    public void buttonY(boolean pressed) {
+        if (pressed) {
             press(Button.Y);
-        }
-        else{
+        } else {
             depress(Button.Y);
         }
     }
 
-    public void back(boolean pressed)
-    {
-        if (pressed){
+    public void back(boolean pressed) {
+        if (pressed) {
             press(Button.BACK);
-        }
-        else{
-            depress(Button.START);
+        } else {
+            depress(Button.BACK);
         }
     }
 
-    public void start(boolean pressed)
-    {
-        if (pressed){
+    public void start(boolean pressed) {
+        if (pressed) {
             press(Button.START);
-        }
-        else{
+        } else {
             depress(Button.START);
         }
     }
 
-    public void leftShoulder(boolean pressed)
-    {
-        if (pressed){
+    public void leftShoulder(boolean pressed) {
+        if (pressed) {
             press(Button.LBUMPER);
-        }
-        else{
+        } else {
             depress(Button.LBUMPER);
         }
     }
 
-    public void rightShoulder(boolean pressed)
-    {
-        if (pressed){
+    public void rightShoulder(boolean pressed) {
+        if (pressed) {
             press(Button.RBUMPER);
-        }
-        else{
+        } else {
             depress(Button.RBUMPER);
         }
     }
 
-    public void leftThumb(boolean pressed)
-    {
-        if (pressed){
+    public void leftThumb(boolean pressed) {
+        if (pressed) {
             press(Button.LTHUMB);
-        }
-        else{
+        } else {
             depress(Button.LTHUMB);
         }
     }
 
-    public void rightThumb(boolean pressed)
-    {
-        if (pressed){
+    public void rightThumb(boolean pressed) {
+        if (pressed) {
             press(Button.RTHUMB);
-        }
-        else{
+        } else {
             depress(Button.RTHUMB);
         }
     }
@@ -168,7 +145,7 @@ public class Controller extends XboxControllerAdapter{
                     // NW
                     break;
             }
-        } else{
+        } else {
             switch (direction) {
                 case 0:
                     // N
@@ -202,104 +179,88 @@ public class Controller extends XboxControllerAdapter{
         }
     }
 
-    public void leftTrigger(double value)
-    {
+    public void leftTrigger(double value) {
         //value is how hard you press. Between 0-1.0
         controllerState.leftTriggerMagnitude = value;
     }
 
-    public void rightTrigger(double value)
-    {
+    public void rightTrigger(double value) {
         //value is how hard you press. Between 0-1.0
         controllerState.rightTriggerMagnitude = value;
     }
 
-    public void leftThumbMagnitude(double magnitude)
-    {
+    public void leftThumbMagnitude(double magnitude) {
         //magnitude is how hard you press. Between 0-1.0
         controllerState.leftThumbstickMagnitude = magnitude;
-        if( magnitude < 0.2){
+        if (magnitude < 0.2) {
             controllerState.leftThumbstickDirection = 'Z';
             controllerState.leftThumbstickRotation = 0.0;
         }
     }
 
-    public void leftThumbDirection(double direction)
-    {
+    public void leftThumbDirection(double direction) {
         //direction is angle. Between 0-360.0, at top
         controllerState.leftThumbstickRotation = (direction);
-        if (direction < 45 || direction > 315){
+        if (direction < 45 || direction > 315) {
             controllerState.setLeftThumbDir('N');
-        } else if (direction < 135){
+        } else if (direction < 135) {
             controllerState.setLeftThumbDir('E');
-        } else if (direction < 225){
+        } else if (direction < 225) {
             controllerState.setLeftThumbDir('S');
-        } else if (direction < 315){
+        } else if (direction < 315) {
             controllerState.setLeftThumbDir('W');
         } else {
             controllerState.setLeftThumbDir('Z');
         }
     }
 
-    public void rightThumbMagnitude(double magnitude)
-    {
+    public void rightThumbMagnitude(double magnitude) {
         //magnitude is how hard you press. Between 0-1.0
         controllerState.rightThumbstickMagnitude = magnitude;
-        if( magnitude < 0.2){
+        if (magnitude < 0.2) {
             controllerState.rightThumbstickDirection = 'Z';
             controllerState.rightThumbstickRotation = 0.0;
         }
     }
 
-    public void rightThumbDirection(double direction)
-    {
+    public void rightThumbDirection(double direction) {
         //direction is angle. Between 0-360.0, at top
         controllerState.rightThumbstickRotation = (direction);
-        if (direction < 45 || direction > 315){
+        if (direction < 45 || direction > 315) {
             controllerState.setRightThumbstickDirection('N');
-        } else if (direction < 135){
+        } else if (direction < 135) {
             controllerState.setRightThumbstickDirection('E');
-        } else if (direction < 225){
+        } else if (direction < 225) {
             controllerState.setRightThumbstickDirection('S');
-        } else if (direction < 315){
+        } else if (direction < 315) {
             controllerState.setRightThumbstickDirection('W');
         } else {
             controllerState.setRightThumbstickDirection('Z');
         }
     }
 
-    public void isConnected()
-    {
-        if (connectedController.isConnected()) {
+    public void isConnected() {
+        if (xboxController.isConnected()) {
             Log(" - Controller connected");
-        }
-        else {
+        } else {
             Log(" - Controller disconnected");
         }
     }
 
-    public Controller(NetworkConnector messageConnector)
-    {
-        connector = messageConnector;
+    public Controller(ControllerMessage controllerState) {
 
-        String baseDir=System.getProperty("user.dir");
-        if(baseDir.endsWith("honeybadger")){
-            baseDir+="\\executable";
+        String baseDir = System.getProperty("user.dir");
+        if (baseDir.endsWith("honeybadger")) {
+            baseDir += "\\executable";
         }
-        baseDir+="\\bin";
+        baseDir += "\\bin";
         String arch = System.getProperty("os.arch");
         System.out.println(arch);
-        dllPath = String.format("%s\\%s",baseDir,
-                arch.contains("x86")? "xboxcontroller.dll" : "xboxcontroller64.dll");
-
-        ScheduledManager = Executors.newScheduledThreadPool(1);
-        controllerState = new ControllerMessage();
-
-        Initialize();
-    }
-
-    private void Initialize(){
-        connectedController = new XboxController(
+        if(dllPath == null) {
+            dllPath = String.format("%s\\%s", baseDir,
+                    arch.contains("x86") ? "xboxcontroller.dll" : "xboxcontroller64.dll");
+        }
+        xboxController = new XboxController(
                 dllPath,
                 1,
                 50,
@@ -307,42 +268,11 @@ public class Controller extends XboxControllerAdapter{
 
         isConnected();
 
-        controllerState.Initialize();
-        connectedController.addXboxControllerListener(this);
-        connectedController.setLeftThumbDeadZone(0.2);
-        connectedController.setRightThumbDeadZone(0.2);
+        this.controllerState = controllerState;
 
-        makePeriodicSender();
-    }
+        xboxController.addXboxControllerListener(this);
+        xboxController.setLeftThumbDeadZone(0.2);
+        xboxController.setRightThumbDeadZone(0.2);
 
-    private void makePeriodicSender(){
-        if (connector==null || ControllerMessageSender!=null || connector.IsBroken()){
-            Log("Unable to make periodic controller message sender.");
-            return;
-        }
-
-        ControllerMessageSender = ScheduledManager.scheduleAtFixedRate(
-                () -> {
-                    if(connector.HasActiveConnection() && !connector.IsBroken()) {
-                        if(connectedController.isConnected())
-                            connector.SendMessage(new ControllerMessage(controllerState));
-                    }
-                },
-                //Fastest we can send is 13ms. Don't go lower!
-                1000, Constants.UPDATE_SPEED, Constants.UPDATE_TIME_UNIT
-        );
-    }
-
-    public void Reinitialize(NetworkConnector nc){
-        if(nc==null){
-            return;
-        }
-
-        ControllerMessageSender.cancel(true);
-//        connectedController.release();
-        ControllerMessageSender = null;
-        connector = nc;
-
-        makePeriodicSender();
     }
 }

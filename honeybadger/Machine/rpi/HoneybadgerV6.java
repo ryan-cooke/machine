@@ -52,7 +52,7 @@ public class HoneybadgerV6 {
     public static float MaxFlywheelPowerA = 25.f;
     public static float MaxFlywheelPowerB = 30.f;
 
-    public static float BACKWARDS_COMPENSATION_FACTOR = 5/3;
+    public static final float BACKWARDS_COMPENSATION_FACTOR = 1; //(5/3)
 
     /**
      * Makes a new Honeybadger (this is version 6). Guaranteed not to give a shit
@@ -67,7 +67,7 @@ public class HoneybadgerV6 {
 
         FlywheelThrottleA = 0.f;
         FlywheelThrottleB = 0.f;
-        FlywheelCannonAngle = BadgerMotorController.FLYWHEEL_ANGLE_START;
+        FlywheelCannonAngle = 0;//TODO: SET FROM SERVO when arming flywheel
         FlywheelIsReady = false;
 
         Log("Made the BadgerV6");
@@ -326,8 +326,7 @@ public class HoneybadgerV6 {
 
         //TODO: REFACTOR to be a sum of components
         if (updateFactor > 0.1 && wantsAdditional5Percent) {
-            maxFlywheelPowerA = 30.f;
-            maxFlywheelPowerB = 20.f;
+            MaxFlywheelPowerA += 5.f;
         } else if (updateFactor < 0.1 && wantsAdditional5Percent) {
             maxFlywheelPowerA = 5.f;
             maxFlywheelPowerB = 5.f;

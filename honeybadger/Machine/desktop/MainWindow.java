@@ -60,12 +60,14 @@ public class MainWindow {
 
     private static String ConnectionIP;
 
-    private static Controller Xbox360Controller;
+    private static MainController Controller;
 
     private int selectedCamera;
     private BadgerAutonomousController BAC;
 
     private MainWindow() {
+
+        CommandLineRunner.SetStaticIP();
 
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         double width = 0.75 * screenSize.getWidth();
@@ -447,6 +449,7 @@ public class MainWindow {
             try {
                 networkBus.SendMessage("close");
                 networkBus.End();
+                CommandLineRunner.SetDHCP();
             } catch (Exception e) {
                 e.printStackTrace();
             } finally {
@@ -465,7 +468,7 @@ public class MainWindow {
         singleton.networkBus = new NetworkConnector(ConnectionIP, 2017);
         singleton.messageReader = new NetworkConnector.MessageReader(singleton.networkBus);
         Thread readMessages = new Thread(singleton.messageReader);
-        Xbox360Controller.Reinitialize(singleton.networkBus);
+        Controller.Reinitialize(singleton.networkBus);
         readMessages.start();
     }
 
@@ -534,7 +537,7 @@ public class MainWindow {
         Thread controllerThread = new Thread(new Runnable() {
             @Override
             public void run() {
-                Xbox360Controller = new Controller(singleton.networkBus);
+                Controller = new MainController(singleton.networkBus);
                 while(true){
                     try {
                         Thread.sleep(500);

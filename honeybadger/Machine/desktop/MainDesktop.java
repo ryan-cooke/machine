@@ -63,7 +63,7 @@ public class MainDesktop {
             NetworkConnector nc = new NetworkConnector(IP, 2017);
             MessageReader readerHandle = new MessageReader(nc);
             Thread readMessages = new Thread(readerHandle);
-            Controller Xbox = new Controller(nc);
+            MainController mainController = new MainController(nc);
             input = "";
             keepAlive = true;
             isActive = true;
@@ -87,6 +87,9 @@ public class MainDesktop {
                             for(IBadgerFunction functor : functors){
                                 Log(String.format("\t%s | call: %s",functor.getClass().getSimpleName(),functor.Explain()));
                             }
+                        }
+                        else if (keywords[1].contains("AUTO")){
+                            mainController.setAutonomousRunning(!mainController.isAutonomousRunning());
                         }
                         else {
                             Log(String.format("Sending TextCommandMessage \'%s\'", input.substring(4)));
