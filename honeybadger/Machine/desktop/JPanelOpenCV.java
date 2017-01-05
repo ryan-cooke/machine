@@ -39,6 +39,10 @@ public class JPanelOpenCV extends JPanel {
 
     private static BUFFER_TYPE FrameBufferType = BUFFER_TYPE.REGULAR;
 
+    private static String startSide="red";
+    private static int floorTG=500;
+    private static boolean tgReached=false;
+
     private static boolean target = false;
     private static boolean blueTarget = false;
     private static int center = 320;
@@ -365,7 +369,8 @@ public class JPanelOpenCV extends JPanel {
             {
                 if(objectBoundingRectangle.width*objectBoundingRectangle.height>2000) {
                     Imgproc.rectangle(frame, objectBoundingRectangle.tl(), objectBoundingRectangle.br(), new Scalar(255, 0, 0));
-
+                    if (objectBoundingRectangle.x+objectBoundingRectangle.width>floorTG||!color.equals(startSide))
+                    {tgReached=true;}
                 }
             }
         }
@@ -480,11 +485,20 @@ public class JPanelOpenCV extends JPanel {
         double distance=0;
         if (topWall>120){distance = ((topWall-120)/5.45)+25;}
         if (topWall<=120){distance = (topWall/11)+15;}
-
-
-
-
         return distance;
     }
+
+    //red or yellow
+    public static void setStartSide(String color)
+    {
+        startSide=color;
+    }
+
+    public static boolean isTgReached()
+    {
+        return tgReached;
+    }
+
+
 
 }
