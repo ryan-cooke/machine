@@ -321,18 +321,14 @@ public class HoneybadgerV6 {
         final float minFlywheelPower = BadgerMotorController.FLYWHEEL_PERCENT_MIN;
 
         //Values determined empirically.
-        final float maxFlywheelPowerA;
-        final float maxFlywheelPowerB;
+        float maxFlywheelPowerA = MaxFlywheelPowerA;
+        float maxFlywheelPowerB = MaxFlywheelPowerB;
 
-        //TODO: REFACTOR to be a sum of components
         if (updateFactor > 0.1 && wantsAdditional5Percent) {
-            MaxFlywheelPowerA += 5.f;
+            maxFlywheelPowerA = MaxFlywheelPowerA+5.f;
         } else if (updateFactor < 0.1 && wantsAdditional5Percent) {
             maxFlywheelPowerA = 5.f;
             maxFlywheelPowerB = 5.f;
-        } else  {
-            maxFlywheelPowerA = 25.f;
-            maxFlywheelPowerB = 20.f;
         }
 
         final float step = 0.1f;
