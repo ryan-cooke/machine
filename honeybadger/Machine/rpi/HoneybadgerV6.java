@@ -216,12 +216,18 @@ public class HoneybadgerV6 {
         if (buttons.get(Button.START)){
             handleStart();
         }
+
+
         if (buttons.get(Button.RBUMPER)){
             handleRBumper();
         }
         if (buttons.get(Button.LBUMPER)){
             handleLBumper();
         }
+        if(!buttons.get(Button.RBUMPER) && !buttons.get(Button.LBUMPER)){
+            setConveyor(1,0);
+        }
+
         if (buttons.get(Button.RTHUMB)){
             handleRThumb();
         }

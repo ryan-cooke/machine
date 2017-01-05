@@ -431,12 +431,12 @@ public class MainWindow {
     }
 
     private void onPressStartAutonomous() {
-        if(BAC!=null){
-            return;
-        }
-
-        BAC = new BadgerAutonomousController(networkBus);
-        BAC.TakeOver();
+//        if(BAC!=null){
+//            return;
+//        }
+//
+//        BAC = new BadgerAutonomousController(networkBus);
+//        BAC.TakeOver();
     }
 
     private void onPressExit() {

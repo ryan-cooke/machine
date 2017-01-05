@@ -13,6 +13,7 @@ import static Machine.Common.Utils.Log;
  * The autonomous controller class that will run at the beggining of the match
  */
 public class BadgerAutonomousController {
+//    private NetworkConnector
 
     private ControllerMessage controllerState;
 
