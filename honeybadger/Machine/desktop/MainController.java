@@ -1,5 +1,6 @@
 package Machine.desktop;
 
+import Machine.Common.Constants;
 import Machine.Common.Network.ControllerMessage;
 import ch.aplu.xboxcontroller.XboxController;
 
@@ -59,7 +60,7 @@ public class MainController {
                         connector.SendMessage(new ControllerMessage(connectedController.getControllerState()));
                 }
             },
-            1,1, TimeUnit.SECONDS
+            1, Constants.UPDATE_SPEED, Constants.UPDATE_TIME_UNIT
         );
     }
 
