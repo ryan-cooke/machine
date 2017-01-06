@@ -18,7 +18,7 @@ public class ShellCommandMessage extends BaseMsg{
         HoneybadgerV6 badger = (HoneybadgerV6)context;
 
         Shell bash = new Shell();
-        //bash.Run(payload,1000); FIXME doesn't work
+        //bash.Run(payload,1000); FUTURE doesn't work
         badger.sendDebugMessageToDesktop("\n"+bash.getLatestStandardOut());
     }
 }

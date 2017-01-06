@@ -199,7 +199,7 @@ public class HoneybadgerV6 {
     }
 
 
-    public void handleButtonPress(HashMap<Button, Boolean> buttons){        //TODO: VERIFY!!!
+    public void handleButtonPress(HashMap<Button, Boolean> buttons){
         if (buttons.get(Button.A)){
             handleA();
         }
@@ -257,11 +257,9 @@ public class HoneybadgerV6 {
     }
 
     private void handleX(){
-        //TODO:
     }
 
     private void handleY(){
-        //TODO:
     }
 
     private void handleBack(){
@@ -283,7 +281,6 @@ public class HoneybadgerV6 {
     }
 
     private void handleRThumb(){
-
     }
 
     private void handleLThumb(){

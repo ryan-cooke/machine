@@ -134,7 +134,6 @@ public class JPanelOpenCV extends JPanel {
         System.loadLibrary(openCVLib);
         System.loadLibrary(ffmpegLib);
 
-        //TODO: For Joey: you might want to change the IP
         VideoCapture camera = new VideoCapture(ConnectURL);
         if (!camera.isOpened()) {
             ErrorLog("Error opening stream");

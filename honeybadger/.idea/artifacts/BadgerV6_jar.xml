@@ -1,5 +1,5 @@
 <component name="ArtifactManager">
-  <artifact type="jar" name="BadgerV6:jar">
+  <artifact type="jar" build-on-make="true" name="BadgerV6:jar">
     <output-path>$PROJECT_DIR$/executable/bin</output-path>
     <root id="archive" name="BadgerV6-Desktop.jar">
       <element id="module-output" name="Forge" />

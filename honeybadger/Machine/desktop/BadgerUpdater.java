@@ -57,8 +57,6 @@ public class BadgerUpdater {
             channelSftp = (ChannelSftp) channel;
             channelSftp.cd(targetDirectory);
 
-            //Open up the zip file
-            //TODO: test in release
             String currentDir = System.getProperty("user.dir");
             if(currentDir.endsWith("honeybadger")){
                 currentDir = currentDir+"\\executable";
