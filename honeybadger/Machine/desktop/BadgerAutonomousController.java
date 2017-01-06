@@ -31,6 +31,12 @@ public class BadgerAutonomousController {
 
     }
 
+    public void moveBadger(double first, long time1, double second, long time2, double rotate, long time3){
+        goToOtherSide(first, time1);
+        getToCenter(second, time2);
+        rotateLeftToPole(rotate, time3);
+    }
+
     public void placeBadger(double first, double second, long time, double rotate){
         goToOtherSide(first);
         getToCenter(second, time);
@@ -40,6 +46,13 @@ public class BadgerAutonomousController {
     public void goToOtherSide(double throttle){
         moveForward(throttle);
         while(!JPanelOpenCV.isTgReached());
+        clear();
+    }
+
+    public void goToOtherSide(double throttle, long time){
+        strafeRight(throttle);
+        long currentTime = System.currentTimeMillis();
+        while(currentTime+time > System.currentTimeMillis());
         clear();
     }
 
@@ -56,6 +69,12 @@ public class BadgerAutonomousController {
         clear();
     }
 
+    public void rotateLeftToPole(double throttle, long time){
+        rotateLeft(throttle);
+        long currentTime = System.currentTimeMillis();
+        while(currentTime+time > System.currentTimeMillis());
+        clear();
+    }
     public void rotateRightToPole(double throttle){
         rotateRight(throttle);
         while(!JPanelOpenCV.isBlueTarget());
