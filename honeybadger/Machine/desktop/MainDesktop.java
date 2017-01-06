@@ -119,12 +119,12 @@ public class MainDesktop {
                         else if (keywords[1].contains("SHOOT")){
                             if(keywords[2] != null && keywords[3] != null){
                                 mainController.setAutonomousRunning(true);
-                                if(keywords[4] != null){
-                                    auto.shootBalls(StoD(keywords[2]),StoD(keywords[3]),
-                                            StoL(keywords[4]));
-                                } else {
-                                    auto.shootBalls(StoD(keywords[2]), StoD(keywords[3]));
-                                }
+//                                if(keywords[4] != null){
+//                                    auto.shootBalls(StoD(keywords[2]),StoD(keywords[3]),
+//                                            StoL(keywords[4]));
+//                                } else {
+//                                    auto.shootBalls(StoD(keywords[2]), StoD(keywords[3]));
+//                                }
                                 mainController.setAutonomousRunning(false);
                             }
                         }

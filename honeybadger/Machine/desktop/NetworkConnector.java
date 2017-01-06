@@ -192,6 +192,14 @@ public class NetworkConnector {
                 }
             }
         }
+        else if(input.startsWith("COLOR")){
+            String[] keywords = input.split(" ");
+            if(keywords.length > 1){
+                String color = keywords[1];
+                JPanelOpenCV.setStartSide(color);
+                Log(String.format("Set start side %s",color));
+            }
+        }
         else if(input.startsWith("SH")){
             MainWindow.writeToMessageFeed(String.format("Sending Shell Message \'%s\'", input.substring(3)));
             this.SendMessage(new ShellCommandMessage(input.substring(3)));
