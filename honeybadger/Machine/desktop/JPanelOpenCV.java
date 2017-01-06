@@ -51,10 +51,6 @@ public class JPanelOpenCV extends JPanel {
     private static int[]topWallAr = {0,0,0,0,0};
     private static int countTop=0;
 
-    private static int topWall=0;
-    private static int[]topWallAr = {0,0,0,0,0};
-    private static int countTop=0;
-
     private static Scalar lowerBlack = new Scalar(0, 0, 0);
     private static Scalar upperBlack = new Scalar(180, 255, 90);
 
