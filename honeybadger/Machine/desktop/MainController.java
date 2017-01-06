@@ -24,12 +24,17 @@ public class MainController {
     private final ScheduledExecutorService ScheduledManager;
     private ScheduledFuture<?> ControllerMessageSender;
 
-    public boolean isAutonomousRunning() {
+    synchronized public boolean isAutonomousRunning() {
         return isAutonomousRunning;
     }
 
-    public void setAutonomousRunning(boolean autonomousRunning) {
+    synchronized public void setAutonomousRunning(boolean autonomousRunning) {
         isAutonomousRunning = autonomousRunning;
+    }
+
+
+    public BadgerAutonomousController getAutonomousController() {
+        return autonomousController;
     }
 
     public MainController(NetworkConnector messageConnector){
@@ -38,7 +43,6 @@ public class MainController {
         controllerState.Initialize();
         connectedController = new Controller(controllerState);
         autonomousController = new BadgerAutonomousController(controllerState);
-
         ScheduledManager = Executors.newScheduledThreadPool(1);
 
         makePeriodicSender();
@@ -56,8 +60,9 @@ public class MainController {
                     if (isAutonomousRunning){
                         connector.SendMessage(new ControllerMessage(autonomousController.getControllerState()));
                     }
-                    else if(connectedController.getXboxController().isConnected())
+                    else if(connectedController.getXboxController().isConnected()) {
                         connector.SendMessage(new ControllerMessage(connectedController.getControllerState()));
+                    }
                 }
             },
             1, Constants.UPDATE_SPEED, Constants.UPDATE_TIME_UNIT

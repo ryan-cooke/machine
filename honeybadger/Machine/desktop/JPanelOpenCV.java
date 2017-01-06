@@ -39,9 +39,17 @@ public class JPanelOpenCV extends JPanel {
 
     private static BUFFER_TYPE FrameBufferType = BUFFER_TYPE.REGULAR;
 
+    private static String startSide="red";
+    private static int floorTG=500;
+    private static boolean tgReached=false;
+
     private static boolean target = false;
     private static boolean blueTarget = false;
     private static int center = 320;
+
+    private static int topWall=0;
+    private static int[]topWallAr = {0,0,0,0,0};
+    private static int countTop=0;
 
     private static Scalar lowerBlack = new Scalar(0, 0, 0);
     private static Scalar upperBlack = new Scalar(180, 255, 90);
@@ -52,10 +60,10 @@ public class JPanelOpenCV extends JPanel {
     private static Scalar lowerGreen = new Scalar(35, 140, 60);
     private static Scalar upperGreen = new Scalar(70, 255, 255);
 
-    private static Scalar lowerYellow = new Scalar(90,100,60);
+    private static Scalar lowerYellow = new Scalar(90,150,150);
     private static Scalar upperYellow = new Scalar(110,255,255);
 
-    private static Scalar lowerRed = new Scalar(110,100,60);
+    private static Scalar lowerRed = new Scalar(115,100,100);
     private static Scalar upperRed = new Scalar(140,255,255);
 
 
@@ -107,11 +115,11 @@ public class JPanelOpenCV extends JPanel {
         ShouldDraw = shouldDraw;
     }
 
-    public boolean isTarget() {
+    public static boolean isTarget() {
         return target;
     }
 
-    public boolean isBlueTarget() {
+    public static boolean isBlueTarget() {
         return blueTarget;
     }
 
@@ -135,6 +143,7 @@ public class JPanelOpenCV extends JPanel {
         System.loadLibrary(ffmpegLib);
 
         VideoCapture camera = new VideoCapture(ConnectURL);
+        //VideoCapture camera = new VideoCapture(1);
         if (!camera.isOpened()) {
             ErrorLog("Error opening stream");
             return;
@@ -190,13 +199,21 @@ public class JPanelOpenCV extends JPanel {
         Core.inRange(hsv, lowerGreen, upperGreen, hsv);
         Core.inRange(hsv2, lowerBlue, upperBlue, hsv2);
         Core.inRange(hsv3, lowerBlack, upperBlack, hsv3);
+        Core.inRange(hsv4, lowerYellow, upperYellow,hsv4);
+        Core.inRange(hsv5, lowerRed, upperRed, hsv5);
 
         hsv = erodeDilate(hsv, dilate, erode);
         hsv2 = erodeDilate(hsv2, dilate, erode);
         hsv3 = erodeDilate(hsv3, dilate, erode);
+        hsv4 = erodeDilate(hsv4, dilate, erode);
+        hsv5 = erodeDilate(hsv5, dilate, erode);
+
 
         frame = searchForMovement(hsv, frame, "green");
         frame = searchForMovement(hsv2, frame, "blue");
+        frame = searchForMovement(hsv4,frame, "yellow");
+        frame = searchForMovement(hsv5,frame,"red");
+
 
         frame = searchLine(hough, frame);
         frame = drawCrosshair(frame, 30, 320, 240, new Scalar(0, 0, 255));
@@ -324,10 +341,12 @@ public class JPanelOpenCV extends JPanel {
             objectBoundingRectangle.width -= 13;
             objectBoundingRectangle.x += 3;
             boolean skinnyRect = false;
+            boolean floorPanels =false;
             if (objectBoundingRectangle.width == 0) {
             } else if (objectBoundingRectangle.height / objectBoundingRectangle.width > 3) {
                 skinnyRect = true;
             }
+            if (color.equals("red")||color.equals("yellow")){floorPanels=true;}
 
             if (skinnyRect) {
                 Imgproc.rectangle(frame, objectBoundingRectangle.tl(), objectBoundingRectangle.br(), new Scalar(0, 255, 0));
@@ -337,6 +356,15 @@ public class JPanelOpenCV extends JPanel {
                     if (color.equals("blue")) {
                         blueTarget = true;
                     }
+                }
+            }
+
+            if (floorPanels)
+            {
+                if(objectBoundingRectangle.width*objectBoundingRectangle.height>2000) {
+                    Imgproc.rectangle(frame, objectBoundingRectangle.tl(), objectBoundingRectangle.br(), new Scalar(255, 0, 0));
+                    if (objectBoundingRectangle.x+objectBoundingRectangle.width>floorTG||!color.equals(startSide))
+                    {tgReached=true;}
                 }
             }
         }
@@ -391,8 +419,13 @@ public class JPanelOpenCV extends JPanel {
             double run = Math.abs(val[2] - val[0]);
             if ((rise / run) > 0.8) {
             } else {
-
-                Imgproc.line(out, new Point(val[0], val[1]), new Point(val[2], val[3]), new Scalar(0, 0, 255), 2);
+                Scalar c1 = new Scalar(200,200,0);
+                if(val[1]<250){c1= new Scalar(0,0,255);}
+                Imgproc.line(out, new Point(val[0], val[1]), new Point(val[2], val[3]), c1, 2);
+            }
+            if(val[1]<250){
+            avgTop((int)val[1]);
+            Log(getDistances()+" inches is distance");
             }
         }
 
@@ -435,11 +468,30 @@ public class JPanelOpenCV extends JPanel {
         FrameBufferType = drawingBuffer;
     }
 
-    synchronized static void shouldRender(boolean shouldDraw){
-        ShouldDraw = shouldDraw;
+    public static void avgTop(int x)
+    {
+        countTop++;
+        topWall=((topWallAr[0]+topWallAr[1]+topWallAr[2]+topWallAr[3]+topWallAr[4])/5);
+        topWallAr[countTop%5]=x;
+    }
+    public static double getDistances(){
+        double distance=0;
+        if (topWall>120){distance = ((topWall-120)/5.45)+25;}
+        if (topWall<=120){distance = (topWall/11)+15;}
+        return distance;
     }
 
-    synchronized static boolean isrendering(){
-        return ShouldDraw;
+    //red or yellow
+    public static void setStartSide(String color)
+    {
+        startSide=color;
     }
+
+    public static boolean isTgReached()
+    {
+        return tgReached;
+    }
+
+
+
 }

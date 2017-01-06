@@ -64,6 +64,7 @@ public class MainDesktop {
             MessageReader readerHandle = new MessageReader(nc);
             Thread readMessages = new Thread(readerHandle);
             MainController mainController = new MainController(nc);
+            BadgerAutonomousController auto = mainController.getAutonomousController();
             input = "";
             keepAlive = true;
             isActive = true;
@@ -87,8 +88,110 @@ public class MainDesktop {
                                 Log(String.format("\t%s | call: %s",functor.getClass().getSimpleName(),functor.Explain()));
                             }
                         }
-                        else if (keywords[1].contains("AUTO")){
-                            mainController.setAutonomousRunning(!mainController.isAutonomousRunning());
+                        // "MOVE 0.5 0.5 2000 0.5" will move to other side at 0.5 throttle,
+                        // get to center at 0.5 throttle for 2000 ms
+                        // and rotate at a 0.5 throttle.
+                        else if (keywords[1].contains("MOVE")){
+                            mainController.setAutonomousRunning(true);
+                            if (keywords[2] != null){
+                                auto.moveBadger(StoD(keywords[2]),StoD(keywords[3]),
+                                        StoL(keywords[4]),StoD(keywords[5]));
+                            } else{
+                                auto.moveBadger(0.5,0.5,2000,0.5);
+                            }
+                            mainController.setAutonomousRunning(false);
+                        }
+                        //"MOVENOCV 0.5 2000 0.5 2000 0.5 2000 will move to other side at 0.5 throttle for 2 seconds,
+                        // get to center at 0.5 throttle for 2000ms,
+                        // and rotate at a 0.5 throttle.
+                        else if (keywords[1].contains("MOVENOCV")){
+                            mainController.setAutonomousRunning(true);
+                            if(keywords[2] != null){
+                                auto.moveBadger(StoD(keywords[2]),StoL(keywords[3]),
+                                        StoD(keywords[4]),StoL(keywords[5]),
+                                        StoD(keywords[6]),StoL(keywords[7]));
+                            } else{
+                                auto.moveBadger(0.5,2000,0.5,2000,0.5,2000);
+                            }
+                        }
+                        // SHOOT 0.5 0.5 3000 will start flywheel at 0.5,
+                        // conveyors at 0.5 and last 3000 ms.
+                        else if (keywords[1].contains("SHOOT")){
+                            if(keywords[2] != null && keywords[3] != null){
+                                mainController.setAutonomousRunning(true);
+                                if(keywords[4] != null){
+                                    auto.shootBalls(StoD(keywords[2]),StoD(keywords[3]),
+                                            StoL(keywords[4]));
+                                } else {
+                                    auto.shootBalls(StoD(keywords[2]), StoD(keywords[3]));
+                                }
+                                mainController.setAutonomousRunning(false);
+                            }
+                        }
+                        // Need to set starting color, default is red.
+                        else if (keywords[1].contains("COLOR")){
+                            if (keywords[2].contains("YELLOW")) {
+                                JPanelOpenCV.setStartSide("yellow");
+                            }else {
+                                JPanelOpenCV.setStartSide("red");
+                            }
+                        }
+                        //"MVFW 0.5 2000" will move forward at throttle 0.5 for 2000 ms
+                        //"MVFW 0.5" will move forward at 0.5 throttle till reach opencv boundary
+                        else if (keywords[1].contains("MVFW")){
+                            mainController.setAutonomousRunning(true);
+                            if (keywords[2] != null && keywords[3] != null){
+                                auto.goForward(StoD(keywords[2]), StoL(keywords[3]));
+                            } else if (keywords[2] != null){
+                                auto.goForward(StoD(keywords[2]));
+                            }
+                            mainController.setAutonomousRunning(false);
+                        }
+                        //"MVBK 0.5 2000" will move backwards at throttle 0.5 for 2000 ms
+                        else if (keywords[1].contains("MVBK")){
+                            mainController.setAutonomousRunning(true);
+                            if (keywords[2] != null && keywords[3] != null){
+                                auto.goBackwards(StoD(keywords[2]), StoL(keywords[3]));
+                            }
+                            mainController.setAutonomousRunning(false);
+                        }
+                        //"STRR 0.5 2000" will strafe right at throttle 0.5 for 2000 ms
+                        else if (keywords[1].contains("STRR")){
+                            mainController.setAutonomousRunning(true);
+                            if (keywords[2] != null && keywords[3] != null){
+                                auto.strafeRight(StoD(keywords[2]), StoL(keywords[3]));
+                            }
+                            mainController.setAutonomousRunning(false);
+                        }
+                        //"STRL 0.5 2000" will strafe left at throttle 0.5 for 2000 ms
+                        else if (keywords[1].contains("STRL")){
+                            mainController.setAutonomousRunning(true);
+                            if (keywords[2] != null && keywords[3] != null){
+                                auto.strafeLeft(StoD(keywords[2]), StoL(keywords[3]));
+                            }
+                            mainController.setAutonomousRunning(false);
+                        }
+                        //"ROTL 0.5 2000" will rotate at throttle 0.5 for 2000 ms
+                        //"ROTL 0.5" will roateLeft at 0.5 throttle till reach opencv blue post
+                        else if (keywords[1].contains("ROTL")){
+                            mainController.setAutonomousRunning(true);
+                            if (keywords[2] != null && keywords[3] != null){
+                                auto.rotateLeft(StoD(keywords[2]), StoL(keywords[3]));
+                            } else if (keywords[2] != null){
+                                auto.rotateLeftToPole(StoD(keywords[2]));
+                            }
+                            mainController.setAutonomousRunning(false);
+                        }
+                        //"ROTR 0.5 2000" will rotate at throttle 0.5 for 2000 ms
+                        //"ROTR 0.5" will roate right at 0.5 throttle till reach opencv blue post
+                        else if (keywords[1].contains("ROTR")){
+                            mainController.setAutonomousRunning(true);
+                            if (keywords[2] != null && keywords[3] != null){
+                                auto.rotateRight(StoD(keywords[2]), StoL(keywords[3]));
+                            } else if (keywords[2] != null){
+                                auto.rotateRightToPole(StoD(keywords[2]));
+                            }
+                            mainController.setAutonomousRunning(false);
                         }
                         else {
                             Log(String.format("Sending TextCommandMessage \'%s\'", input.substring(4)));
@@ -123,4 +226,9 @@ public class MainDesktop {
 
         System.exit(0);
     }
+
+    private static double StoD(String s){
+        return Double.parseDouble(s);
+    }
+    private static Long StoL(String s){ return Long.parseLong(s);}
 }
