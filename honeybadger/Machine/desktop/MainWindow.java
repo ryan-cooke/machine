@@ -67,7 +67,7 @@ public class MainWindow {
 
     private MainWindow() {
 
-        CommandLineRunner.SetStaticIP();
+        //CommandLineRunner.SetStaticIP();
 
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         double width = 0.75 * screenSize.getWidth();
@@ -492,7 +492,7 @@ public class MainWindow {
     public static String promptForIP() {
         String ConnectionIP = JOptionPane.showInputDialog(
                 "Honeybadger IP: ",
-                "192.168.137.69");
+                "192.168.0.1");
 
         if (ConnectionIP == null) {
             JOptionPane.showMessageDialog(null,

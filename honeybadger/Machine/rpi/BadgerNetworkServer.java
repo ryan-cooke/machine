@@ -79,7 +79,7 @@ public class BadgerNetworkServer {
     }
 
     protected boolean Handshake(){
-        //TODO: last part. Implement some verification with the badger to make sure they speak our language.
+        //FUTURE: last part. Implement some verification with the badger to make sure they speak our language.
         //Currently does nothing.
         return true;
     }

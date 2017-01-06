@@ -18,7 +18,7 @@ public class ShellCommandMessage extends BaseMsg{
         HoneybadgerV6 badger = (HoneybadgerV6)context;
 
         Shell bash = new Shell();
-        //bash.Run(payload,1000); //TODO: secure with non-root shell.
+        //bash.Run(payload,1000); FUTURE doesn't work
         badger.sendDebugMessageToDesktop("\n"+bash.getLatestStandardOut());
     }
 }

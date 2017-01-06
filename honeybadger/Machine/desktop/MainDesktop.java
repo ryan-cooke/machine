@@ -72,7 +72,6 @@ public class MainDesktop {
             while (keepAlive) {
                 input = Prompt('>', Kb);
 
-                //TODO: Cleanup the cases below
                 if(input.contains("CMD")){
                     //Check that it is not followed by something else
                     String[] keywords = input.split(" ");

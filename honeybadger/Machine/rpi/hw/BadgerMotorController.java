@@ -86,20 +86,18 @@ public class BadgerMotorController {
 
     /**
      * Lowest angle we can do in terms of the servo position
-     * TODO: SET EMPIRICALLY
      */
-    public static final int FLYWHEEL_ANGLE_LOWEST = 100;
+    public static final int FLYWHEEL_ANGLE_LOWEST = 111;
 
     /**
      * Highest angle we can do
-     * TODO: SET EMPIRICALLY
      */
     public static final int FLYWHEEL_ANGLE_HIGHEST = 420;
 
     /**
-     *
+     * Starting angle for the flywheel
      */
-    public static final int FLYWHEEL_ANGLE_START = 400;
+    public static final int FLYWHEEL_ANGLE_START = FLYWHEEL_ANGLE_LOWEST;
 
     /**
      * Constant that defines integer representation of a drive wheel going backwards
@@ -195,7 +193,7 @@ public class BadgerMotorController {
 
                 GPIO.provisionDigitalOutputPin(RPIProvider, RPI.CONVEYOR_A, "Conveyor A"),
                 GPIO.provisionDigitalOutputPin(RPIProvider, RPI.CONVEYOR_B, "Conveyor B"),
-                //TODO: Provision the rest of the digital pins
+                GPIO.provisionDigitalOutputPin(RPIProvider, RPI.VACUUM_ROLLER, "Vacuum Roller"),
         };
         this.DigitalOutputs = myOutputs;
     }

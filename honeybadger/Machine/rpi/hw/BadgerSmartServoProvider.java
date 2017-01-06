@@ -17,7 +17,7 @@ public class BadgerSmartServoProvider {
         @Override
         public void dataReceived(SerialDataEvent event) {
             lastReceivedEvent = event;
-            //TODO: handle receiving the ServoStatus
+            //FUTURE: handle receiving the ServoStatus
         }
 
         public SerialDataEvent getLastReceivedEvent(){ return lastReceivedEvent; }
@@ -140,7 +140,7 @@ public class BadgerSmartServoProvider {
     }
 
     private void ReadServoStatus(byte servoID){
-        //TODO: port from code below
+        //FUTURE: NO ONE CARES HOW YOU FEEL
         //Original method call A1_16_ReadData(id, _CMD=CMD_RAM_READ, _addr_start=RAM_Joint_Position, _data_length=0x02)
 //        while(Serial1.read() != -1);
 //        checksum_1 = (9^_pID^_CMD^_addr_start^_data_length)&0xfe;
