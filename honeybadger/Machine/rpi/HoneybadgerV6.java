@@ -10,6 +10,7 @@ import Machine.rpi.hw.BadgerPWMProvider;
 import Machine.rpi.hw.RPI;
 import Machine.Common.Utils.Button;
 
+import com.pi4j.component.motor.Motor;
 import com.pi4j.io.gpio.Pin;
 
 import java.util.HashMap;
@@ -49,10 +50,10 @@ public class HoneybadgerV6 {
     private int FlywheelCannonAngle;
 
     //Values determined empirically.
-    public static final float MaxFlywheelPowerA = 25.f;
-    public static final float MaxFlywheelPowerB = 30.f;
+    public static float MaxFlywheelPowerA = 25.f;
+    public static float MaxFlywheelPowerB = 30.f;
 
-    public static final float BACKWARDS_COMPENSATION_FACTOR = 5/3;
+    public static final float BACKWARDS_COMPENSATION_FACTOR = 1; //(5/3)
 
     /**
      * Makes a new Honeybadger (this is version 6). Guaranteed not to give a shit
@@ -67,10 +68,10 @@ public class HoneybadgerV6 {
 
         FlywheelThrottleA = 0.f;
         FlywheelThrottleB = 0.f;
-        FlywheelCannonAngle = 0;//TODO: SET FROM SERVO when arming flywheel
+        FlywheelCannonAngle = 0;
         FlywheelIsReady = false;
 
-        Log("Made the BadgerV6");
+        Log("Made the Badger V6.");
     }
 
     public BadgerNetworkServer getNetworkServer(){
@@ -216,12 +217,19 @@ public class HoneybadgerV6 {
         if (buttons.get(Button.START)){
             handleStart();
         }
+
+
         if (buttons.get(Button.RBUMPER)){
             handleRBumper();
         }
         if (buttons.get(Button.LBUMPER)){
             handleLBumper();
         }
+        if(!buttons.get(Button.RBUMPER) && !buttons.get(Button.LBUMPER)){
+            setConveyor(1,0);
+            stopVacuumRoller();
+        }
+
         if (buttons.get(Button.RTHUMB)){
             handleRThumb();
         }
@@ -243,11 +251,11 @@ public class HoneybadgerV6 {
     }
 
     private void handleA(){
-        //TODO:
+        armFlywheel();
     }
 
     private void handleB(){
-        //TODO:
+        disarmFlywheel();
     }
 
     private void handleX(){
@@ -268,10 +276,12 @@ public class HoneybadgerV6 {
 
     private void handleRBumper(){
         setConveyor(BadgerMotorController.FORWARD,100.f);
+        startVacuumRoller();
     }
 
     private void handleLBumper(){
-        setConveyor(BadgerMotorController.BACKWARD,100.f);
+        setConveyor(BadgerMotorController.BACKWARD,60.f);
+        stopVacuumRoller();
     }
 
     private void handleRThumb(){
@@ -321,18 +331,14 @@ public class HoneybadgerV6 {
         final float minFlywheelPower = BadgerMotorController.FLYWHEEL_PERCENT_MIN;
 
         //Values determined empirically.
-        final float maxFlywheelPowerA;
-        final float maxFlywheelPowerB;
+        float maxFlywheelPowerA = MaxFlywheelPowerA;
+        float maxFlywheelPowerB = MaxFlywheelPowerB;
 
         if (updateFactor > 0.1 && wantsAdditional5Percent) {
-            maxFlywheelPowerA = 30.f;
-            maxFlywheelPowerB = 20.f;
+            maxFlywheelPowerA = MaxFlywheelPowerA+5.f;
         } else if (updateFactor < 0.1 && wantsAdditional5Percent) {
             maxFlywheelPowerA = 5.f;
             maxFlywheelPowerB = 5.f;
-        } else  {
-            maxFlywheelPowerA = 25.f;
-            maxFlywheelPowerB = 20.f;
         }
 
         final float step = 0.1f;
@@ -347,8 +353,8 @@ public class HoneybadgerV6 {
         }
 
         //Update and keep it in the safe ranges.
-        FlywheelThrottleA = Utils.Clamp(FlywheelThrottleA+delta ,minFlywheelPower,MaxFlywheelPowerA);
-        FlywheelThrottleB = Utils.Clamp(FlywheelThrottleB+delta ,minFlywheelPower,MaxFlywheelPowerB);
+        FlywheelThrottleA = Utils.Clamp(FlywheelThrottleA+delta ,minFlywheelPower,maxFlywheelPowerA);
+        FlywheelThrottleB = Utils.Clamp(FlywheelThrottleB+delta ,minFlywheelPower,maxFlywheelPowerB);
 
         if(FlywheelIsReady) {
             sendAckMessageToDesktop(String.format("Flywheel speed A:%f B:%f",FlywheelThrottleA,FlywheelThrottleB));
@@ -485,15 +491,21 @@ public class HoneybadgerV6 {
         MotorController.setServoPosition(BadgerMotorController.FLYWHEEL_SERVO_ID,FlywheelCannonAngle);
     }
 
+    /**
+     *
+     */
+    private void resetFlywheelAngle(){
+        MotorController.setServoPosition(
+                BadgerMotorController.FLYWHEEL_SERVO_ID,
+                BadgerMotorController.FLYWHEEL_ANGLE_START);
+        FlywheelCannonAngle = BadgerMotorController.FLYWHEEL_ANGLE_START;
+    }
+
     public void STOP(){
         sendDebugMessageToDesktop("Motor Controllers stopped.");
 
-        //KILL the Drive Motors
         MotorController.stopDriveMotors();
-
-        //Stop the flywheels
-//        MotorController.setPWM(BadgerPWMProvider.FLYWHEEL_A, BadgerMotorController.FLYWHEEL_PERCENT_MIN);
-//        MotorController.setPWM(BadgerPWMProvider.FLYWHEEL_B, BadgerMotorController.FLYWHEEL_PERCENT_MIN);
+        resetFlywheelAngle();
 
         this.IsListeningToController = false;
         this.IsMoving = false;
@@ -520,6 +532,15 @@ public class HoneybadgerV6 {
 
         MotorController.setDriveMotorSpeed(BadgerPWMProvider.CONVEYOR_A,throttle);
         MotorController.setDriveMotorSpeed(BadgerPWMProvider.CONVEYOR_B,throttle);
+    }
+
+    public void startVacuumRoller(){
+        MotorController.setDriveMotorDirection(RPI.VACUUM_ROLLER,BadgerMotorController.FORWARD);
+        MotorController.setDriveMotorSpeed(BadgerPWMProvider.VACUUM_ROLLER,100.f);
+    }
+
+    public void stopVacuumRoller(){
+        MotorController.setDriveMotorSpeed(BadgerPWMProvider.VACUUM_ROLLER,0.f);
     }
 
     /**

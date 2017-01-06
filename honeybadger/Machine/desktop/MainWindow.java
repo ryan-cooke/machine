@@ -29,6 +29,7 @@ public class MainWindow {
     private Thread networkThread;
     private Thread videoThread;
     private Thread updaterThread;
+    private Thread autonomousThread;
 
     private JPanel contentPane;
     private JButton buttonAutonomous;
@@ -47,6 +48,7 @@ public class MainWindow {
     private JMenuItem regularBuffer;
     private JMenuItem cannyBuffer;
     private JMenuItem houghBuffer;
+    private JMenuItem changeStream;
 
     private JTextArea messageFeed;
     private JPanelOpenCV videoPanel;
@@ -61,9 +63,11 @@ public class MainWindow {
     private static MainController Controller;
 
     private int selectedCamera;
-    private JMenuItem changeStream;
+    private BadgerAutonomousController BAC;
 
     private MainWindow() {
+
+        CommandLineRunner.SetStaticIP();
 
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         double width = 0.75 * screenSize.getWidth();
@@ -427,8 +431,12 @@ public class MainWindow {
     }
 
     private void onPressStartAutonomous() {
-        //TODO: Send a network command to quit.
-
+//        if(BAC!=null){
+//            return;
+//        }
+//
+//        BAC = new BadgerAutonomousController(networkBus);
+//        BAC.TakeOver();
     }
 
     private void onPressExit() {
@@ -441,6 +449,7 @@ public class MainWindow {
             try {
                 networkBus.SendMessage("close");
                 networkBus.End();
+                CommandLineRunner.SetDHCP();
             } catch (Exception e) {
                 e.printStackTrace();
             } finally {

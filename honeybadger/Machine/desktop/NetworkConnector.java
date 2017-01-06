@@ -174,11 +174,13 @@ public class NetworkConnector {
             //Check that it is not followed by something else
             String[] keywords = input.split(" ");
             if (keywords.length > 1) {
-                if (keywords[1].contains("LIST")) {
+                if (keywords[1].toLowerCase().contains("list")) {
                     Set<String> commands = TextCommandMessage.getCommandListName();
                     MainWindow.writeToMessageFeed("Known command that can be called with CMD");
-                    MainWindow.writeToMessageFeed(String.format("   %s", Arrays.toString(commands.toArray())));
-                } else if (keywords[1].contains("HELP")) {
+                    for(String command : commands){
+                        MainWindow.writeToMessageFeed(String.format("   %s",command));
+                    }
+                } else if (keywords[1].toLowerCase().contains("help")) {
                     MainWindow.writeToMessageFeed("Explaining Commands");
                     Collection<IBadgerFunction> functors = TextCommandMessage.getCommandHandlers();
                     for (IBadgerFunction functor : functors) {
@@ -186,7 +188,7 @@ public class NetworkConnector {
                     }
                 } else {
                     MainWindow.writeToMessageFeed(String.format("Sending TextCommandMessage \'%s\'", input.substring(4)));
-                    this.SendMessage(new TextCommandMessage(input.substring(4)));
+                    this.SendMessage(new TextCommandMessage(input.substring(4).trim()));
                 }
             }
         }
