@@ -30,8 +30,10 @@ public class BadgerAutonomousController {
      * Runs the autonomous script that begins sending messages to the RPi
      */
     public void TakeOver(){
+        controllerState.buttons.replace(Utils.Button.START,true);
         moveBadger(0.6,0.6,2000,0.5);
         shootBalls(1.0,3000);
+        controllerState.buttons.replace(Utils.Button.START,false);
     }
 
     public void moveBadger(double first, double second, long time, double rotate){
@@ -190,8 +192,6 @@ public class BadgerAutonomousController {
         controllerState.rightTriggerMagnitude = 0.0;
         controllerState.buttons.replace(Utils.Button.A, false);
         controllerState.buttons.replace(Utils.Button.RBUMPER, false);
-
-
     }
 
 }

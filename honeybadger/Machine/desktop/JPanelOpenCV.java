@@ -425,7 +425,7 @@ public class JPanelOpenCV extends JPanel {
             }
             if(val[1]<250){
             avgTop((int)val[1]);
-            Log(getDistances()+" inches is distance");
+            //Log(getDistances()+" inches is distance");
             }
         }
 
