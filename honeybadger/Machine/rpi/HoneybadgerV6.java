@@ -56,6 +56,8 @@ public class HoneybadgerV6 {
 
     public static float BACKWARDS_COMPENSATION_FACTOR = 1; //(5/3)
 
+    private boolean RotatedControls = false;
+
     /**
      * Makes a new Honeybadger (this is version 6). Guaranteed not to give a shit
      * @throws Exception But honey badger don't give a shit
@@ -127,36 +129,71 @@ public class HoneybadgerV6 {
         sendAckMessageToDesktop(String.format("Moving direction %s - throttle %f",dir,throttle));
 
         //Change to a map with lambdas or something...
-        switch (dir){
-            case 'N':{ //up
-                IsMoving = true;
-                moveForward(throttle);
-                break;
+        if (!RotatedControls) {
+            switch (dir){
+                case 'N':{ //up
+                    IsMoving = true;
+                    moveForward(throttle);
+                    break;
+                }
+                case 'W':{ //left
+                    IsMoving = true;
+                    strafeLeft(throttle);
+                    break;
+                }
+                case 'E':{ //right
+                    IsMoving = true;
+                    strafeRight(throttle);
+                    break;
+                }
+                case 'S':{ //down
+                    IsMoving = true;
+                    moveBackward(throttle);
+                    break;
+                }
+                case 'Z':{ //no dir
+                    moveForward(0);
+                    IsMoving = false;
+                    break;
+                }
+                default:{
+                    sendDebugMessageToDesktop("Movement update not understood!");
+                    IsMoving = false;
+                    break;
+                }
             }
-            case 'W':{ //left
-                IsMoving = true;
-                strafeLeft(throttle);
-                break;
-            }
-            case 'E':{ //right
-                IsMoving = true;
-                strafeRight(throttle);
-                break;
-            }
-            case 'S':{ //down
-                IsMoving = true;
-                moveBackward(throttle);
-                break;
-            }
-            case 'Z':{ //no dir
-                moveForward(0);
-                IsMoving = false;
-                break;
-            }
-            default:{
-                sendDebugMessageToDesktop("Movement update not understood!");
-                IsMoving = false;
-                break;
+        } else {
+            switch (dir){
+                case 'N':{ //up
+                    IsMoving = true;
+                    strafeRight(throttle);
+                    break;
+                }
+                case 'E':{ //right
+                    IsMoving = true;
+                    moveBackward(throttle);
+                    break;
+                }
+                case 'S':{ //down
+                    IsMoving = true;
+                    strafeLeft(throttle);
+                    break;
+                }
+                case 'W':{ //left
+                    IsMoving = true;
+                    moveForward(throttle);
+                    break;
+                }
+                case 'Z':{ //no dir
+                    moveForward(0);
+                    IsMoving = false;
+                    break;
+                }
+                default:{
+                    sendDebugMessageToDesktop("Movement update not understood!");
+                    IsMoving = false;
+                    break;
+                }
             }
         }
     }
@@ -206,9 +243,7 @@ public class HoneybadgerV6 {
         if (buttons.get(Button.B)){
             handleB();
         }
-        if (buttons.get(Button.X)){
-            handleX();
-        }
+        handleX(buttons.get(Button.X));
         if (buttons.get(Button.Y)){
             handleY();
         }
@@ -256,7 +291,8 @@ public class HoneybadgerV6 {
         disarmFlywheel();
     }
 
-    private void handleX(){
+    private void handleX(Boolean isPressed){
+        RotatedControls = isPressed;
     }
 
     private void handleY(){
@@ -518,10 +554,10 @@ public class HoneybadgerV6 {
     }
 
     public void BREAK() {
-        MotorController.setDriveMotorDirection(RPI.DRIVE_FRONT_LEFT, BadgerMotorController.FORWARD);
-        MotorController.setDriveMotorDirection(RPI.DRIVE_BACK_LEFT, BadgerMotorController.FORWARD);
-        MotorController.setDriveMotorDirection(RPI.DRIVE_FRONT_RIGHT, BadgerMotorController.FORWARD);
-        MotorController.setDriveMotorDirection(RPI.DRIVE_BACK_RIGHT, BadgerMotorController.FORWARD);
+        MotorController.setDriveMotorDirection(RPI.DRIVE_FRONT_LEFT, BadgerMotorController.BACKWARD);
+        MotorController.setDriveMotorDirection(RPI.DRIVE_BACK_LEFT, BadgerMotorController.BACKWARD);
+        MotorController.setDriveMotorDirection(RPI.DRIVE_FRONT_RIGHT, BadgerMotorController.BACKWARD);
+        MotorController.setDriveMotorDirection(RPI.DRIVE_BACK_RIGHT, BadgerMotorController.BACKWARD);
 
         MotorController.setDriveMotorSpeed(BadgerPWMProvider.DRIVE_FRONT_LEFT, 0);
         MotorController.setDriveMotorSpeed(BadgerPWMProvider.DRIVE_BACK_LEFT, 0);
