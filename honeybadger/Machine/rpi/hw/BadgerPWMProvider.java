@@ -20,10 +20,10 @@ public class BadgerPWMProvider extends PCA9685GpioProvider{
     public static Pin DRIVE_BACK_LEFT = PCA9685Pin.PWM_02;
     public static Pin DRIVE_BACK_RIGHT = PCA9685Pin.PWM_03;
 
-    public static Pin CONVEYOR_A = PCA9685Pin.PWM_04;
+    public static Pin CONVEYOR_A = PCA9685Pin.PWM_06;
     public static Pin CONVEYOR_B = PCA9685Pin.PWM_05;
 
-    public static Pin VACUUM_ROLLER = PCA9685Pin.PWM_06;
+    public static Pin VACUUM_ROLLER = PCA9685Pin.PWM_04;
 
     public static Pin CLIMBING_MOTOR = PCA9685Pin.PWM_11;
 
@@ -92,6 +92,7 @@ public class BadgerPWMProvider extends PCA9685GpioProvider{
 
         PinNameMap.put("CONVEYOR_A",CONVEYOR_A);
         PinNameMap.put("CONVEYOR_B",CONVEYOR_B);
+        PinNameMap.put("VACUUM_ROLLER",VACUUM_ROLLER);
     }
 
     @Override
