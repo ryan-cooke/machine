@@ -45,7 +45,7 @@ public class JPanelOpenCV extends JPanel {
 
     private static boolean target = false;
     private static boolean blueTarget = false;
-    private static int center = 320;
+    private static int center = 270; //About 50 pixels off center.
 
     private static int topWall=0;
     private static int[]topWallAr = {0,0,0,0,0};
