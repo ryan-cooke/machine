@@ -148,21 +148,49 @@ public class MainDesktop {
                             }
                             mainController.setAutonomousRunning(false);
                         }
-                        else if (keywords[1].contains("STRAFERIGHT")){
+                        //"MVBK 0.5 2000" will move backwards at throttle 0.5 for 2000 ms
+                        else if (keywords[1].contains("MVBK")){
+                            mainController.setAutonomousRunning(true);
+                            if (keywords[2] != null && keywords[3] != null){
+                                auto.goBackwards(StoD(keywords[2]), StoL(keywords[3]));
+                            }
+                            mainController.setAutonomousRunning(false);
+                        }
+                        //"STRR 0.5 2000" will strafe right at throttle 0.5 for 2000 ms
+                        else if (keywords[1].contains("STRR")){
                             mainController.setAutonomousRunning(true);
                             if (keywords[2] != null && keywords[3] != null){
                                 auto.getToCenter(StoD(keywords[2]), StoL(keywords[3]));
                             }
                             mainController.setAutonomousRunning(false);
                         }
-                        //"ROTATELEFT 0.5 2000" will rotate at throttle 0.5 for 2000 ms
-                        //"ROTATELEFT 0.5" will roateLeft at 0.5 throttle till reach opencv blue post
-                        else if (keywords[1].contains("ROTATELEFT")){
+                        //"STRR 0.5 2000" will strafe left at throttle 0.5 for 2000 ms
+                        else if (keywords[1].contains("STRL")){
                             mainController.setAutonomousRunning(true);
                             if (keywords[2] != null && keywords[3] != null){
-                                auto.rotateLeftToPole(StoD(keywords[2]), StoL(keywords[3]));
+                                auto.getToCenter(StoD(keywords[2]), StoL(keywords[3]));
+                            }
+                            mainController.setAutonomousRunning(false);
+                        }
+                        //"ROTL 0.5 2000" will rotate at throttle 0.5 for 2000 ms
+                        //"ROTL 0.5" will roateLeft at 0.5 throttle till reach opencv blue post
+                        else if (keywords[1].contains("ROTL")){
+                            mainController.setAutonomousRunning(true);
+                            if (keywords[2] != null && keywords[3] != null){
+                                auto.rotateLeft(StoD(keywords[2]), StoL(keywords[3]));
                             } else if (keywords[2] != null){
                                 auto.rotateLeftToPole(StoD(keywords[2]));
+                            }
+                            mainController.setAutonomousRunning(false);
+                        }
+                        //"ROTR 0.5 2000" will rotate at throttle 0.5 for 2000 ms
+                        //"ROTR 0.5" will roate right at 0.5 throttle till reach opencv blue post
+                        else if (keywords[1].contains("ROTR")){
+                            mainController.setAutonomousRunning(true);
+                            if (keywords[2] != null && keywords[3] != null){
+                                auto.rotateRight(StoD(keywords[2]), StoL(keywords[3]));
+                            } else if (keywords[2] != null){
+                                auto.rotateRightToPole(StoD(keywords[2]));
                             }
                             mainController.setAutonomousRunning(false);
                         }

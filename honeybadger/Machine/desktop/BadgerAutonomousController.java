@@ -35,7 +35,7 @@ public class BadgerAutonomousController {
     public void moveBadger(double first, long time1, double second, long time2, double rotate, long time3){
         goToOtherSide(first, time1);
         getToCenter(second, time2);
-        rotateLeftToPole(rotate, time3);
+        rotateLeft(rotate, time3);
     }
 
     public void placeBadger(double first, double second, long time, double rotate){
@@ -51,12 +51,19 @@ public class BadgerAutonomousController {
     }
 
     public void goToOtherSide(double throttle, long time){
-        strafeRight(throttle);
+        moveForward(throttle);
         long currentTime = System.currentTimeMillis();
         while(currentTime+time > System.currentTimeMillis());
         clear();
     }
 
+    public void goBackwards(double throttle, long time){
+        moveBackwards(throttle);
+        long currentTime = System.currentTimeMillis();
+        while(currentTime+time > System.currentTimeMillis());
+        clear();
+
+    }
     public void getToCenter(double throttle, long time){
         strafeRight(throttle);
         long currentTime = System.currentTimeMillis();
@@ -70,7 +77,7 @@ public class BadgerAutonomousController {
         clear();
     }
 
-    public void rotateLeftToPole(double throttle, long time){
+    public void rotateLeft(double throttle, long time){
         rotateLeft(throttle);
         long currentTime = System.currentTimeMillis();
         while(currentTime+time > System.currentTimeMillis());
@@ -82,6 +89,12 @@ public class BadgerAutonomousController {
         clear();
     }
 
+    public void rotateRight(double throttle, long time){
+        rotateRight(throttle);
+        long currentTime = System.currentTimeMillis();
+        while(currentTime+time > System.currentTimeMillis());
+        clear();
+    }
     public void shootBalls(double conveyors, double flywheel){
         shootBalls(conveyors, flywheel, 5000);
     }
