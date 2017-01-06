@@ -67,7 +67,7 @@ public class MainWindow {
 
     private MainWindow() {
 
-        CommandLineRunner.SetStaticIP();
+        //CommandLineRunner.SetStaticIP();
 
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         double width = 0.75 * screenSize.getWidth();

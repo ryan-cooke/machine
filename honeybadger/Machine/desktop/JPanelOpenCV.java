@@ -71,7 +71,7 @@ public class JPanelOpenCV extends JPanel {
     }
 
     public static void SetConnectionHost(String host, int port) {
-        ConnectURL = String.format("http://%s:8090/?action=%d", host, port);
+        ConnectURL = String.format("http://%s:%d/?action=stream", host, port);
         ShouldDraw = true;
     }
 
@@ -144,11 +144,6 @@ public class JPanelOpenCV extends JPanel {
         Mat frame = new Mat();
         Mat diffFrame = null;
         camera.read(frame);
-
-        if (!camera.isOpened()) {
-            Log("Error 1 again");
-        }
-
 
         Mat resized = new Mat();
         Size outputSize = new Size(640, 480);
@@ -365,7 +360,6 @@ public class JPanelOpenCV extends JPanel {
             int y = (int) vecCircle[1];
             int r = (int) vecCircle[2];
             Imgproc.circle(out, new Point(x, y), r, new Scalar(0, 0, 255), 10);
-            //System.out.println("x detected as " + x);
         }
 
         return out;
