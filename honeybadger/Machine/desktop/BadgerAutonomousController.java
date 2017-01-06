@@ -29,7 +29,7 @@ public class BadgerAutonomousController {
      * Runs the autonomous script that begins sending messages to the RPi
      */
     public void TakeOver(){
-
+        moveBadger(0.5,0.5,2000,0.5);
     }
 
     public void moveBadger(double first, long time1, double second, long time2, double rotate, long time3){

@@ -24,11 +24,11 @@ public class MainController {
     private final ScheduledExecutorService ScheduledManager;
     private ScheduledFuture<?> ControllerMessageSender;
 
-    public boolean isAutonomousRunning() {
+    synchronized public boolean isAutonomousRunning() {
         return isAutonomousRunning;
     }
 
-    public void setAutonomousRunning(boolean autonomousRunning) {
+    synchronized public void setAutonomousRunning(boolean autonomousRunning) {
         isAutonomousRunning = autonomousRunning;
     }
 

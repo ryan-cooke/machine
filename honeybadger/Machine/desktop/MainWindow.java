@@ -125,6 +125,8 @@ public class MainWindow {
                 Prompt.setText(promptChar);
 
                 inputHistory.add(input);
+                //TODO: Add autonomous phase command here
+
                 if (singleton.networkBus != null) {
                     boolean messageSuccess = singleton.networkBus.HandleMessage(input);
                     if (!messageSuccess) {
@@ -315,6 +317,13 @@ public class MainWindow {
 
     private void onPressStop() {
         if (singleton.networkBus != null) {
+            if(Controller.isAutonomousRunning()){
+                Controller.setAutonomousRunning(false);
+            }
+            if(autonomousThread!=null){
+                autonomousThread.stop();
+            }
+
             boolean messageSuccess = singleton.networkBus.HandleMessage("CMD stop");
             if (!messageSuccess) {
                 resetConnection();
@@ -431,12 +440,19 @@ public class MainWindow {
     }
 
     private void onPressStartAutonomous() {
-//        if(BAC!=null){
-//            return;
-//        }
-//
-//        BAC = new BadgerAutonomousController(networkBus);
-//        BAC.TakeOver();
+        if(autonomousThread==null){
+            Log("Autonomous controller is already running!");
+            return;
+        }
+        autonomousThread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                Controller.setAutonomousRunning(true);
+                Controller.getAutonomousController().TakeOver();
+                Controller.setAutonomousRunning(false);
+            }
+        });
+        autonomousThread.start();
     }
 
     private void onPressExit() {
