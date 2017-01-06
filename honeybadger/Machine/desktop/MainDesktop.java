@@ -95,10 +95,10 @@ public class MainDesktop {
                         else if (keywords[1].contains("MOVE")){
                             mainController.setAutonomousRunning(true);
                             if (keywords[2] != null){
-                                auto.placeBadger(StoD(keywords[2]),StoD(keywords[3]),
+                                auto.moveBadger(StoD(keywords[2]),StoD(keywords[3]),
                                         StoL(keywords[4]),StoD(keywords[5]));
                             } else{
-                                auto.placeBadger(0.5,0.5,2000,0.5);
+                                auto.moveBadger(0.5,0.5,2000,0.5);
                             }
                             mainController.setAutonomousRunning(false);
                         }

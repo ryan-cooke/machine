@@ -38,7 +38,7 @@ public class BadgerAutonomousController {
         rotateLeft(rotate, time3);
     }
 
-    public void placeBadger(double first, double second, long time, double rotate){
+    public void moveBadger(double first, double second, long time, double rotate){
         goForward(first);
         strafeRight(second, time);
         rotateLeftToPole(rotate);
