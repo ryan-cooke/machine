@@ -389,8 +389,8 @@ public class HoneybadgerV6 {
 
         if(FlywheelIsReady) {
             sendAckMessageToDesktop(String.format("Flywheel speed A:%f B:%f",FlywheelThrottleA,FlywheelThrottleB));
-            MotorController.setPWM(BadgerPWMProvider.FLYWHEEL_A, FlywheelThrottleA);
-            MotorController.setPWM(BadgerPWMProvider.FLYWHEEL_B, FlywheelThrottleB);
+            MotorController.setPWM(BadgerPWMProvider.FLYWHEEL_A, FlywheelThrottleA); //THIS IS THE LOWER ONE!!!!
+//            MotorController.setPWM(BadgerPWMProvider.FLYWHEEL_B, FlywheelThrottleB); //THis is the upper one
         }
     }
 
