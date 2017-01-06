@@ -583,4 +583,27 @@ public class CMD {
             return 1;
         }
     }
+
+    public static class setSpinCorrection extends CheckedFunction {
+
+        @Override
+        public String Explain() {
+            return "\'CMD setSpinCorrection <Correction Value>\'";
+        }
+
+        @Override
+        public int MinimumParameterNum() {
+            return 1;
+        }
+
+        public boolean Invoke(HoneybadgerV6 badger, String[] params){
+            if(!super.Invoke(badger,params)){
+                return false;
+            }
+
+            float newCorrectionFactor = Float.parseFloat(params[0]);
+            HoneybadgerV6.BACKWARDS_COMPENSATION_FACTOR = newCorrectionFactor;
+            return true;
+        }
+    }
 }
