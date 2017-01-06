@@ -33,24 +33,24 @@ public class BadgerAutonomousController {
     }
 
     public void moveBadger(double first, long time1, double second, long time2, double rotate, long time3){
-        goToOtherSide(first, time1);
-        getToCenter(second, time2);
+        goForward(first, time1);
+        strafeRight(second, time2);
         rotateLeft(rotate, time3);
     }
 
     public void placeBadger(double first, double second, long time, double rotate){
-        goToOtherSide(first);
-        getToCenter(second, time);
+        goForward(first);
+        strafeRight(second, time);
         rotateLeftToPole(rotate);
     }
 
-    public void goToOtherSide(double throttle){
+    public void goForward(double throttle){
         moveForward(throttle);
         while(!JPanelOpenCV.isTgReached());
         clear();
     }
 
-    public void goToOtherSide(double throttle, long time){
+    public void goForward(double throttle, long time){
         moveForward(throttle);
         long currentTime = System.currentTimeMillis();
         while(currentTime+time > System.currentTimeMillis());
@@ -64,8 +64,15 @@ public class BadgerAutonomousController {
         clear();
 
     }
-    public void getToCenter(double throttle, long time){
+    public void strafeRight(double throttle, long time){
         strafeRight(throttle);
+        long currentTime = System.currentTimeMillis();
+        while(currentTime+time > System.currentTimeMillis());
+        clear();
+    }
+
+    public void strafeLeft(double throttle, long time){
+        strafeLeft(throttle);
         long currentTime = System.currentTimeMillis();
         while(currentTime+time > System.currentTimeMillis());
         clear();

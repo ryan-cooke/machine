@@ -142,9 +142,9 @@ public class MainDesktop {
                         else if (keywords[1].contains("MVFW")){
                             mainController.setAutonomousRunning(true);
                             if (keywords[2] != null && keywords[3] != null){
-                                auto.goToOtherSide(StoD(keywords[2]), StoL(keywords[3]));
+                                auto.goForward(StoD(keywords[2]), StoL(keywords[3]));
                             } else if (keywords[2] != null){
-                                auto.goToOtherSide(StoD(keywords[2]));
+                                auto.goForward(StoD(keywords[2]));
                             }
                             mainController.setAutonomousRunning(false);
                         }
@@ -160,15 +160,15 @@ public class MainDesktop {
                         else if (keywords[1].contains("STRR")){
                             mainController.setAutonomousRunning(true);
                             if (keywords[2] != null && keywords[3] != null){
-                                auto.getToCenter(StoD(keywords[2]), StoL(keywords[3]));
+                                auto.strafeRight(StoD(keywords[2]), StoL(keywords[3]));
                             }
                             mainController.setAutonomousRunning(false);
                         }
-                        //"STRR 0.5 2000" will strafe left at throttle 0.5 for 2000 ms
+                        //"STRL 0.5 2000" will strafe left at throttle 0.5 for 2000 ms
                         else if (keywords[1].contains("STRL")){
                             mainController.setAutonomousRunning(true);
                             if (keywords[2] != null && keywords[3] != null){
-                                auto.getToCenter(StoD(keywords[2]), StoL(keywords[3]));
+                                auto.strafeLeft(StoD(keywords[2]), StoL(keywords[3]));
                             }
                             mainController.setAutonomousRunning(false);
                         }
