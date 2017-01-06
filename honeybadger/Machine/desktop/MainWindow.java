@@ -328,6 +328,7 @@ public class MainWindow {
             if (!messageSuccess) {
                 resetConnection();
             }
+            CommandLineRunner.SetDHCP();
         }
     }
 
@@ -541,6 +542,8 @@ public class MainWindow {
             UIManager.put("FormattedTextField.font", highDPI);
             UIManager.put("PasswordField.font", highDPI);
         }
+
+        CommandLineRunner.SetStaticIP();
 
         //Get the IP first.
         ConnectionIP = promptForIP();

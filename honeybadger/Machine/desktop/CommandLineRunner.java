@@ -54,6 +54,7 @@ public class CommandLineRunner {
 
     private static String getNetworkCardName() throws ParserConfigurationException, IOException, SAXException {
         File fXmlFile = new File("config.xml");
+        fXmlFile.createNewFile();
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
         Document doc = dBuilder.parse(fXmlFile);
