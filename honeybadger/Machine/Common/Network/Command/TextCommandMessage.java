@@ -64,12 +64,12 @@ public class TextCommandMessage extends BaseMsg {
 
             String message = success?
                     String.format("Call to %s successful",command[0])
-                    : String.format("Error calling %s",command[0]);
+                    : String.format("Error calling \'%s\'",command[0]);
 
             badger.sendDebugMessageToDesktop(message);
         }catch (Exception e){
             e.printStackTrace();
-            badger.sendCriticalMessageToDesktop(String.format("Error invoking %s",payload),e);
+            badger.sendCriticalMessageToDesktop(String.format("Error invoking \'%s\'",payload),e);
         }
     }
 

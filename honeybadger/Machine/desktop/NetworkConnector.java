@@ -188,7 +188,7 @@ public class NetworkConnector {
                     }
                 } else {
                     MainWindow.writeToMessageFeed(String.format("Sending TextCommandMessage \'%s\'", input.substring(4)));
-                    this.SendMessage(new TextCommandMessage(input.substring(4)));
+                    this.SendMessage(new TextCommandMessage(input.substring(4).trim()));
                 }
             }
         }

@@ -10,6 +10,7 @@ import Machine.rpi.hw.BadgerPWMProvider;
 import Machine.rpi.hw.RPI;
 import Machine.Common.Utils.Button;
 
+import com.pi4j.component.motor.Motor;
 import com.pi4j.io.gpio.Pin;
 
 import java.util.HashMap;
@@ -67,10 +68,10 @@ public class HoneybadgerV6 {
 
         FlywheelThrottleA = 0.f;
         FlywheelThrottleB = 0.f;
-        FlywheelCannonAngle = 0;//TODO: SET FROM SERVO when arming flywheel
+        FlywheelCannonAngle = 0;
         FlywheelIsReady = false;
 
-        Log("Made the BadgerV6");
+        Log("Made the Badger V6.");
     }
 
     public BadgerNetworkServer getNetworkServer(){
@@ -226,6 +227,7 @@ public class HoneybadgerV6 {
         }
         if(!buttons.get(Button.RBUMPER) && !buttons.get(Button.LBUMPER)){
             setConveyor(1,0);
+            stopVacuumRoller();
         }
 
         if (buttons.get(Button.RTHUMB)){
@@ -249,11 +251,11 @@ public class HoneybadgerV6 {
     }
 
     private void handleA(){
-        //TODO:
+        armFlywheel();
     }
 
     private void handleB(){
-        //TODO:
+        disarmFlywheel();
     }
 
     private void handleX(){
@@ -274,10 +276,12 @@ public class HoneybadgerV6 {
 
     private void handleRBumper(){
         setConveyor(BadgerMotorController.FORWARD,100.f);
+        startVacuumRoller();
     }
 
     private void handleLBumper(){
         setConveyor(BadgerMotorController.BACKWARD,60.f);
+        stopVacuumRoller();
     }
 
     private void handleRThumb(){
@@ -528,6 +532,15 @@ public class HoneybadgerV6 {
 
         MotorController.setDriveMotorSpeed(BadgerPWMProvider.CONVEYOR_A,throttle);
         MotorController.setDriveMotorSpeed(BadgerPWMProvider.CONVEYOR_B,throttle);
+    }
+
+    public void startVacuumRoller(){
+        MotorController.setDriveMotorDirection(RPI.VACUUM_ROLLER,BadgerMotorController.FORWARD);
+        MotorController.setDriveMotorSpeed(BadgerPWMProvider.VACUUM_ROLLER,100.f);
+    }
+
+    public void stopVacuumRoller(){
+        MotorController.setDriveMotorSpeed(BadgerPWMProvider.VACUUM_ROLLER,0.f);
     }
 
     /**

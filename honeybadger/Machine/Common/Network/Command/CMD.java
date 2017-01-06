@@ -475,10 +475,14 @@ public class CMD {
             try {
                 Field floatField = badger.getClass().getDeclaredField(field);
                 floatField.setAccessible(true);
+                Object oldVal = floatField.get(badger);
                 floatField.set(badger,value);
-
+                badger.sendAckMessageToDesktop(
+                        String.format("Successfully updated %s from %f to %f",
+                                floatField.getName(),oldVal,value));
                 success = true;
             }catch (Exception e){
+                badger.sendAckMessageToDesktop(String.format("Unable to update %s",field));
                 success = false;
             }
 
@@ -493,6 +497,90 @@ public class CMD {
         @Override
         public int MinimumParameterNum() {
             return 2;
+        }
+    }
+
+    public static class useRoller extends CheckedFunction{
+        @Override
+        public boolean Invoke(HoneybadgerV6 badger, String[] params) {
+            if(!super.Invoke(badger,params)){
+                return false;
+            }
+
+            int val = Integer.parseInt(params[0]);
+            if(val!=1&&val!=0){
+                return false;
+            }
+
+            if(val==1){
+                badger.startVacuumRoller();
+            }else if(val==0){
+                badger.stopVacuumRoller();
+            }
+
+            return true;
+        }
+
+        @Override
+        public String Explain() {
+            return "\'CMD useRoller <1 || 0>\'";
+        }
+
+        @Override
+        public int MinimumParameterNum() {
+            return 1;
+        }
+    }
+
+    public static class adjustFlywheel extends CheckedFunction{
+        public boolean Invoke(HoneybadgerV6 badger, String[] params) {
+            if(!super.Invoke(badger,params)){
+                return false;
+            }
+
+            float newFlywheelALimit = Float.parseFloat(params[0]);
+            float newFlywheelBLimit = Float.parseFloat(params[1]);
+
+
+
+            HoneybadgerV6.MaxFlywheelPowerA = newFlywheelALimit;
+            HoneybadgerV6.MaxFlywheelPowerB = newFlywheelBLimit;
+
+            return true;
+        }
+
+        @Override
+        public String Explain() {
+            return "\'CMD adjustFlywheelMax <Flywheel A limit> <Flywheel B limit>\'";
+        }
+
+        @Override
+        public int MinimumParameterNum() {
+            return 1;
+        }
+    }
+
+    public static class getFlywheelValues extends CheckedFunction{
+        public boolean Invoke(HoneybadgerV6 badger, String[] params) {
+            if(!super.Invoke(badger,params)){
+                return false;
+            }
+
+            StringBuffer buffer = new StringBuffer();
+            buffer.append(String.format("Flywheel A max = %f\n",HoneybadgerV6.MaxFlywheelPowerA));
+            buffer.append(String.format("Flywheel B max = %f\n",HoneybadgerV6.MaxFlywheelPowerB));
+
+            return true;
+        }
+
+        @Override
+        public String Explain() {
+            return "\'CMD adjustFlywheelMax <Flywheel A limit> <Flywheel B limit>\'";
+        }
+
+        @Override
+        public int MinimumParameterNum() {
+            return 1;
         }
     }
 }
