@@ -15,6 +15,7 @@ import com.pi4j.io.gpio.Pin;
 
 import java.util.HashMap;
 
+import static Machine.Common.Utils.Clamp;
 import static Machine.Common.Utils.ErrorLog;
 import static Machine.Common.Utils.Log;
 
@@ -171,7 +172,7 @@ public class HoneybadgerV6 {
         if( !IsMoving){
             switch (dir){
                 case 'N':{
-                    raiseShootingAngle();
+                    raiseShootingAngle(throttle);
                     break;
                 }
                 case 'W':{
@@ -183,7 +184,7 @@ public class HoneybadgerV6 {
                     break;
                 }
                 case 'S':{
-                    lowerShootingAngle();
+                    lowerShootingAngle(throttle);
                     break;
                 }
                 case 'Z':{
@@ -217,8 +218,6 @@ public class HoneybadgerV6 {
         if (buttons.get(Button.START)){
             handleStart();
         }
-
-
         if (buttons.get(Button.RBUMPER)){
             handleRBumper();
         }
@@ -229,7 +228,6 @@ public class HoneybadgerV6 {
             setConveyor(1,0);
             stopVacuumRoller();
         }
-
         if (buttons.get(Button.RTHUMB)){
             handleRThumb();
         }
@@ -293,20 +291,19 @@ public class HoneybadgerV6 {
     }
 
     private void handleNDPad(){
-        setConveyor(BadgerMotorController.FORWARD,100.f);
+        setConveyor(BadgerMotorController.BACKWARD,60.f);
     }
 
     private void handleEDPad(){
-
+        stopVacuumRoller();
     }
 
     private void handleWDPad(){
-
+        startVacuumRoller();
     }
 
     private void handleSDPad() {
-        //@foxtrot94: if we're not moving forward, we should go slower
-        setConveyor(BadgerMotorController.BACKWARD,60.f);
+        setConveyor(BadgerMotorController.FORWARD,100.f);
     }
 
 
@@ -481,14 +478,25 @@ public class HoneybadgerV6 {
         MotorController.setDriveMotorSpeed(BadgerPWMProvider.DRIVE_BACK_RIGHT, throttle);
     }
 
-    private void raiseShootingAngle(){
-        FlywheelCannonAngle+=1;
-        MotorController.setServoPosition(BadgerMotorController.FLYWHEEL_SERVO_ID,FlywheelCannonAngle);
+    private void raiseShootingAngle(float throttle){
+        if(FlywheelCannonAngle < BadgerMotorController.FLYWHEEL_ANGLE_HIGHEST) {
+            FlywheelCannonAngle += Utils.Clamp((10*throttle), 0, 10);
+
+            if(FlywheelCannonAngle > BadgerMotorController.FLYWHEEL_ANGLE_HIGHEST){
+                FlywheelCannonAngle = BadgerMotorController.FLYWHEEL_ANGLE_HIGHEST;
+            }
+            MotorController.setServoPosition(BadgerMotorController.FLYWHEEL_SERVO_ID, FlywheelCannonAngle);
+        }
     }
 
-    private void lowerShootingAngle(){
-        FlywheelCannonAngle-=1;
-        MotorController.setServoPosition(BadgerMotorController.FLYWHEEL_SERVO_ID,FlywheelCannonAngle);
+    private void lowerShootingAngle(float throttle){
+        if(FlywheelCannonAngle > BadgerMotorController.FLYWHEEL_ANGLE_LOWEST) {
+            FlywheelCannonAngle -= Utils.Clamp((10*throttle), 0, 10);
+            if(FlywheelCannonAngle < BadgerMotorController.FLYWHEEL_ANGLE_LOWEST){
+                FlywheelCannonAngle = BadgerMotorController.FLYWHEEL_ANGLE_LOWEST;
+            }
+            MotorController.setServoPosition(BadgerMotorController.FLYWHEEL_SERVO_ID, FlywheelCannonAngle);
+        }
     }
 
     /**
