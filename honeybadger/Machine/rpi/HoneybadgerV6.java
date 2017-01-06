@@ -68,7 +68,7 @@ public class HoneybadgerV6 {
 
         FlywheelThrottleA = 0.f;
         FlywheelThrottleB = 0.f;
-        FlywheelCannonAngle = 0;
+        FlywheelCannonAngle = BadgerMotorController.FLYWHEEL_ANGLE_LOWEST;
         FlywheelIsReady = false;
 
         Log("Made the Badger V6.");

@@ -560,7 +560,7 @@ public class CMD {
         }
     }
 
-    public static class getFlywheelValues extends CheckedFunction{
+    public static class flywheelValues extends CheckedFunction{
         public boolean Invoke(HoneybadgerV6 badger, String[] params) {
             if(!super.Invoke(badger,params)){
                 return false;
@@ -569,18 +569,19 @@ public class CMD {
             StringBuffer buffer = new StringBuffer();
             buffer.append(String.format("Flywheel A max = %f\n",HoneybadgerV6.MaxFlywheelPowerA));
             buffer.append(String.format("Flywheel B max = %f\n",HoneybadgerV6.MaxFlywheelPowerB));
+            badger.sendAckMessageToDesktop(buffer.toString());
 
             return true;
         }
 
         @Override
         public String Explain() {
-            return "\'CMD adjustFlywheelMax <Flywheel A limit> <Flywheel B limit>\'";
+            return "\'CMD flywheelValues\'";
         }
 
         @Override
         public int MinimumParameterNum() {
-            return 1;
+            return 0;
         }
     }
 }
