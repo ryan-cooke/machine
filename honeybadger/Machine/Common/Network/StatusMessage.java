@@ -24,7 +24,7 @@ public class StatusMessage extends BaseMsg{
     }
 
     public void appendDeviceStatus(HoneybadgerV6 badger){
-        //TODO?
+        //Maybe someday kid, maybe someday
     }
 
     public void Execute(Object context){

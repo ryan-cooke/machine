@@ -37,7 +37,7 @@ public class Shell {
             StringBuffer buffer = new StringBuffer();
             BufferedReader reader = new BufferedReader(new InputStreamReader(latestProcess.getInputStream()));
 
-            //TODO: FIX! timeouts aren't working :/
+            // FIX! timeouts aren't working :/
             boolean completedNormally = latestProcess.waitFor(latestTimeout, TimeUnit.MILLISECONDS);
 
             String line;

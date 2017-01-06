@@ -565,7 +565,7 @@ public class HoneybadgerV6 {
      */
     public void sendDebugMessageToDesktop(String msg){
         StatusMessage message = new StatusMessage(msg);
-        message.appendDeviceStatus(this);
+//        message.appendDeviceStatus(this);
 
         NetworkServer.SendMessage(message);
     }
