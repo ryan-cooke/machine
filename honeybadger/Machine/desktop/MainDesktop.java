@@ -52,7 +52,7 @@ public class MainDesktop {
         //CommandLineRunner.SetStaticIP();
 
         do {
-            String IP = "192.168.0.1";
+            String IP = "192.168.0.69";
             Log(String.format("Enter RPi IP (Default %s): ", IP));
             String input = Kb.nextLine();
             if (!input.isEmpty()) {

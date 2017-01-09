@@ -441,7 +441,7 @@ public class MainWindow {
     }
 
     private void onPressStartAutonomous() {
-        if(autonomousThread==null){
+        if(autonomousThread!=null){
             Log("Autonomous controller is already running!");
             return;
         }
@@ -451,6 +451,7 @@ public class MainWindow {
                 Controller.setAutonomousRunning(true);
                 Controller.getAutonomousController().TakeOver();
                 Controller.setAutonomousRunning(false);
+                autonomousThread = null;
             }
         });
         autonomousThread.start();
@@ -509,7 +510,7 @@ public class MainWindow {
     public static String promptForIP() {
         String ConnectionIP = JOptionPane.showInputDialog(
                 "Honeybadger IP: ",
-                "192.168.0.1");
+                "192.168.0.69");
 
         if (ConnectionIP == null) {
             JOptionPane.showMessageDialog(null,

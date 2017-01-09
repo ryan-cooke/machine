@@ -31,8 +31,9 @@ public class BadgerAutonomousController {
      */
     public void TakeOver(){
         controllerState.buttons.replace(Utils.Button.START,true);
-        moveBadger(0.6,0.6,2000,0.5);
-        shootBalls(1.0,3000);
+        moveBadger(0.5,3000,0.5,2000,0.5,2000);
+//        moveBadger(0.6,0.6,2000,0.5);
+        //shootBalls(1.0,3000);
         controllerState.buttons.replace(Utils.Button.START,false);
     }
 
@@ -44,10 +45,10 @@ public class BadgerAutonomousController {
     }
 
     public void moveBadger(double first, long time1, double second, long time2, double rotate, long time3){
-        strafeLeft(0.5, 1000);
+        //strafeLeft(0.5, 1000);
         goForward(first, time1);
         strafeRight(second, time2);
-        rotateLeft(rotate, time3);
+        //rotateLeft(rotate, time3);
     }
 
     public void goForward(double throttle){
